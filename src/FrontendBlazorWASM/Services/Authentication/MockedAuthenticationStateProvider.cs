@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-namespace FrontendBlazorWASM.Services.Authentication;
+namespace Planity.FrontendBlazorWASM.Services.Authentication;
 
 public class MockedAuthenticationStateProvider : AuthenticationStateProvider
 {

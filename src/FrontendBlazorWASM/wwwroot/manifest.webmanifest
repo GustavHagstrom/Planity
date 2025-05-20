@@ -1,6 +1,6 @@
 {
-  "name": "FrontendBlazorWASM",
-  "short_name": "FrontendBlazorWASM",
+  "name": "Planity.FrontendBlazorWASM",
+  "short_name": "Planity.FrontendBlazorWASM",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
