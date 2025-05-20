@@ -1,0 +1,24 @@
+﻿@using FrontendBlazorWASM.Services.Authentication
+
+@inject IAuthService AuthService
+
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity?.Name!
+        <button class="nav-link btn btn-link" @onclick="LogOutAsync">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <button class="nav-link btn btn-link" @onclick="LoginAsync">Log in</button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    public Task LogOutAsync()
+    {
+        return AuthService.LogoutAsync();
+    }
+    public Task LoginAsync()
+    {
+        return AuthService.LoginAsync();
+    }
+}
