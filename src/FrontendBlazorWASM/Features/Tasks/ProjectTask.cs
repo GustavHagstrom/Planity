@@ -1,4 +1,4 @@
-﻿namespace Planity.FrontendBlazorWASM.Models;
+﻿namespace Planity.FrontendBlazorWASM.Features.Tasks;
 
 public class ProjectTask
 {

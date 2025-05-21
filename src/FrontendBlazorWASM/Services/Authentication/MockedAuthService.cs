@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Planity.FrontendBlazorWASM.Services.Authentication;
 
-public class MockedAuthService(AuthenticationStateProvider authStateProvider, NavigationManager navigationManager) : IAuthService
+public class MockedAuthService(AuthenticationStateProvider authStateProvider) : IAuthService
 {
     public async Task<string> GetOrganizationIdAsync()
     {
