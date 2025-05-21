@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-namespace Planity.FrontendBlazorWASM.Services.Authentication;
+namespace Planity.FrontendBlazorWASM.Features.Authentication;
 
 public class MockedAuthenticationStateProvider : AuthenticationStateProvider
 {
@@ -17,7 +17,7 @@ public class MockedAuthenticationStateProvider : AuthenticationStateProvider
         }, "mock"));
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        if(_isLoggedIn)
+        if (_isLoggedIn)
         {
             return Task.FromResult(new AuthenticationState(_user));
         }

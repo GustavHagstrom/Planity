@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace Planity.FrontendBlazorWASM.Services.Authentication;
+namespace Planity.FrontendBlazorWASM.Features.Authentication;
 
 public class MockedAuthService(AuthenticationStateProvider authStateProvider) : IAuthService
 {
@@ -27,7 +27,7 @@ public class MockedAuthService(AuthenticationStateProvider authStateProvider) : 
     }
     public Task LoginAsync()
     {
-        if(authStateProvider is MockedAuthenticationStateProvider mockedAuthStateProvider)
+        if (authStateProvider is MockedAuthenticationStateProvider mockedAuthStateProvider)
         {
             mockedAuthStateProvider.SignIn();
         }
