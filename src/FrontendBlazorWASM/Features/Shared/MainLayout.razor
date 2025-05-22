@@ -1,4 +1,12 @@
 ﻿@inherits LayoutComponentBase
-<LoginDisplay />
 
-@Body
+<MudLayout>
+    <MudAppBar Dense="true" Gutters="false">
+        <LoginDisplay />
+    </MudAppBar>
+    
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
