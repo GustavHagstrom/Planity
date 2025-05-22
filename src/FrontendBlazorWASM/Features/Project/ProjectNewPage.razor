@@ -1,6 +1,29 @@
 ﻿@page "/projects/new"
-<h3>ProjectNewPage</h3>
+@inject NavigationManager NavigationManager
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Nytt projekt</MudText>
+
+    <MudTextField Label="Projektnamn" @bind-Value="Project.Name" />
+    <MudTextField Label="Beskrivning" @bind-Value="Project.Description" />
+    @* <MudDatePicker Label="Startdatum" @bind-Date="Project.StartDate" />
+    <MudDatePicker Label="Slutdatum" @bind-Date="Project.EndDate" /> *@
+    <MudSelect T="ProjectStatus" Label="Status" @bind-Value="Project.Status">
+        @foreach (var status in Enum.GetValues<ProjectStatus>())
+        {
+            <MudSelectItem Value="@status">@status</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudButton Color="Color.Primary" OnClick="SaveProject">Spara</MudButton>
+</MudPaper>
 
 @code {
+    private Project Project = new();
 
+    private void SaveProject()
+    {
+        // TODO: spara till service
+        NavigationManager.NavigateTo("/projects");
+    }
 }

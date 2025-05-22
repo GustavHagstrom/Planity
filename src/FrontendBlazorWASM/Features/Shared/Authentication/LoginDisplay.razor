@@ -2,11 +2,13 @@
 
 <AuthorizeView>
     <Authorized>
-        Hello, @context.User.Identity?.Name!
-        <button class="nav-link btn btn-link" @onclick="LogOutAsync">Log out</button>
+        <div class="pr-3">
+            Hello, @context.User.Identity?.Name!
+        </div>
+        <MudButton Variant="Variant.Filled" @onclick="LogOutAsync" Style="color: var(--mud-palette-primary-text)">Log out</MudButton>
     </Authorized>
     <NotAuthorized>
-        <button class="nav-link btn btn-link" @onclick="LoginAsync">Log in</button>
+        <MudButton Variant="Variant.Text" Color="Color.Surface" IconColor="Color.Error" @onclick="LoginAsync" Style="color: var(--mud-palette-primary-text)">Log in</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 

@@ -1,12 +1,15 @@
 ﻿@inherits LayoutComponentBase
-
+@attribute [Authorize]
 <MudLayout>
+
     <MudAppBar Dense="true" Gutters="false">
+        <a href="@Routes.Dashboard"><MudText Typo="Typo.h4" Style="color: var(--mud-palette-primary-text)">Planity</MudText></a>
+        <MudSpacer />
         <LoginDisplay />
     </MudAppBar>
-    
+
     <MudMainContent>
         @Body
     </MudMainContent>
-</MudLayout>
 
+</MudLayout>

@@ -1,6 +1,50 @@
 ﻿@page "/projects/{id}"
-<h3>ProjectDetails</h3>
+@using Planity.FrontendBlazorWASM.Features.Tasks
+@inject NavigationManager NavigationManager
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Projektinformation</MudText>
+
+    <MudTextField Label="Projektnamn" @bind-Value="Project.Name" />
+    <MudTextField Label="Beskrivning" @bind-Value="Project.Description" />
+@*     <MudDatePicker Label="Startdatum" @bind-Date="Project.StartDate" />
+    <MudDatePicker Label="Slutdatum" @bind-Date="Project.EndDate" /> *@
+    <MudSelect T="ProjectStatus" Label="Status" @bind-Value="Project.Status">
+        @foreach (var status in Enum.GetValues<ProjectStatus>())
+        {
+            <MudSelectItem Value="@status">@status</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudDivider Class="my-4" />
+
+    <MudText Typo="Typo.h6">Uppgifter</MudText>
+    <MudList T="ProjectTask" >
+        @foreach (var task in Project.Tasks)
+        {
+            <MudListItem>
+                <MudTextField T="string">@task.Name</MudTextField>
+                <MudChip Color="Color.Info">@task.Status</MudChip>
+            </MudListItem>
+        }
+    </MudList>
+
+    <MudButton Color="Color.Primary" OnClick="SaveProject">Spara ändringar</MudButton>
+</MudPaper>
 
 @code {
-    [Parameter] public string Id { get; set; } = string.Empty;
+    [Parameter] public string? Id { get; set; }
+
+    private Project Project = new(); // TODO: ladda från service
+
+    protected override void OnInitialized()
+    {
+        // TODO: hämta baserat på ProjectId
+    }
+
+    private void SaveProject()
+    {
+        // TODO: uppdatera projekt
+        NavigationManager.NavigateTo("/projects");
+    }
 }

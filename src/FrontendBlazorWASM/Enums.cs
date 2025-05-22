@@ -1,5 +1,17 @@
 ﻿namespace Planity.FrontendBlazorWASM;
 
-public enum ProjectStatus { NotStarted, InProgress, Completed, OnHold }
-public enum TaskStatus { ToDo, InProgress, Done, Blocked }
+public enum ProjectStatus 
+{ 
+    NotStarted, 
+    InProgress, 
+    Completed, 
+    OnHold 
+}
+public enum TaskStatus 
+{ 
+    NotStarted, 
+    InProgress, 
+    Completed, 
+    Blocked 
+}
 

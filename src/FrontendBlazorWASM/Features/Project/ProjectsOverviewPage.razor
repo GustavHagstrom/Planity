@@ -1,7 +1,38 @@
 ﻿@page "/projects"
+@inject NavigationManager NavigationManager
 
-<h3>ProjecstPage</h3>
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Projektöversikt</MudText>
+
+    <MudButton Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/projects/new"))" StartIcon="@Icons.Material.Filled.Add">
+        Skapa nytt projekt
+    </MudButton>
+
+    <MudTable Items="@Projects" Hover="true">
+        <HeaderContent>
+            <MudTh>Namn</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Start</MudTh>
+            <MudTh>Slut</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Status</MudTd>
+            <MudTd>@context.StartDate.ToShortDateString()</MudTd>
+            <MudTd>@context.EndDate.ToShortDateString()</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary"
+                               OnClick="@(() => NavigationManager.NavigateTo($"/projects/{context.Id}"))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
 
 @code {
-
+    private List<Project> Projects = new()
+    {
+        new Project { Id = Guid.NewGuid(), Name = "Villa Ängsviken", StartDate = DateTime.Today, EndDate = DateTime.Today.AddMonths(6), Status = ProjectStatus.NotStarted },
+        new Project { Id = Guid.NewGuid(), Name = "Parhus Björkbacken", StartDate = DateTime.Today.AddDays(-30), EndDate = DateTime.Today.AddMonths(4), Status = ProjectStatus.InProgress }
+    };
 }

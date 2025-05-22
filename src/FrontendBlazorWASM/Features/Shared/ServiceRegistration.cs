@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
-using Planity.FrontendBlazorWASM.Features.Authentication;
+using Planity.FrontendBlazorWASM.Features.Shared.Authentication;
 
 namespace Planity.FrontendBlazorWASM.Features.Shared;
 

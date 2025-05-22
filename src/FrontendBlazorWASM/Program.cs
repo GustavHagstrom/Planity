@@ -13,6 +13,11 @@ builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
 });
+builder.Services.AddAuthorizationCore(options =>
+{
+    //options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    //options.AddPolicy("User", policy => policy.RequireRole("User"));
+});
 builder.Services.AddMudServices();
 builder.Services.AddFeatureServices();
 

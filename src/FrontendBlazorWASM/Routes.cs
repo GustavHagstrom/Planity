@@ -9,6 +9,7 @@ public static class Routes
     public const string ProjectsOverview = "/projects";
     public const string ProjecstNew = "projects/new";
     public static string ProjectDetails(string id) => $"/projects/{id}";
+    public const string Unauthorized = "/unauthorized";
 
     public static string[] AllRoutes =>
     [
@@ -16,6 +17,7 @@ public static class Routes
         Settings,
         ProjectsOverview,
         ProjecstNew,
-        ProjectDetails("SampleId")
+        ProjectDetails("SampleId"),
+        Unauthorized
     ];
 }

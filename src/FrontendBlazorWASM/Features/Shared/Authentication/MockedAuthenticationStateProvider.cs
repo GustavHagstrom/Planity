@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-namespace Planity.FrontendBlazorWASM.Features.Authentication;
+namespace Planity.FrontendBlazorWASM.Features.Shared.Authentication;
 
 public class MockedAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private bool _isLoggedIn = true;
+    private bool _isLoggedIn = false;
     private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
     private ClaimsPrincipal _user = new ClaimsPrincipal(new ClaimsIdentity(
         new[]
