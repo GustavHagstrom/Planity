@@ -1,11 +1,30 @@
 ﻿@page "/unauthorized"
 @layout EmptyLayout
-
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
 
 <h3>UnAuthorizedPage</h3>
+
+
+<AuthorizeView>
+    <Authorized>
+        @{
+            NavigationManager.NavigateTo(Routes.Dashboard);
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        <MudButton Variant="Variant.Filled" @onclick="LoginAsync" Style="color: var(--mud-palette-primary-text)">Log in</MudButton>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 
 
 @code {
 
+    public Task LoginAsync()
+    {
+        return AuthService.LoginAsync(true);
+    }
 }

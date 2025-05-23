@@ -8,7 +8,7 @@
         <MudButton Variant="Variant.Filled" @onclick="LogOutAsync" Style="color: var(--mud-palette-primary-text)">Log out</MudButton>
     </Authorized>
     <NotAuthorized>
-        <MudButton Variant="Variant.Text" Color="Color.Surface" IconColor="Color.Error" @onclick="LoginAsync" Style="color: var(--mud-palette-primary-text)">Log in</MudButton>
+        <MudButton Variant="Variant.Filled" @onclick="LoginAsync" Style="color: var(--mud-palette-primary-text)">Log in</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -19,6 +19,6 @@
     }
     public Task LoginAsync()
     {
-        return AuthService.LoginAsync();
+        return AuthService.LoginAsync(false);
     }
 }

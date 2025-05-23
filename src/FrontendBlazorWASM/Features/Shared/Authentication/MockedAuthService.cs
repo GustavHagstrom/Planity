@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Planity.FrontendBlazorWASM.Features.Shared.Authentication;
 
-public class MockedAuthService(AuthenticationStateProvider authStateProvider) : IAuthService
+public class MockedAuthService(AuthenticationStateProvider authStateProvider, NavigationManager navigationManager) : IAuthService
 {
     public async Task<string> GetOrganizationIdAsync()
     {
@@ -24,11 +25,16 @@ public class MockedAuthService(AuthenticationStateProvider authStateProvider) : 
         var state = await authStateProvider.GetAuthenticationStateAsync();
         return state.User.Identity?.IsAuthenticated ?? false;
     }
-    public Task LoginAsync()
+    public Task LoginAsync(bool redirectoToDashboard)
     {
         if (authStateProvider is MockedAuthenticationStateProvider mockedAuthStateProvider)
         {
             mockedAuthStateProvider.SignIn();
+            
+        }
+        if (redirectoToDashboard)
+        {
+            navigationManager.NavigateTo(Routes.Dashboard);
         }
         return Task.CompletedTask;
     }

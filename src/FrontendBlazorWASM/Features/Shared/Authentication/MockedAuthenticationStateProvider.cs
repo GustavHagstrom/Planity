@@ -27,11 +27,11 @@ public class MockedAuthenticationStateProvider : AuthenticationStateProvider
     public void SignIn()
     {
         _isLoggedIn = true;
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
     public void SignOut()
     {
         _isLoggedIn = false;
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_anonymous)));
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 }

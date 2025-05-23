@@ -2,7 +2,7 @@
 
 public interface IAuthService
 {
-    Task LoginAsync();
+    Task LoginAsync(bool redirectoToDashboard);
     Task LogoutAsync();
     Task<bool> IsUserAuthenticatedAsync();
     Task<string> GetUserIdAsync();
