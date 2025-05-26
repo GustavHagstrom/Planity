@@ -1,0 +1,79 @@
+﻿@typeparam TItem where TItem : IGanttItem
+
+<MudGrid>
+    <!-- Vänster kolumn -->
+    <MudItem xs="4">
+        @foreach (var item in VisibleItems)
+        {
+            <MudPaper Class="pa-2 my-1 d-flex align-center">
+                @if (item.Children?.Any() == true)
+                {
+                    <MudIconButton Icon="@(
+                                   item.IsExpanded? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore
+                                        )"
+                               OnClick="@(() => ToggleExpand(item))" />
+                        }
+                <MudText Class="ml-2">@item.Name (@item.Type)</MudText>
+            </MudPaper>
+        }
+    </MudItem>
+
+    <!-- Höger kolumn (tidslinje) -->
+    <MudItem xs="8">
+        <div class="gantt-timeline">
+            @foreach (var item in VisibleItems)
+            {
+                if(item.Start is not null && item.End is not null)
+                {
+                    
+                    <div class="gantt-bar-container">
+                        <div class="gantt-bar"
+                             style="@GanttBarStyle(item)">
+                            @item.Name
+                        </div>
+                    </div>
+                }
+                
+            }
+        </div>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public List<TItem> Items { get; set; } = new();  
+
+    private double PixelsPerDay = 10;  
+
+    private DateTime TimelineStart => Items.Min(i => i.Start?.Date ?? DateTime.MinValue);  
+
+    private List<TItem> VisibleItems => ExpandFlat(Items);  
+
+    private void ToggleExpand(TItem item)  
+    {  
+        item.IsExpanded = !item.IsExpanded;  
+    }  
+
+    private List<TItem> ExpandFlat(IEnumerable<TItem> items)  
+    {  
+        var result = new List<TItem>();  
+
+        foreach (var item in items)  
+        {  
+            result.Add(item);  
+
+            if (item.IsExpanded && item.Children?.Any() == true)  
+            {  
+                result.AddRange(ExpandFlat(item.Children.Cast<TItem>()));  
+            }  
+        }  
+
+        return result;  
+    }  
+    string GanttBarStyle(IGanttItem item) 
+    {
+        if (item.Start is null || item.End is null) return string.Empty;
+        var duration = (item.End - item.Start).Value.TotalDays;
+        var offset = (item.Start - TimelineStart).Value.TotalDays;
+        return $"margin-left: {offset* PixelsPerDay}px; width: {duration* PixelsPerDay}px; background-color: {item.Color ?? "#90caf9"}";
+    }
+}

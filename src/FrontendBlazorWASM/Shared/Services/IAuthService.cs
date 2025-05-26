@@ -1,4 +1,4 @@
-﻿namespace Planity.FrontendBlazorWASM.Features.Shared.Authentication;
+﻿namespace Planity.FrontendBlazorWASM.Shared.Services;
 
 public interface IAuthService
 {

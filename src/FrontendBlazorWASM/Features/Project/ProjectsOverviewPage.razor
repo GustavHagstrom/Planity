@@ -1,4 +1,5 @@
 ﻿@page "/projects"
+@using Planity.FrontendBlazorWASM.Shared.Models
 @inject NavigationManager NavigationManager
 
 <MudPaper Class="pa-4">
@@ -19,8 +20,8 @@
         <RowTemplate>
             <MudTd>@context.Name</MudTd>
             <MudTd>@context.Status</MudTd>
-            <MudTd>@context.StartDate.ToShortDateString()</MudTd>
-            <MudTd>@context.EndDate.ToShortDateString()</MudTd>
+            <MudTd>@context.Start?.ToShortDateString()</MudTd>
+            <MudTd>@context.End?.ToShortDateString()</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary"
                                OnClick="@(() => NavigationManager.NavigateTo($"/projects/{context.Id}"))" />
@@ -32,7 +33,7 @@
 @code {
     private List<Project> Projects = new()
     {
-        new Project { Id = Guid.NewGuid(), Name = "Villa Ängsviken", StartDate = DateTime.Today, EndDate = DateTime.Today.AddMonths(6), Status = ProjectStatus.NotStarted },
-        new Project { Id = Guid.NewGuid(), Name = "Parhus Björkbacken", StartDate = DateTime.Today.AddDays(-30), EndDate = DateTime.Today.AddMonths(4), Status = ProjectStatus.InProgress }
+        new Project { Id = Guid.NewGuid().ToString(), Name = "Villa Ängsviken", Status = ProjectStatus.NotStarted },
+        new Project { Id = Guid.NewGuid().ToString(), Name = "Parhus Björkbacken", Status = ProjectStatus.InProgress }
     };
 }

@@ -1,0 +1,19 @@
+﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
+
+namespace Planity.FrontendBlazorWASM.Shared.Models;
+
+public class Project : IGanttItem
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public DateTime? Start => Tasks.Min(t => t.Start);
+    public DateTime? End => Tasks.Max(t => t.End);
+    public ProjectStatus Status { get; set; }
+    public List<ProjectTask> Tasks { get; set; } = new();
+    public List<Milesonte> Milestones { get; set; } = new();
+    public string? Color => null;
+    public IEnumerable<IGanttItem>? Children => Tasks;
+    public bool IsExpanded { get; set; } = false;
+    GanttItemType IGanttItem.Type => GanttItemType.Project;
+}

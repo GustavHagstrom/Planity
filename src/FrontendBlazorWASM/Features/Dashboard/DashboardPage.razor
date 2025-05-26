@@ -12,4 +12,78 @@
     }
 </div>
 
+<GanttView Items="mockedganttItems"/>
 
+
+@code{
+    List<IGanttItem> mockedganttItems = new List<IGanttItem>
+    {
+        new Project
+        {
+            Id = "1",
+            Name = "Project A",
+            Description = "Description for Project A",
+            Tasks = new List<ProjectTask>
+            {
+                new ProjectTask
+                {
+                    Id = "1.1",
+                    Name = "Task A1",
+                    Start = new DateTime(2023, 1, 1),
+                    End = new DateTime(2023, 2, 15),
+                    Description = "Description for Task A1"
+                },
+                new ProjectTask
+                {
+                    Id = "1.2",
+                    Name = "Task A2",
+                    Start = new DateTime(2023, 2, 16),
+                    End = new DateTime(2023, 3, 10),
+                    Description = "Description for Task A2"
+                }
+            }
+        },
+        new Project
+        {
+            Id = "2",
+            Name = "Project B",
+            Description = "Description for Project B",
+            Tasks = new List<ProjectTask>
+            {
+                new ProjectTask
+                {
+                    Id = "2.1",
+                    Name = "Task B1",
+                    Start = new DateTime(2023, 3, 1),
+                    End = new DateTime(2023, 4, 1),
+                    Description = "Description for Task B1"
+                },
+                new ProjectTask
+                {
+                    Id = "2.2",
+                    Name = "Task B2",
+                    Start = new DateTime(2023, 4, 2),
+                    End = new DateTime(2023, 5, 1),
+                    Description = "Description for Task B2"
+                }
+            }
+        },
+        new Project
+        {
+            Id = "3",
+            Name = "Project C",
+            Description = "Description for Project C",
+            Tasks = new List<ProjectTask>
+            {
+                new ProjectTask
+                {
+                    Id = "3.1",
+                    Name = "Task C1",
+                    Start = new DateTime(2023, 5, 1),
+                    End = new DateTime(2023, 6, 1),
+                    Description = "Description for Task C1"
+                }
+            }
+        }
+    };
+}

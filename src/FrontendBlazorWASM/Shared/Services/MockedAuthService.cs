@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace Planity.FrontendBlazorWASM.Features.Shared.Authentication;
+namespace Planity.FrontendBlazorWASM.Shared.Services;
 
 public class MockedAuthService(AuthenticationStateProvider authStateProvider, NavigationManager navigationManager) : IAuthService
 {

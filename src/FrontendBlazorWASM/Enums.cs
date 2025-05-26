@@ -14,4 +14,10 @@ public enum TaskStatus
     Completed, 
     Blocked 
 }
-
+public enum GanttItemType
+{
+    Task,
+    Project,
+    Milestone,
+    Resource
+}
