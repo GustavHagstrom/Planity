@@ -1,16 +1,17 @@
 ﻿@page "/projects/{id}"
-@using Planity.FrontendBlazorWASM.Features.Tasks
-@using Planity.FrontendBlazorWASM.Shared.Models
+
 @inject NavigationManager NavigationManager
+@inject IProjectService ProjectService
+@inject IStringLocalizer<ProjectDetailsPage> localizer
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Projektinformation</MudText>
+    <MudText Typo="Typo.h5">@localizer["Projektinformation"]</MudText>
 
-    <MudTextField Label="Projektnamn" @bind-Value="Project.Name" />
-    <MudTextField Label="Beskrivning" @bind-Value="Project.Description" />
-@*     <MudDatePicker Label="Startdatum" @bind-Date="Project.StartDate" />
-    <MudDatePicker Label="Slutdatum" @bind-Date="Project.EndDate" /> *@
-    <MudSelect T="ProjectStatus" Label="Status" @bind-Value="Project.Status">
+    <MudTextField T="string" Label="@localizer["Projektnamn"]" @bind-Value="Project.Name" />
+    <MudTextField T="string" Label="@localizer["Beskrivning"]" @bind-Value="Project.Description" />
+@*     <MudDatePicker Label="@localizer[\"Startdatum\"]" @bind-Date="Project.StartDate" />
+    <MudDatePicker Label="@localizer[\"Slutdatum\"]" @bind-Date="Project.EndDate" /> *@
+    <MudSelect T="ProjectStatus" Label="@localizer["Status"]" @bind-Value="Project.Status">
         @foreach (var status in Enum.GetValues<ProjectStatus>())
         {
             <MudSelectItem Value="@status">@status</MudSelectItem>
@@ -19,7 +20,7 @@
 
     <MudDivider Class="my-4" />
 
-    <MudText Typo="Typo.h6">Uppgifter</MudText>
+    <MudText Typo="Typo.h6">@localizer["Uppgifter"]</MudText>
     <MudList T="ProjectTask" >
         @foreach (var task in Project.Tasks)
         {
@@ -30,22 +31,29 @@
         }
     </MudList>
 
-    <MudButton Color="Color.Primary" OnClick="SaveProject">Spara ändringar</MudButton>
+    <MudButton Color="Color.Primary" OnClick="SaveProject">@localizer["Spara ändringar"]</MudButton>
 </MudPaper>
 
 @code {
     [Parameter] public string? Id { get; set; }
 
-    private Project Project = new(); // TODO: ladda från service
+    private Project Project = new();
+    private bool IsLoading = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // TODO: hämta baserat på ProjectId
+        if (!string.IsNullOrEmpty(Id))
+        {
+            var project = await ProjectService.GetProjectByIdAsync(Id);
+            if (project != null)
+                Project = project;
+        }
+        IsLoading = false;
     }
 
-    private void SaveProject()
+    private async Task SaveProject()
     {
-        // TODO: uppdatera projekt
+        await ProjectService.UpdateProjectAsync(Project);
         NavigationManager.NavigateTo("/projects");
     }
 }

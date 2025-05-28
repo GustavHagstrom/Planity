@@ -11,6 +11,11 @@ public static class Routes
     public static string ProjectDetails(string id) => $"/projects/{id}";
     public const string Unauthorized = "/unauthorized";
 
+    // Resource routes
+    public const string Resources = "/resources";
+    public static string ResourceDetails(string id) => $"/resources/{id}";
+    public const string ResourceNew = "/resources/new";
+
     public static string[] AllRoutes =>
     [
         Dashboard,
@@ -18,6 +23,9 @@ public static class Routes
         ProjectsOverview,
         ProjecstNew,
         ProjectDetails("SampleId"),
-        Unauthorized
+        Unauthorized,
+        Resources,
+        ResourceDetails("SampleId"),
+        ResourceNew
     ];
 }

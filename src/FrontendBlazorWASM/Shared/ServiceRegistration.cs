@@ -7,9 +7,11 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddSharedServices(this IServiceCollection services)
     {
-        
         services.AddScoped<AuthenticationStateProvider, MockedAuthenticationStateProvider>();
         services.AddScoped<IAuthService, MockedAuthService>();
+        services.AddScoped<IProjectService, MockProjectService>();
+        services.AddScoped<IResourceService, MockResourceService>();
+        
         return services;
     }
 }

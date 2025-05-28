@@ -1,0 +1,50 @@
+@using Planity.FrontendBlazorWASM.Shared.Models
+@inject Planity.FrontendBlazorWASM.Shared.Services.IResourceService ResourceService
+@using MudBlazor
+@inject IStringLocalizer<ResourceForm> localizer
+
+<MudForm @ref="mudForm" Model="resource">
+    <MudTextField @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
+    <MudTextField @bind-Value="resource.Role" Label="@localizer["Roll"]" For="() => resource.Role" />
+    <MudTextField @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
+    <MudButton Type="Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="HandleValidSubmit">@localizer["Spara"]</MudButton>
+</MudForm>
+
+@code {
+    [Parameter]
+    public Resource? ResourceModel { get; set; }
+    [Parameter]
+    public EventCallback<Resource> OnSaved { get; set; }
+    
+    bool isNew => ResourceModel is null;
+    private Resource resource = new();
+    private MudForm? mudForm;
+
+    protected override void OnParametersSet()
+    {
+        if (ResourceModel != null)
+        {
+            resource = new Resource
+            {
+                Id = ResourceModel.Id,
+                Name = ResourceModel.Name,
+                Role = ResourceModel.Role,
+                OrganizationId = ResourceModel.OrganizationId,
+                RoleId = ResourceModel.RoleId
+            };
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (isNew)
+        {
+            await ResourceService.CreateResourceAsync(resource);
+        }
+        else
+        {
+            await ResourceService.UpdateResourceAsync(resource);
+        }
+        await OnSaved.InvokeAsync(resource);
+    }
+}

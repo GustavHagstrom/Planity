@@ -1,0 +1,14 @@
+@page "/resources/new"
+@inject NavigationManager Navigation
+@inject IStringLocalizer<ResourceNew> localizer
+
+<h3>Ny resurs</h3>
+
+<ResourceForm OnSaved="OnResourceSaved" />
+
+@code {
+    private void OnResourceSaved(Planity.FrontendBlazorWASM.Shared.Models.Resource resource)
+    {
+        Navigation.NavigateTo(Planity.FrontendBlazorWASM.Routes.Resources);
+    }
+}

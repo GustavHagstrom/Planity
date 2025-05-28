@@ -1,6 +1,7 @@
 ﻿@page "/projects/new"
 @using Planity.FrontendBlazorWASM.Shared.Models
 @inject NavigationManager NavigationManager
+@inject IProjectService ProjectService
 
 <MudPaper Class="pa-4">
     <MudText Typo="Typo.h5">Nytt projekt</MudText>
@@ -22,9 +23,9 @@
 @code {
     private Project Project = new();
 
-    private void SaveProject()
+    private async Task SaveProject()
     {
-        // TODO: spara till service
+        await ProjectService.CreateProjectAsync(Project);
         NavigationManager.NavigateTo("/projects");
     }
 }

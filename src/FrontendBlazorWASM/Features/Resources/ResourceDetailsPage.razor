@@ -1,0 +1,43 @@
+@page "/resources/{ResourceId}"
+@using Planity.FrontendBlazorWASM.Shared.Models
+@inject Planity.FrontendBlazorWASM.Shared.Services.IResourceService ResourceService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<ResourceDetailsPage> localizer
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Resursinformation</MudText>
+    @if (resource == null)
+    {
+        <MudProgressCircular Indeterminate Color="Color.Primary" />
+    }
+    else
+    {
+        <ResourceForm ResourceModel="resource" OnSaved="OnResourceSaved" />
+    }
+    <MudButton Variant="Variant.Text" OnClick="GoBack">Tillbaka till översikt</MudButton>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? ResourceId { get; set; }
+    private Resource? resource;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(ResourceId))
+        {
+            resource = await ResourceService.GetResourceByIdAsync(ResourceId);
+        }
+    }
+
+    private void OnResourceSaved(Resource r)
+    {
+        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.Resources);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.Resources);
+    }
+}

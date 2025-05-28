@@ -3,11 +3,12 @@
 @inject NavigationManager NavigationManager
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Projektöversikt</MudText>
-
-    <MudButton Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/projects/new"))" StartIcon="@Icons.Material.Filled.Add">
-        Skapa nytt projekt
-    </MudButton>
+    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+        <MudText Typo="Typo.h5">Projektöversikt</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjecstNew))" StartIcon="@Icons.Material.Filled.Add">
+            Skapa nytt projekt
+        </MudButton>
+    </MudStack>
 
     <MudTable Items="@Projects" Hover="true">
         <HeaderContent>
@@ -31,9 +32,12 @@
 </MudPaper>
 
 @code {
-    private List<Project> Projects = new()
+    private List<Project> Projects = new();
+
+    [Inject] private IProjectService ProjectService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
     {
-        new Project { Id = Guid.NewGuid().ToString(), Name = "Villa Ängsviken", Status = ProjectStatus.NotStarted },
-        new Project { Id = Guid.NewGuid().ToString(), Name = "Parhus Björkbacken", Status = ProjectStatus.InProgress }
-    };
+        Projects = await ProjectService.GetProjectsAsync();
+    }
 }

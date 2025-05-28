@@ -2,8 +2,19 @@
 
 <AuthorizeView>
     <Authorized>
-
         <MudLayout>
+            <MudDrawer Open="true" Variant="DrawerVariant.Mini" Anchor="Anchor.Left" Elevation="1" Class="mud-width-220" ClipMode="DrawerClipMode.Always">
+                <MudNavMenu>
+                    @foreach (var route in Routes.AllRoutes)
+                    {
+                        if (!route.Contains("SampleId"))
+                        {
+                            <MudNavLink Href="@route" Icon="@GetIcon(route)" Match="GetMatch(route)">@GetRouteName(route)</MudNavLink>
+                        }
+                    }
+                </MudNavMenu>
+            </MudDrawer>
+
             <MudAppBar Dense="true" Gutters="false">
                 <a href="@Routes.Dashboard"><MudText Typo="Typo.h4" Style="color: var(--mud-palette-primary-text)">Planity</MudText></a>
                 <MudSpacer />
@@ -13,13 +24,44 @@
             <MudMainContent>
                 @Body
             </MudMainContent>
-
         </MudLayout>
     </Authorized>
 
     <NotAuthorized>
         <RedirectToLogin/>
     </NotAuthorized>
-
 </AuthorizeView>
+
+@code {
+    private string GetRouteName(string route)
+    {
+        return route switch
+        {
+            "/" => "Dashboard",
+            "/projects" => "Projektöversikt",
+            "projects/new" => "Nytt projekt",
+            "/settings" => "Inställningar",
+            "/unauthorized" => "Ej behörig",
+            _ when route.StartsWith("/projects/") => "Projektdetaljer",
+            _ => route
+        };
+    }
+    private string GetIcon(string route)
+    {
+        return route switch
+        {
+            "/" => Icons.Material.Filled.Dashboard,
+            "/projects" => Icons.Material.Filled.List,
+            "projects/new" => Icons.Material.Filled.AddBox,
+            "/settings" => Icons.Material.Filled.Settings,
+            "/unauthorized" => Icons.Material.Filled.Block,
+            _ when route.StartsWith("/projects/") => Icons.Material.Filled.Info,
+            _ => Icons.Material.Filled.Link
+        };
+    }
+    private NavLinkMatch GetMatch(string route)
+    {
+        return route == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix;
+    }
+}
 
