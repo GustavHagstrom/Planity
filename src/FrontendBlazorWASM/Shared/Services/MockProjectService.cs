@@ -169,4 +169,28 @@ public class MockProjectService : IProjectService
         }
         return Task.CompletedTask;
     }
+
+    public Task<ProjectTask?> GetTaskByIdAsync(string taskId)
+    {
+        var task = _projects.SelectMany(p => p.Tasks).FirstOrDefault(t => t.Id == taskId);
+        return Task.FromResult(task);
+    }
+
+    public Task<List<ProjectTask>> GetAllTasksAsync()
+    {
+        var allTasks = _projects.SelectMany(p => p.Tasks).ToList();
+        return Task.FromResult(allTasks);
+    }
+
+    public Task<Milesonte?> GetMilestoneByIdAsync(string milestoneId)
+    {
+        var milestone = _projects.SelectMany(p => p.Milestones).FirstOrDefault(m => m.Id == milestoneId);
+        return Task.FromResult(milestone);
+    }
+
+    public Task<List<Milesonte>> GetAllMilestonesAsync()
+    {
+        var allMilestones = _projects.SelectMany(p => p.Milestones).ToList();
+        return Task.FromResult(allMilestones);
+    }
 }

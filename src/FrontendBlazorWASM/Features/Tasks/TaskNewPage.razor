@@ -1,0 +1,37 @@
+@page "/tasks/new"
+@using Planity.FrontendBlazorWASM.Shared.Models
+@inject IProjectService ProjectService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Ny uppgift</MudText>
+    <MudSelect T="string" Label="Projekt" @bind-Value="selectedProjectId" Required="true">
+        @foreach (var project in Projects)
+        {
+            <MudSelectItem Value="@project.Id">@project.Name</MudSelectItem>
+        }
+    </MudSelect>
+    <TaskForm OnSaved="OnTaskSaved" />
+</MudPaper>
+
+@code {
+    private List<Project> Projects = new();
+    private string? selectedProjectId;
+    private ProjectTask newTask = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Projects = await ProjectService.GetProjectsAsync();
+        selectedProjectId = Projects.FirstOrDefault()?.Id;
+    }
+
+    private async Task OnTaskSaved(ProjectTask task)
+    {
+        if (!string.IsNullOrEmpty(selectedProjectId))
+        {
+            await ProjectService.AddTaskToProjectAsync(selectedProjectId, task);
+        }
+        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TasksOverview);
+    }
+}

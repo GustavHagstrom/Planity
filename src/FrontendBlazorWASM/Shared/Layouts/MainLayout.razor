@@ -42,6 +42,15 @@
             "projects/new" => "Nytt projekt",
             "/settings" => "Inställningar",
             "/unauthorized" => "Ej behörig",
+            "/resources" => "Resursöversikt",
+            "/resources/new" => "Ny resurs",
+            _ when route.StartsWith("/resources/") => "Resursdetaljer",
+            "/tasks" => "Uppgiftsöversikt",
+            "/tasks/new" => "Ny uppgift",
+            _ when route.StartsWith("/tasks/") => "Uppgiftsdetaljer",
+            "/milestones" => "Milestoneöversikt",
+            "/milestones/new" => "Ny milestone",
+            _ when route.StartsWith("/milestones/") => "Milestonedetaljer",
             _ when route.StartsWith("/projects/") => "Projektdetaljer",
             _ => route
         };
@@ -55,6 +64,15 @@
             "projects/new" => Icons.Material.Filled.AddBox,
             "/settings" => Icons.Material.Filled.Settings,
             "/unauthorized" => Icons.Material.Filled.Block,
+            "/resources" => Icons.Material.Filled.People,
+            "/resources/new" => Icons.Material.Filled.PersonAdd,
+            _ when route.StartsWith("/resources/") => Icons.Material.Filled.Person,
+            "/tasks" => Icons.Material.Filled.Checklist,
+            "/tasks/new" => Icons.Material.Filled.AddTask,
+            _ when route.StartsWith("/tasks/") => Icons.Material.Filled.Task,
+            "/milestones" => Icons.Material.Filled.Flag,
+            "/milestones/new" => Icons.Material.Filled.Add,
+            _ when route.StartsWith("/milestones/") => Icons.Material.Filled.FlagCircle,
             _ when route.StartsWith("/projects/") => Icons.Material.Filled.Info,
             _ => Icons.Material.Filled.Link
         };

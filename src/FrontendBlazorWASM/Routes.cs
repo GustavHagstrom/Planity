@@ -16,6 +16,16 @@ public static class Routes
     public static string ResourceDetails(string id) => $"/resources/{id}";
     public const string ResourceNew = "/resources/new";
 
+    // Task routes
+    public const string TasksOverview = "/tasks";
+    public const string TaskNew = "/tasks/new";
+    public static string TaskDetails(string id) => $"/tasks/{id}";
+
+    // Milestone routes
+    public const string MilestonesOverview = "/milestones";
+    public const string MilestoneNew = "/milestones/new";
+    public static string MilestoneDetails(string id) => $"/milestones/{id}";
+
     public static string[] AllRoutes =>
     [
         Dashboard,
@@ -26,6 +36,12 @@ public static class Routes
         Unauthorized,
         Resources,
         ResourceDetails("SampleId"),
-        ResourceNew
+        ResourceNew,
+        TasksOverview,
+        TaskNew,
+        TaskDetails("SampleId"),
+        MilestonesOverview,
+        MilestoneNew,
+        MilestoneDetails("SampleId")
     ];
 }

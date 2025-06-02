@@ -1,0 +1,52 @@
+@page "/milestones/{MilestoneId}"
+@using Planity.FrontendBlazorWASM.Shared.Models
+@inject IProjectService ProjectService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Milestoneinformation</MudText>
+    @if (milestone == null)
+    {
+        <MudProgressCircular Indeterminate Color="Color.Primary" />
+    }
+    else
+    {
+        <MudTextField Label="Namn" @bind-Value="milestone.Name" />
+        <MudTextField Label="Beskrivning" @bind-Value="milestone.Description" />
+        <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
+        <MudCheckBox T="bool" @bind-Checked="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
+        <MudButton Color="Color.Primary" OnClick="SaveMilestone">Spara ändringar</MudButton>
+    }
+    <MudButton Variant="Variant.Text" OnClick="GoBack">Tillbaka till översikt</MudButton>
+</MudPaper>
+
+@code {
+    [Parameter] public string? MilestoneId { get; set; }
+    private Milesonte? milestone;
+    private string? projectId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Find the project and milestone by searching all projects
+        var projects = await ProjectService.GetProjectsAsync();
+        var found = projects.SelectMany(p => p.Milestones.Select(m => (Milestone: m, ProjectId: p.Id)))
+                            .FirstOrDefault(x => x.Milestone.Id == MilestoneId);
+        milestone = found.Milestone;
+        projectId = found.ProjectId;
+    }
+
+    private async Task SaveMilestone()
+    {
+        if (milestone != null && projectId != null)
+        {
+            await ProjectService.UpdateMilestoneAsync(projectId, milestone);
+            NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
+    }
+}

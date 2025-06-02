@@ -1,0 +1,53 @@
+@page "/milestones"
+@using Planity.FrontendBlazorWASM.Shared.Models
+@inject IProjectService ProjectService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+        <MudText Typo="Typo.h5">Milestoneöversikt</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestoneNew))" StartIcon="@Icons.Material.Filled.Add">
+            Skapa ny milestone
+        </MudButton>
+    </MudStack>
+    <MudDivider Class="my-2" />
+    <MudTable Items="@Milestones" Hover="true">
+        <HeaderContent>
+            <MudTh>Namn</MudTh>
+            <MudTh>Datum</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Projekt</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Date.ToString()</MudTd>
+            <MudTd>@(context.IsCompleted ? "Klar" : "Ej klar")</MudTd>
+            <MudTd>@GetProjectName(context)</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary"
+                               OnClick="@(() => NavigationManager.NavigateTo($"/milestones/{context.Id}"))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<Milesonte> Milestones = new();
+    private Dictionary<string, string> MilestoneProjectMap = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var projects = await ProjectService.GetProjectsAsync();
+        Milestones = projects.SelectMany(p => p.Milestones).ToList();
+        MilestoneProjectMap = projects
+            .SelectMany(p => p.Milestones.Select(m => new { m.Id, ProjectName = p.Name }))
+            .ToDictionary(x => x.Id, x => x.ProjectName);
+    }
+
+    private string GetProjectName(Milesonte milestone)
+    {
+        return MilestoneProjectMap.TryGetValue(milestone.Id, out var name) ? name : string.Empty;
+    }
+}

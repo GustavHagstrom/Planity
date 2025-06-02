@@ -16,9 +16,13 @@ public interface IProjectService
     Task<ProjectTask> UpdateTaskAsync(string projectId, ProjectTask task);
     Task DeleteTaskAsync(string projectId, string taskId);
     Task AssignResourceToTaskAsync(string projectId, string taskId, string resourceId);
+    Task<ProjectTask?> GetTaskByIdAsync(string taskId);
+    Task<List<ProjectTask>> GetAllTasksAsync();
 
     // Milestones
     Task<Milesonte> AddMilestoneToProjectAsync(string projectId, Milesonte milestone);
     Task<Milesonte> UpdateMilestoneAsync(string projectId, Milesonte milestone);
     Task DeleteMilestoneAsync(string projectId, string milestoneId);
+    Task<Milesonte?> GetMilestoneByIdAsync(string milestoneId);
+    Task<List<Milesonte>> GetAllMilestonesAsync();
 }

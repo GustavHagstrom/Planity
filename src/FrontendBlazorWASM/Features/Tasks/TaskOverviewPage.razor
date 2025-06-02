@@ -1,0 +1,55 @@
+@page "/tasks"
+@using Planity.FrontendBlazorWASM.Shared.Models
+@inject NavigationManager NavigationManager
+@inject IProjectService ProjectService
+@using MudBlazor
+
+<MudPaper Class="pa-4">
+    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+        <MudText Typo="Typo.h5">Uppgiftsöversikt</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TaskNew))" StartIcon="@Icons.Material.Filled.Add">
+            Skapa ny uppgift
+        </MudButton>
+    </MudStack>
+    <MudDivider Class="my-2" />
+    <MudTable Items="@Tasks" Hover="true">
+        <HeaderContent>
+            <MudTh>Namn</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Start</MudTh>
+            <MudTh>Slut</MudTh>
+            <MudTh>Projekt</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Status</MudTd>
+            <MudTd>@context.Start?.ToShortDateString()</MudTd>
+            <MudTd>@context.End?.ToShortDateString()</MudTd>
+            <MudTd>@GetProjectName(context)</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary"
+                               OnClick="@(() => NavigationManager.NavigateTo($"/tasks/{context.Id}"))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<ProjectTask> Tasks = new();
+    private Dictionary<string, string> TaskProjectMap = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var projects = await ProjectService.GetProjectsAsync();
+        Tasks = projects.SelectMany(p => p.Tasks).ToList();
+        TaskProjectMap = projects
+            .SelectMany(p => p.Tasks.Select(t => new { t.Id, ProjectName = p.Name }))
+            .ToDictionary(x => x.Id, x => x.ProjectName);
+    }
+
+    private string GetProjectName(ProjectTask task)
+    {
+        return TaskProjectMap.TryGetValue(task.Id, out var name) ? name : string.Empty;
+    }
+}
