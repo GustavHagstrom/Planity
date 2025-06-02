@@ -1,12 +1,13 @@
 @inject IResourceService ResourceService
 @inject IStringLocalizer<ResourceForm> localizer
 
-<MudForm @ref="mudForm" Model="resource">
-    <MudTextField @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
-    <MudTextField @bind-Value="resource.Role" Label="@localizer["Roll"]" For="() => resource.Role" />
-    <MudTextField @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
-    <MudButton Type="Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="HandleValidSubmit">@localizer["Spara"]</MudButton>
-</MudForm>
+<EntityForm TModel="Resource" Model="resource" OnValidSubmit="HandleValidSubmit" SaveButtonText="@localizer["Spara"]">
+    <EntityForm.Fields>
+        <MudTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
+        <MudTextField T="string" @bind-Value="resource.Role" Label="@localizer["Roll"]" For="() => resource.Role" />
+        <MudTextField T="string" @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
+    </EntityForm.Fields>
+</EntityForm>
 
 @code {
     [Parameter]
@@ -16,7 +17,6 @@
     
     bool isNew => ResourceModel is null;
     private Resource resource = new();
-    private MudForm? mudForm;
 
     protected override void OnParametersSet()
     {

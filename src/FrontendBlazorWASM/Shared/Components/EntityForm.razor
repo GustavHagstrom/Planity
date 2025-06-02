@@ -1,0 +1,41 @@
+@typeparam TModel
+@using MudBlazor
+
+<MudForm @ref="mudForm" Model="Model">
+    @Fields
+    <MudButton Color="Color.Primary" OnClick="OnSubmitAsync" Disabled="IsSaving">
+        @if (IsSaving)
+        {
+            <MudProgressCircular Indeterminate="true" Size="Size.Large" Class="mr-2" />
+            <span>Sparar...</span>
+        }
+        else
+        {
+            <span>@(SaveButtonText ?? "Spara")</span>
+        }
+    </MudButton>
+</MudForm>
+
+@code {
+    [Parameter] public TModel Model { get; set; } = default!;
+    [Parameter] public RenderFragment Fields { get; set; } = default!;
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public string? SaveButtonText { get; set; }
+
+    private MudForm? mudForm;
+    private bool IsSaving = false;
+
+    private async Task OnSubmitAsync()
+    {
+        if (mudForm != null)
+        {
+            await mudForm.Validate();
+            if (mudForm.IsValid)
+            {
+                IsSaving = true;
+                await OnValidSubmit.InvokeAsync();
+                IsSaving = false;
+            }
+        }
+    }
+}

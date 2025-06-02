@@ -18,36 +18,23 @@
 
     <MudDivider Class="my-4" />
 
-    <MudText Typo="Typo.h6">@localizer["Uppgifter"]</MudText>
-    <MudList T="ProjectTask" >
-        @foreach (var task in Project.Tasks)
-        {
-            <MudListItem>
-                
-                    <MudText>
-                        <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(task.Id)">
-                        @task.Name
+    <EntityList TItem="ProjectTask" Title="@localizer["Uppgifter"]" Items="Project.Tasks">
+        <ItemTemplate Context="task">
+            <MudText>
+                <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(task.Id)">@task.Name</MudLink>
+            </MudText>
+            <MudChip T="string" Color="Color.Info">@task.Status</MudChip>
+        </ItemTemplate>
+    </EntityList>
 
-                    </MudLink>
-                    </MudText>
-                    <MudChip Color="Color.Info">@task.Status</MudChip>
-                
-            </MudListItem>
-        }
-    </MudList>
-
-    <MudText Typo="Typo.h6">Milestones</MudText>
-    <MudList T="Milesonte">
-        @foreach (var milestone in Project.Milestones)
-        {
-            <MudListItem>
-                <MudText>
-                    <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>
-                </MudText>
-                <MudChip Color="@(milestone.IsCompleted ? Color.Success : Color.Default)">@((milestone.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
-            </MudListItem>
-        }
-    </MudList>
+    <EntityList TItem="Milesonte" Title="Milestones" Items="Project.Milestones">
+        <ItemTemplate Context="milestone">
+            <MudText>
+                <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>
+            </MudText>
+            <MudChip T="string" Color="@(milestone.IsCompleted ? Color.Success : Color.Default)">@((milestone.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
+        </ItemTemplate>
+    </EntityList>
 
     <MudButton Color="Color.Primary" OnClick="SaveProject">@localizer["Spara ändringar"]</MudButton>
 </MudPaper>

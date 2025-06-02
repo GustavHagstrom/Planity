@@ -2,27 +2,27 @@
 @using TaskStatus = Planity.FrontendBlazorWASM.TaskStatus;
 @using MudBlazor
 
-<MudForm @ref="mudForm" Model="task">
-    <MudTextField @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true" />
-    <MudTextField @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description" />
-    <MudDatePicker @bind-Date="task.Start" Label="Startdatum" />
-    <MudDatePicker @bind-Date="task.End" Label="Slutdatum" />
-    <MudSelect T="TaskStatus" Label="Status" @bind-Value="task.Status">
-        @foreach (TaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
-        {
-            <MudSelectItem Value="@status">@status</MudSelectItem>
-        }
-    </MudSelect>
-    <MudTextField @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName" />
-    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="HandleValidSubmit">Spara</MudButton>
-</MudForm>
+<EntityForm TModel="ProjectTask" Model="task" OnValidSubmit="HandleValidSubmit" SaveButtonText="Spara">
+    <EntityForm.Fields>
+        <MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true" />
+        <MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description" />
+        <MudDatePicker @bind-Date="task.Start" Label="Startdatum" />
+        <MudDatePicker @bind-Date="task.End" Label="Slutdatum" />
+        <MudSelect T="TaskStatus" Label="Status" @bind-Value="task.Status">
+            @foreach (TaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
+            {
+                <MudSelectItem Value="@status">@status</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField T="string" @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName" />
+    </EntityForm.Fields>
+</EntityForm>
 
 @code {
     [Parameter] public ProjectTask? TaskModel { get; set; }
     [Parameter] public EventCallback<ProjectTask> OnSaved { get; set; }
 
     private ProjectTask task = new();
-    private MudForm? mudForm;
     private bool isNew => TaskModel is null;
 
     protected override void OnParametersSet()

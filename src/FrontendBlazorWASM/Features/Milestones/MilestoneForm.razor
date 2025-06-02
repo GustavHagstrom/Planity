@@ -1,13 +1,14 @@
 @using Planity.FrontendBlazorWASM.Shared.Models
 @using MudBlazor
 
-<MudForm @ref="mudForm" Model="milestone">
-    <MudTextField @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true" />
-    <MudTextField @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description" />
-    <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
-    <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
-    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="HandleValidSubmit">Spara</MudButton>
-</MudForm>
+<EntityForm TModel="Milesonte" Model="milestone" OnValidSubmit="HandleValidSubmit" SaveButtonText="Spara">
+    <EntityForm.Fields>
+        <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true" />
+        <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description" />
+        <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
+        <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
+    </EntityForm.Fields>
+</EntityForm>
 
 @code {
     [Parameter] public Milesonte? MilestoneModel { get; set; }
@@ -17,7 +18,6 @@
     {
         Date = null
     };
-    private MudForm? mudForm;
     private bool isNew => MilestoneModel is null;
 
     protected override void OnParametersSet()
