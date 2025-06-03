@@ -1,19 +1,14 @@
-@inject IResourceService ResourceService
 @inject IStringLocalizer<ResourceForm> localizer
 
-<EntityForm TModel="Resource" Model="resource" OnValidSubmit="HandleValidSubmit" SaveButtonText="@localizer["Spara"]">
-        <MudTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
-        <MudTextField T="string" @bind-Value="resource.Role" Label="@localizer["Roll"]" For="() => resource.Role" />
-        <MudTextField T="string" @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
-</EntityForm>
+
+<MudTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
+<MudTextField T="string" @bind-Value="resource.Role" Label="@localizer["Roll"]" For="() => resource.Role" />
+<MudTextField T="string" @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
+
 
 @code {
-    [Parameter]
-    public Resource? ResourceModel { get; set; }
-    [Parameter]
-    public EventCallback<Resource> OnSaved { get; set; }
+    [Parameter] public Resource? ResourceModel { get; set; }
     
-    bool isNew => ResourceModel is null;
     private Resource resource = new();
 
     protected override void OnParametersSet()
@@ -29,18 +24,5 @@
                 RoleId = ResourceModel.RoleId
             };
         }
-    }
-
-    private async Task HandleValidSubmit()
-    {
-        if (isNew)
-        {
-            await ResourceService.CreateResourceAsync(resource);
-        }
-        else
-        {
-            await ResourceService.UpdateResourceAsync(resource);
-        }
-        await OnSaved.InvokeAsync(resource);
     }
 }

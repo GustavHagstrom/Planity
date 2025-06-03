@@ -7,7 +7,7 @@ public enum ProjectStatus
     Completed, 
     OnHold 
 }
-public enum TaskStatus 
+public enum ProjectTaskStatus 
 { 
     NotStarted, 
     InProgress, 

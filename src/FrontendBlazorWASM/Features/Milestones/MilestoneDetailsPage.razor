@@ -4,23 +4,11 @@
 @inject IJSRuntime JS
 @inject IStringLocalizer<MilestoneDetailsPage> localizer
 
-<MudPaper Class="pa-4">
-    <EntityForm TModel="Milestone" Model="milestone" OnValidSubmit="SaveMilestone" Title="@localizer["Milstensinformation"]">
-        @if (milestone == null)
-        {
-            <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
-        }
-        else
-        {
-        
-            <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true"></MudTextField>
-            <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description"></MudTextField>
-            <MudDatePicker @bind-Date="milestone.Date" Label="Datum"></MudDatePicker>
-            <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar"></MudCheckBox>
-        
-        }
-    </EntityForm>
-</MudPaper>
+<EntityFormsPageLayout Title="@localizer["Milestoneinformation"]" IsLoading="milestone is null" OnSave="Save">
+    <MainContent>
+        <MilestoneForm MilestoneModel="milestone"/>
+    </MainContent>
+</EntityFormsPageLayout>
 
 @code {
     [Parameter] public string? MilestoneId { get; set; }
@@ -37,7 +25,7 @@
         projectId = found.ProjectId;
     }
 
-    private async Task SaveMilestone()
+    private async Task Save()
     {
         if (milestone != null && projectId != null)
         {

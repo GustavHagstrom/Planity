@@ -4,49 +4,37 @@
 @inject IStringLocalizer<ProjectDetailsPage> localizer
 @inject IJSRuntime JS
 
-<MudPaper Class="pa-4">
-    <EntityForm TModel="Project" Model="Project" OnValidSubmit="SaveProject" Title="@localizer["Projektinformation"]">
-        @if (Project == null)
-        {
-            <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
-        }
-        else
-        {
+<EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null" OnSave="Save">
+    <MainContent>
+
+        <ProjectForm ProjectModel="Project"/>
+
+        <MudDivider Class="my-4"></MudDivider>
+        <EntityList TItem="ProjectTask" Title="@localizer["Uppgifter"]" Items="Project.Tasks">
+            <ItemTemplate Context="task">
+                <MudText>
+                    <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(task.Id)">@task.Name</MudLink>
+                </MudText>
+                <MudChip T="string" Color="Color.Info">@task.Status</MudChip>
+            </ItemTemplate>
+        </EntityList>
+        <EntityList TItem="Milestone" Title="Milestones" Items="Project.Milestones">
+            <ItemTemplate Context="milestone">
+                <MudText>
+                    <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>
+                </MudText>
+                <MudChip T="string" Color="@(milestone.IsCompleted ? Color.Success : Color.Default)">@((milestone.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
+            </ItemTemplate>
+        </EntityList>
         
-            <MudTextField T="string" Label="@localizer["Projektnamn"]" @bind-Value="Project.Name" For="() => Project.Name" Required="true"></MudTextField>
-            <MudTextField T="string" Label="@localizer["Beskrivning"]" @bind-Value="Project.Description" For="() => Project.Description"></MudTextField>
-            <MudSelect T="ProjectStatus" Label="@localizer["Status"]" @bind-Value="Project.Status">
-                @foreach (var status in Enum.GetValues<ProjectStatus>())
-                {
-                    <MudSelectItem Value="@status">@status</MudSelectItem>
-                }
-            </MudSelect>
-        
-            <MudDivider Class="my-4"></MudDivider>
-            <EntityList TItem="ProjectTask" Title="@localizer["Uppgifter"]" Items="Project.Tasks">
-                <ItemTemplate Context="task">
-                    <MudText>
-                        <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(task.Id)">@task.Name</MudLink>
-                    </MudText>
-                    <MudChip T="string" Color="Color.Info">@task.Status</MudChip>
-                </ItemTemplate>
-            </EntityList>
-            <EntityList TItem="Milestone" Title="Milestones" Items="Project.Milestones">
-                <ItemTemplate Context="milestone">
-                    <MudText>
-                        <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>
-                    </MudText>
-                    <MudChip T="string" Color="@(milestone.IsCompleted ? Color.Success : Color.Default)">@((milestone.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
-                </ItemTemplate>
-            </EntityList>
-        }
-    </EntityForm>
-</MudPaper>
+    </MainContent>
+</EntityFormsPageLayout>
+
 
 @code {
     [Parameter] public string? Id { get; set; }
 
-    private Project Project = new();
+    private Project? Project;
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,8 +46,10 @@
         }
     }
 
-    private async Task SaveProject()
+    private async Task Save()
     {
+        if (Project == null)
+            return;
         await ProjectService.UpdateProjectAsync(Project);
         await JS.InvokeVoidAsync("history.back");
     }

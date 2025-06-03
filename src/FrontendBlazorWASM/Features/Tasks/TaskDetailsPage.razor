@@ -1,34 +1,14 @@
 @page "/tasks/{TaskId}"
-@using TaskStatus = Planity.FrontendBlazorWASM.TaskStatus;
 @inject IProjectService ProjectService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IStringLocalizer<TaskDetailsPage> localizer
 
-<MudPaper Class="pa-4">
-    <EntityForm TModel="ProjectTask" Model="task" OnValidSubmit="SaveTask" Title="@localizer["Uppgiftsinformation"]">
-        @if (task == null)
-        {
-            <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
-        }
-        else
-        {
-        
-            <MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true"></MudTextField>
-            <MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description"></MudTextField>
-            <MudDatePicker @bind-Date="task.Start" Label="Startdatum"></MudDatePicker>
-            <MudDatePicker @bind-Date="task.End" Label="Slutdatum"></MudDatePicker>
-            <MudSelect T="TaskStatus" Label="Status" @bind-Value="task.Status">
-                @foreach (TaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
-                {
-                    <MudSelectItem Value="@status">@status</MudSelectItem>
-                }
-            </MudSelect>
-            <MudTextField T="string" @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName"></MudTextField>
-        
-        }
-    </EntityForm>
-</MudPaper>
+<EntityFormsPageLayout Title="@localizer["Uppgiftsinformation"]" IsLoading="task is null" OnSave="Save">
+    <MainContent>
+        <TaskForm TaskModel="task"/>
+    </MainContent>
+</EntityFormsPageLayout>
 
 @code {
     [Parameter] public string? TaskId { get; set; }
@@ -45,7 +25,7 @@
         projectId = found.ProjectId;
     }
 
-    private async Task SaveTask()
+    private async Task Save()
     {
         if (task != null && projectId != null)
         {

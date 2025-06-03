@@ -1,0 +1,54 @@
+@inject IStringLocalizer<EntityFormsPageLayout> localizer
+
+<div class="pa-4">
+    <MudStack Spacing="2">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudText Typo="Typo.h4">@Title</MudText>
+            <MudStack Direction="Row" Spacing="1">
+                @if (Actions != null)
+                {
+                    @Actions
+                }
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnSaveClicked" Disabled="IsSaving">
+                    @if (IsSaving)
+                    {
+                        <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Sharp.Save" Class="mr-2" Size="Size.Small" />
+                    }
+                    <span>@localizer["Spara"]</span>
+                </MudButton>
+            </MudStack>
+        </MudStack>
+        <MudDivider />
+        <div>
+            @if (IsLoading)
+            {
+                <MudProgressCircular Indeterminate Color="Color.Primary" />
+            }
+            else
+            {
+                @MainContent
+            }
+        </div>
+    </MudStack>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public RenderFragment? MainContent { get; set; }
+    [Parameter] public bool IsLoading { get; set; } = false;
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    private bool IsSaving = false;
+
+    private async Task OnSaveClicked()
+    {
+        IsSaving = true;
+        await OnSave.InvokeAsync();
+        IsSaving = false;
+    }
+}

@@ -1,19 +1,13 @@
 @page "/tasks/new"
-@using Planity.FrontendBlazorWASM.Shared.Models
 @inject IProjectService ProjectService
 @inject NavigationManager NavigationManager
-@using MudBlazor
+@inject IStringLocalizer<TaskNewPage> localizer
 
-<MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Ny uppgift</MudText>
-    <MudSelect T="string" Label="Projekt" @bind-Value="selectedProjectId" Required="true">
-        @foreach (var project in Projects)
-        {
-            <MudSelectItem Value="@project.Id">@project.Name</MudSelectItem>
-        }
-    </MudSelect>
-    <TaskForm OnSaved="OnTaskSaved" />
-</MudPaper>
+<EntityFormsPageLayout Title="@localizer["Ny uppgift"]" is null" OnSave="Save">
+    <MainContent>
+        <TaskForm TaskModel="newTask" />
+    </MainContent>
+</EntityFormsPageLayout>
 
 @code {
     private List<Project> Projects = new();
@@ -26,12 +20,13 @@
         selectedProjectId = Projects.FirstOrDefault()?.Id;
     }
 
-    private async Task OnTaskSaved(ProjectTask task)
+    private async Task Save()
     {
         if (!string.IsNullOrEmpty(selectedProjectId))
         {
-            await ProjectService.AddTaskToProjectAsync(selectedProjectId, task);
+            await ProjectService.AddTaskToProjectAsync(selectedProjectId, newTask);
+            NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TasksOverview);
         }
-        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TasksOverview);
+        
     }
 }

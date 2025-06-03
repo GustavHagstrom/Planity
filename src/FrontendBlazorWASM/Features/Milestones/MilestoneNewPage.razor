@@ -2,7 +2,13 @@
 @using Planity.FrontendBlazorWASM.Shared.Models
 @inject IProjectService ProjectService
 @inject NavigationManager NavigationManager
-@using MudBlazor
+@inject IStringLocalizer<MilestoneNewPage> localizer
+
+<EntityFormsPageLayout Title="@localizer["Ny milestone"]" OnSave="Save">
+    <MainContent>
+        <MilestoneForm MilestoneModel="milestone" />
+    </MainContent>
+</EntityFormsPageLayout>
 
 <MudPaper Class="pa-4">
     <MudText Typo="Typo.h5">Ny milestone</MudText>
@@ -18,7 +24,7 @@
 @code {
     private List<Project> Projects = new();
     private string? selectedProjectId;
-    private Milestone newMilestone = new();
+    private Milestone milestone = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,12 +32,12 @@
         selectedProjectId = Projects.FirstOrDefault()?.Id;
     }
 
-    private async Task OnMilestoneSaved(Milestone milestone)
+    private async Task Save()
     {
         if (!string.IsNullOrEmpty(selectedProjectId))
         {
             await ProjectService.AddMilestoneToProjectAsync(selectedProjectId, milestone);
+            NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
         }
-        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
     }
 }

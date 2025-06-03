@@ -1,14 +1,24 @@
 @page "/resources/new"
 @inject NavigationManager Navigation
+@inject IResourceService ResourceService
 @inject IStringLocalizer<ResourceNew> localizer
+@inject IJSRuntime JS
+
+<EntityFormsPageLayout Title="@localizer["Ny resurs"]"  OnSave="Save">
+    <MainContent>
+        <ResourceForm ResourceModel="resource" />
+    </MainContent>
+</EntityFormsPageLayout>
 
 <h3>Ny resurs</h3>
 
 <ResourceForm OnSaved="OnResourceSaved" />
 
 @code {
-    private void OnResourceSaved(Planity.FrontendBlazorWASM.Shared.Models.Resource resource)
+    private Resource resource = new();
+    private async Task Save()
     {
-        Navigation.NavigateTo(Planity.FrontendBlazorWASM.Routes.Resources);
+        await ResourceService.CreateResourceAsync(resource);
+        await JS.InvokeVoidAsync("history.back");
     }
 }

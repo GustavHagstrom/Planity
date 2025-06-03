@@ -20,8 +20,8 @@ public class MockProjectService : IProjectService
                 Status = ProjectStatus.InProgress,
                 Tasks = new List<ProjectTask>
                 {
-                    new ProjectTask { Id = "T1", Name = "Grävning", Status = TaskStatus.NotStarted, Start = DateTime.Today, End = DateTime.Today.AddDays(2), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
-                    new ProjectTask { Id = "T2", Name = "Gjutning platta", Status = TaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(5), AssignedResourceId = "3", AssignedResourceName = "Cecilia Carlsson" }
+                    new ProjectTask { Id = "T1", Name = "Grävning", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today, End = DateTime.Today.AddDays(2), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
+                    new ProjectTask { Id = "T2", Name = "Gjutning platta", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(5), AssignedResourceId = "3", AssignedResourceName = "Cecilia Carlsson" }
                 },
                 Milestones = new List<Milestone>
                 {

@@ -4,7 +4,7 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<h3>UnAuthorizedPage</h3>
+
 
 
 <AuthorizeView>
@@ -15,7 +15,10 @@
 
     </Authorized>
     <NotAuthorized>
-        <MudButton Variant="Variant.Filled" @onclick="LoginAsync" Style="color: var(--mud-palette-primary-text)">Log in</MudButton>
+        <div style="display: flex;align-content: center;justify-content: center;height: 100dvh;flex-direction: column;align-items: center;">
+            <h3>Unauthorized</h3>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="LoginAsync">Log in</MudButton>
+        </div>
     </NotAuthorized>
 </AuthorizeView>
 

@@ -1,25 +1,14 @@
 @page "/resources/{ResourceId}"
-@inject Planity.FrontendBlazorWASM.Shared.Services.IResourceService ResourceService
+@inject IResourceService ResourceService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<ResourceDetailsPage> localizer
 @inject IJSRuntime JS
 
-<MudPaper Class="pa-4">
-    <EntityForm TModel="Resource" Model="resource" OnValidSubmit="SaveResource" Title="@localizer["Resursöversikt"]">
-    @if (resource == null)
-    {
-        <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
-    }
-    else
-    {
-        
-        <MudTextField T="string" Label="@localizer["Namn"]" @bind-Value="resource.Name" For="() => resource.Name" Required="true"></MudTextField>
-        <MudTextField T="string" Label="@localizer["Roll"]" @bind-Value="resource.Role" For="() => resource.Role"></MudTextField>
-        <MudTextField T="string" Label="@localizer["Organisation"]" @bind-Value="resource.OrganizationId" For="() => resource.OrganizationId"></MudTextField>
-        
-    }
-    </EntityForm>
-</MudPaper>
+<EntityFormsPageLayout Title="@localizer["Resursinformation"]" IsLoading="resource is null" OnSave="Save">
+    <MainContent>
+        <ResourceForm ResourceModel="resource"/>
+    </MainContent>
+</EntityFormsPageLayout>
 
 @code {
     [Parameter]
@@ -34,7 +23,7 @@
         }
     }
 
-    private async Task SaveResource()
+    private async Task Save()
     {
         if (resource != null)
         {

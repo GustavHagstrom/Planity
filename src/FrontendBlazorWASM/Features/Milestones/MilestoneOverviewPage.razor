@@ -1,37 +1,41 @@
 @page "/milestones"
-@using Planity.FrontendBlazorWASM.Shared.Models
 @inject IProjectService ProjectService
 @inject NavigationManager NavigationManager
-@using MudBlazor
+@inject IStringLocalizer<MilestoneOverviewPage> localizer
 
-<MudPaper Class="pa-4">
-    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-        <MudText Typo="Typo.h5">Milestoneöversikt</MudText>
+
+<OverviewPageLayout Title="@localizer["Milstensöversikt"]">
+    <Actions>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestoneNew))" StartIcon="@Icons.Material.Filled.Add">
-            Skapa ny milestone
+            @localizer["Ny milestone"]
         </MudButton>
-    </MudStack>
-    <MudDivider Class="my-2" />
-    <MudTable Items="@Milestones" Hover="true">
-        <HeaderContent>
-            <MudTh>Namn</MudTh>
-            <MudTh>Datum</MudTh>
-            <MudTh>Status</MudTh>
-            <MudTh>Projekt</MudTh>
-            <MudTh></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@context.Name</MudTd>
-            <MudTd>@context.Date.ToString()</MudTd>
-            <MudTd>@(context.IsCompleted ? "Klar" : "Ej klar")</MudTd>
-            <MudTd>@GetProjectName(context)</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary"
-                               OnClick="@(() => NavigationManager.NavigateTo($"/milestones/{context.Id}"))" />
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-</MudPaper>
+    </Actions>
+    <Filters>
+
+    </Filters>
+    <MainContent>
+        <MudTable Items="@Milestones" Hover="true" Dense="true">
+            <HeaderContent>
+                <MudTh>Namn</MudTh>
+                <MudTh>Datum</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Projekt</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Date.ToString()</MudTd>
+                <MudTd>@(context.IsCompleted ? "Klar" : "Ej klar")</MudTd>
+                <MudTd>@GetProjectName(context)</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary" Size="Size.Small"
+                                   OnClick="@(() => NavigationManager.NavigateTo($"/milestones/{context.Id}"))" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MainContent>
+</OverviewPageLayout>
+
 
 @code {
     private List<Milestone> Milestones = new();

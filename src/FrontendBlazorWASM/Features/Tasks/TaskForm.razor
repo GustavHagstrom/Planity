@@ -1,27 +1,20 @@
-@using Planity.FrontendBlazorWASM.Shared.Models
-@using TaskStatus = Planity.FrontendBlazorWASM.TaskStatus;
-@using MudBlazor
+<MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true" />
+<MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description" />
+<MudDatePicker @bind-Date="task.Start" Label="Startdatum" />
+<MudDatePicker @bind-Date="task.End" Label="Slutdatum" />
+<MudSelect T="ProjectTaskStatus" Label="Status" @bind-Value="task.Status">
+    @foreach (ProjectTaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
+    {
+        <MudSelectItem Value="@status">@status</MudSelectItem>
+    }
+</MudSelect>
+<MudTextField T="string" @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName" />
 
-<EntityForm TModel="ProjectTask" Model="task" OnValidSubmit="HandleValidSubmit" SaveButtonText="Spara">
-        <MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true" />
-        <MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description" />
-        <MudDatePicker @bind-Date="task.Start" Label="Startdatum" />
-        <MudDatePicker @bind-Date="task.End" Label="Slutdatum" />
-        <MudSelect T="TaskStatus" Label="Status" @bind-Value="task.Status">
-            @foreach (TaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
-            {
-                <MudSelectItem Value="@status">@status</MudSelectItem>
-            }
-        </MudSelect>
-        <MudTextField T="string" @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName" />
-</EntityForm>
 
 @code {
     [Parameter] public ProjectTask? TaskModel { get; set; }
-    [Parameter] public EventCallback<ProjectTask> OnSaved { get; set; }
 
     private ProjectTask task = new();
-    private bool isNew => TaskModel is null;
 
     protected override void OnParametersSet()
     {
@@ -40,10 +33,5 @@
                 OrganizationId = TaskModel.OrganizationId
             };
         }
-    }
-
-    private async Task HandleValidSubmit()
-    {
-        await OnSaved.InvokeAsync(task);
     }
 }

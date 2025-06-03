@@ -1,22 +1,14 @@
-@using Planity.FrontendBlazorWASM.Shared.Models
-@using MudBlazor
-
-<EntityForm TModel="Milestone" Model="milestone" OnValidSubmit="HandleValidSubmit" SaveButtonText="Spara">
+<MudStack Spacing="2">
     <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true" />
     <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description" />
     <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
     <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
-</EntityForm>
+</MudStack>
 
 @code {
     [Parameter] public Milestone? MilestoneModel { get; set; }
-    [Parameter] public EventCallback<Milestone> OnSaved { get; set; }
 
-    private Milestone milestone = new()
-    {
-        Date = null
-    };
-    private bool isNew => MilestoneModel is null;
+    private Milestone milestone = new();
 
     protected override void OnParametersSet()
     {
@@ -33,10 +25,5 @@
                 ProjectId = MilestoneModel.ProjectId
             };
         }
-    }
-
-    private async Task HandleValidSubmit()
-    {
-        await OnSaved.InvokeAsync(milestone);
     }
 }

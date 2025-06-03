@@ -1,35 +1,38 @@
 @page "/resources"
-@using Planity.FrontendBlazorWASM.Shared.Models
-@using Microsoft.Extensions.Localization
 @inject NavigationManager NavigationManager
-@inject Planity.FrontendBlazorWASM.Shared.Services.IResourceService ResourceService
+@inject IResourceService ResourceService
 @inject IStringLocalizer<ResourceOverviewPage> localizer
-@using MudBlazor
 
-<MudPaper Class="pa-4">
-    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-        <MudText Typo="Typo.h5">@localizer["Resursöversikt"]</MudText>
+
+
+<OverviewPageLayout Title="@localizer["Resursöversikt"]">
+    <Actions>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ResourceNew))" StartIcon="@Icons.Material.Filled.Add">
-            @localizer["Skapa ny resurs"]
+            @localizer["Ny resurs"]
         </MudButton>
-    </MudStack>
-    <MudDivider Class="my-2" />
-    <MudTable Items="@resources" Hover="true">
-        <HeaderContent>
-            <MudTh>@localizer["Namn"]</MudTh>
-            <MudTh>@localizer["Roll"]</MudTh>
-            <MudTh></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@context.Name</MudTd>
-            <MudTd>@context.Role</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary"
-                               OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ResourceDetails(context.Id)))" />
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-</MudPaper>
+    </Actions>
+    <Filters>
+
+    </Filters>
+    <MainContent>
+        <MudTable Items="@resources" Hover="true" Dense="true">
+            <HeaderContent>
+                <MudTh>@localizer["Namn"]</MudTh>
+                <MudTh>@localizer["Roll"]</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Role</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary" Size="Size.Small"
+                                   OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ResourceDetails(context.Id)))" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MainContent>
+</OverviewPageLayout>
+
 
 @code {
     private List<Resource> resources = new();

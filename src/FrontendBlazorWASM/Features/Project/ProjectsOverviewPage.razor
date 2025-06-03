@@ -1,35 +1,40 @@
 ﻿@page "/projects"
-@using Planity.FrontendBlazorWASM.Shared.Models
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<ProjectsOverviewPage> localizer
 
-<MudPaper Class="pa-4">
-    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-        <MudText Typo="Typo.h5">Projektöversikt</MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))" StartIcon="@Icons.Material.Filled.Add">
-            Skapa nytt projekt
+<OverviewPageLayout Title="@localizer["Projektöversikt"]">
+    <Actions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))">
+            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" Size="Size.Small"/>
+            <span>@localizer["Skapa nytt projekt"]</span>
         </MudButton>
-    </MudStack>
+    </Actions>
+    <Filters>
 
-    <MudTable Items="@Projects" Hover="true">
-        <HeaderContent>
-            <MudTh>Namn</MudTh>
-            <MudTh>Status</MudTh>
-            <MudTh>Start</MudTh>
-            <MudTh>Slut</MudTh>
-            <MudTh></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@context.Name</MudTd>
-            <MudTd>@context.Status</MudTd>
-            <MudTd>@context.Start?.ToShortDateString()</MudTd>
-            <MudTd>@context.End?.ToShortDateString()</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary"
-                               OnClick="@(() => NavigationManager.NavigateTo($"/projects/{context.Id}"))" />
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-</MudPaper>
+    </Filters>
+    <MainContent>
+        <MudTable Items="@Projects" Hover="true" Dense="true">
+            <HeaderContent>
+                <MudTh>Namn</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Start</MudTh>
+                <MudTh>Slut</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Status</MudTd>
+                <MudTd>@context.Start?.ToShortDateString()</MudTd>
+                <MudTd>@context.End?.ToShortDateString()</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary" Size="Size.Small"
+                                   OnClick="@(() => NavigationManager.NavigateTo($"/projects/{context.Id}"))" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MainContent>
+</OverviewPageLayout>
+
 
 @code {
     private List<Project> Projects = new();

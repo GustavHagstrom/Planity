@@ -1,0 +1,30 @@
+<div class="pa-4">
+    <MudStack Spacing="2">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudText Typo="Typo.h4">@Title</MudText>
+            @if (Actions != null)
+            {
+                <MudStack Direction="Row" Spacing="1">
+                    @Actions
+                </MudStack>
+            }
+        </MudStack>
+        @if (Filters != null)
+        {
+            <MudPaper Class="pa-2" Elevation="0">
+                @Filters
+            </MudPaper>
+        }
+        <MudDivider/>
+        <div>
+            @MainContent
+        </div>
+    </MudStack>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public RenderFragment? Filters { get; set; }
+    [Parameter] public RenderFragment? MainContent { get; set; }
+}
