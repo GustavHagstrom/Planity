@@ -27,7 +27,7 @@
         </ItemTemplate>
     </EntityList>
 
-    <EntityList TItem="Milesonte" Title="Milestones" Items="Project.Milestones">
+    <EntityList TItem="Milestone" Title="Milestones" Items="Project.Milestones">
         <ItemTemplate Context="milestone">
             <MudText>
                 <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>

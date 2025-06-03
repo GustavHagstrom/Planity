@@ -18,7 +18,7 @@
 @code {
     private List<Project> Projects = new();
     private string? selectedProjectId;
-    private Milesonte newMilestone = new();
+    private Milestone newMilestone = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,7 +26,7 @@
         selectedProjectId = Projects.FirstOrDefault()?.Id;
     }
 
-    private async Task OnMilestoneSaved(Milesonte milestone)
+    private async Task OnMilestoneSaved(Milestone milestone)
     {
         if (!string.IsNullOrEmpty(selectedProjectId))
         {

@@ -2,7 +2,7 @@
 @using MudBlazor
 
 <MudForm @ref="mudForm" Model="Model">
-    @Fields
+    @ChildContent
     <MudButton Color="Color.Primary" OnClick="OnSubmitAsync" Disabled="IsSaving">
         @if (IsSaving)
         {
@@ -18,7 +18,7 @@
 
 @code {
     [Parameter] public TModel Model { get; set; } = default!;
-    [Parameter] public RenderFragment Fields { get; set; } = default!;
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
     [Parameter] public EventCallback OnValidSubmit { get; set; }
     [Parameter] public string? SaveButtonText { get; set; }
 

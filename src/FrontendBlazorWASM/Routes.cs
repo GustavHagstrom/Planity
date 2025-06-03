@@ -7,7 +7,7 @@ public static class Routes
     public const string Dashboard = "/";
     public const string Settings = "/settings";
     public const string ProjectsOverview = "/projects";
-    public const string ProjecstNew = "projects/new";
+    public const string ProjectsNew = "/projects/new";
     public static string ProjectDetails(string id) => $"/projects/{id}";
     public const string Unauthorized = "/unauthorized";
 
@@ -31,7 +31,7 @@ public static class Routes
         Dashboard,
         Settings,
         ProjectsOverview,
-        ProjecstNew,
+        ProjectsNew,
         ProjectDetails("SampleId"),
         Unauthorized,
         Resources,

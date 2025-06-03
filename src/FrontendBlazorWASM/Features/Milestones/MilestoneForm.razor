@@ -1,20 +1,18 @@
 @using Planity.FrontendBlazorWASM.Shared.Models
 @using MudBlazor
 
-<EntityForm TModel="Milesonte" Model="milestone" OnValidSubmit="HandleValidSubmit" SaveButtonText="Spara">
-    <EntityForm.Fields>
-        <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true" />
-        <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description" />
-        <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
-        <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
-    </EntityForm.Fields>
+<EntityForm TModel="Milestone" Model="milestone" OnValidSubmit="HandleValidSubmit" SaveButtonText="Spara">
+    <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true" />
+    <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description" />
+    <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
+    <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
 </EntityForm>
 
 @code {
-    [Parameter] public Milesonte? MilestoneModel { get; set; }
-    [Parameter] public EventCallback<Milesonte> OnSaved { get; set; }
+    [Parameter] public Milestone? MilestoneModel { get; set; }
+    [Parameter] public EventCallback<Milestone> OnSaved { get; set; }
 
-    private Milesonte milestone = new()
+    private Milestone milestone = new()
     {
         Date = null
     };
@@ -24,7 +22,7 @@
     {
         if (MilestoneModel != null)
         {
-            milestone = new Milesonte
+            milestone = new Milestone
             {
                 Id = MilestoneModel.Id,
                 Name = MilestoneModel.Name,

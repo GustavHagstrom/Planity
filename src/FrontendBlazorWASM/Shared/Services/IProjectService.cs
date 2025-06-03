@@ -20,9 +20,9 @@ public interface IProjectService
     Task<List<ProjectTask>> GetAllTasksAsync();
 
     // Milestones
-    Task<Milesonte> AddMilestoneToProjectAsync(string projectId, Milesonte milestone);
-    Task<Milesonte> UpdateMilestoneAsync(string projectId, Milesonte milestone);
+    Task<Milestone> AddMilestoneToProjectAsync(string projectId, Milestone milestone);
+    Task<Milestone> UpdateMilestoneAsync(string projectId, Milestone milestone);
     Task DeleteMilestoneAsync(string projectId, string milestoneId);
-    Task<Milesonte?> GetMilestoneByIdAsync(string milestoneId);
-    Task<List<Milesonte>> GetAllMilestonesAsync();
+    Task<Milestone?> GetMilestoneByIdAsync(string milestoneId);
+    Task<List<Milestone>> GetAllMilestonesAsync();
 }

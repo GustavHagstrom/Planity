@@ -23,9 +23,9 @@ public class MockProjectService : IProjectService
                     new ProjectTask { Id = "T1", Name = "Grävning", Status = TaskStatus.NotStarted, Start = DateTime.Today, End = DateTime.Today.AddDays(2), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
                     new ProjectTask { Id = "T2", Name = "Gjutning platta", Status = TaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(5), AssignedResourceId = "3", AssignedResourceName = "Cecilia Carlsson" }
                 },
-                Milestones = new List<Milesonte>
+                Milestones = new List<Milestone>
                 {
-                    new Milesonte { Id = "M1", Name = "Platta klar", Date = DateTime.Today.AddDays(5), IsCompleted = false, ProjectId = Guid.Empty }
+                    new Milestone { Id = "M1", Name = "Platta klar", Date = DateTime.Today.AddDays(5), IsCompleted = false, ProjectId = Guid.Empty }
                 }
             },
             new Project
@@ -36,7 +36,7 @@ public class MockProjectService : IProjectService
                 OrganizationId = "Org1",
                 Status = ProjectStatus.NotStarted,
                 Tasks = new List<ProjectTask>(),
-                Milestones = new List<Milesonte>()
+                Milestones = new List<Milestone>()
             }
         };
     }
@@ -130,7 +130,7 @@ public class MockProjectService : IProjectService
         return Task.CompletedTask;
     }
 
-    public Task<Milesonte> AddMilestoneToProjectAsync(string projectId, Milesonte milestone)
+    public Task<Milestone> AddMilestoneToProjectAsync(string projectId, Milestone milestone)
     {
         var project = _projects.FirstOrDefault(p => p.Id == projectId);
         if (project != null)
@@ -141,7 +141,7 @@ public class MockProjectService : IProjectService
         return Task.FromResult(milestone);
     }
 
-    public Task<Milesonte> UpdateMilestoneAsync(string projectId, Milesonte milestone)
+    public Task<Milestone> UpdateMilestoneAsync(string projectId, Milestone milestone)
     {
         var project = _projects.FirstOrDefault(p => p.Id == projectId);
         if (project != null)
@@ -182,13 +182,13 @@ public class MockProjectService : IProjectService
         return Task.FromResult(allTasks);
     }
 
-    public Task<Milesonte?> GetMilestoneByIdAsync(string milestoneId)
+    public Task<Milestone?> GetMilestoneByIdAsync(string milestoneId)
     {
         var milestone = _projects.SelectMany(p => p.Milestones).FirstOrDefault(m => m.Id == milestoneId);
         return Task.FromResult(milestone);
     }
 
-    public Task<List<Milesonte>> GetAllMilestonesAsync()
+    public Task<List<Milestone>> GetAllMilestonesAsync()
     {
         var allMilestones = _projects.SelectMany(p => p.Milestones).ToList();
         return Task.FromResult(allMilestones);

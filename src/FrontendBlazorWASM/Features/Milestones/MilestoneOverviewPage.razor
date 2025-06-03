@@ -34,7 +34,7 @@
 </MudPaper>
 
 @code {
-    private List<Milesonte> Milestones = new();
+    private List<Milestone> Milestones = new();
     private Dictionary<string, string> MilestoneProjectMap = new();
 
     protected override async Task OnInitializedAsync()
@@ -46,7 +46,7 @@
             .ToDictionary(x => x.Id, x => x.ProjectName);
     }
 
-    private string GetProjectName(Milesonte milestone)
+    private string GetProjectName(Milestone milestone)
     {
         return MilestoneProjectMap.TryGetValue(milestone.Id, out var name) ? name : string.Empty;
     }

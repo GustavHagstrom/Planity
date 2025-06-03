@@ -12,7 +12,7 @@ public class Project : IGanttItem
     public DateTime? End => Tasks.Max(t => t.End);
     public ProjectStatus Status { get; set; }
     public List<ProjectTask> Tasks { get; set; } = new();
-    public List<Milesonte> Milestones { get; set; } = new();
+    public List<Milestone> Milestones { get; set; } = new();
     public string? Color => null;
     public IEnumerable<IGanttItem>? Children => Tasks;
     public bool IsExpanded { get; set; } = false;

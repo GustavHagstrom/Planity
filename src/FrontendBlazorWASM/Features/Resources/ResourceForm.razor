@@ -2,11 +2,9 @@
 @inject IStringLocalizer<ResourceForm> localizer
 
 <EntityForm TModel="Resource" Model="resource" OnValidSubmit="HandleValidSubmit" SaveButtonText="@localizer["Spara"]">
-    <EntityForm.Fields>
         <MudTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
         <MudTextField T="string" @bind-Value="resource.Role" Label="@localizer["Roll"]" For="() => resource.Role" />
         <MudTextField T="string" @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
-    </EntityForm.Fields>
 </EntityForm>
 
 @code {

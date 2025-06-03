@@ -3,7 +3,6 @@
 @using MudBlazor
 
 <EntityForm TModel="ProjectTask" Model="task" OnValidSubmit="HandleValidSubmit" SaveButtonText="Spara">
-    <EntityForm.Fields>
         <MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true" />
         <MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description" />
         <MudDatePicker @bind-Date="task.Start" Label="Startdatum" />
@@ -15,7 +14,6 @@
             }
         </MudSelect>
         <MudTextField T="string" @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName" />
-    </EntityForm.Fields>
 </EntityForm>
 
 @code {
