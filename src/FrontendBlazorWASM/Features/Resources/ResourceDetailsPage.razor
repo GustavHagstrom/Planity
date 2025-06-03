@@ -1,21 +1,24 @@
 @page "/resources/{ResourceId}"
-@using Planity.FrontendBlazorWASM.Shared.Models
 @inject Planity.FrontendBlazorWASM.Shared.Services.IResourceService ResourceService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<ResourceDetailsPage> localizer
-@using MudBlazor
+@inject IJSRuntime JS
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Resursinformation</MudText>
+    <EntityForm TModel="Resource" Model="resource" OnValidSubmit="SaveResource" Title="@localizer["Resursöversikt"]">
     @if (resource == null)
     {
-        <MudProgressCircular Indeterminate Color="Color.Primary" />
+        <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
     }
     else
     {
-        <ResourceForm ResourceModel="resource" OnSaved="OnResourceSaved" />
+        
+        <MudTextField T="string" Label="@localizer["Namn"]" @bind-Value="resource.Name" For="() => resource.Name" Required="true"></MudTextField>
+        <MudTextField T="string" Label="@localizer["Roll"]" @bind-Value="resource.Role" For="() => resource.Role"></MudTextField>
+        <MudTextField T="string" Label="@localizer["Organisation"]" @bind-Value="resource.OrganizationId" For="() => resource.OrganizationId"></MudTextField>
+        
     }
-    <MudButton Variant="Variant.Text" OnClick="GoBack">Tillbaka till översikt</MudButton>
+    </EntityForm>
 </MudPaper>
 
 @code {
@@ -31,13 +34,13 @@
         }
     }
 
-    private void OnResourceSaved(Resource r)
+    private async Task SaveResource()
     {
-        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.Resources);
+        if (resource != null)
+        {
+            await ResourceService.UpdateResourceAsync(resource);
+            await JS.InvokeVoidAsync("history.back");
+        }
     }
 
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.Resources);
-    }
 }

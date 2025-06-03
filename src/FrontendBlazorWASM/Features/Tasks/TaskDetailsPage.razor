@@ -1,32 +1,33 @@
 @page "/tasks/{TaskId}"
-@using Planity.FrontendBlazorWASM.Shared.Models
 @using TaskStatus = Planity.FrontendBlazorWASM.TaskStatus;
 @inject IProjectService ProjectService
 @inject NavigationManager NavigationManager
-@using MudBlazor
+@inject IJSRuntime JS
+@inject IStringLocalizer<TaskDetailsPage> localizer
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Uppgiftsinformation</MudText>
-    @if (task == null)
-    {
-        <MudProgressCircular Indeterminate Color="Color.Primary" />
-    }
-    else
-    {
-        <MudTextField Label="Namn" @bind-Value="task.Name" />
-        <MudTextField Label="Beskrivning" @bind-Value="task.Description" />
-        <MudDatePicker Label="Startdatum" @bind-Date="task.Start" />
-        <MudDatePicker Label="Slutdatum" @bind-Date="task.End" />
-        <MudSelect T="TaskStatus" Label="Status" @bind-Value="task.Status">
-            @foreach (TaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
-            {
-                <MudSelectItem Value="@status">@status</MudSelectItem>
-            }
-        </MudSelect>
-        <MudTextField Label="Tilldelad resurs" @bind-Value="task.AssignedResourceName" />
-        <MudButton Color="Color.Primary" OnClick="SaveTask">Spara ändringar</MudButton>
-    }
-    <MudButton Variant="Variant.Text" OnClick="GoBack">Tillbaka till översikt</MudButton>
+    <EntityForm TModel="ProjectTask" Model="task" OnValidSubmit="SaveTask" Title="@localizer["Uppgiftsinformation"]">
+        @if (task == null)
+        {
+            <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
+        }
+        else
+        {
+        
+            <MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true"></MudTextField>
+            <MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description"></MudTextField>
+            <MudDatePicker @bind-Date="task.Start" Label="Startdatum"></MudDatePicker>
+            <MudDatePicker @bind-Date="task.End" Label="Slutdatum"></MudDatePicker>
+            <MudSelect T="TaskStatus" Label="Status" @bind-Value="task.Status">
+                @foreach (TaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
+                {
+                    <MudSelectItem Value="@status">@status</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName"></MudTextField>
+        
+        }
+    </EntityForm>
 </MudPaper>
 
 @code {
@@ -49,12 +50,8 @@
         if (task != null && projectId != null)
         {
             await ProjectService.UpdateTaskAsync(projectId, task);
-            NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TasksOverview);
+            await JS.InvokeVoidAsync("history.back");
         }
     }
 
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TasksOverview);
-    }
 }

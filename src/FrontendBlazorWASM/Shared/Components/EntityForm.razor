@@ -1,19 +1,26 @@
 @typeparam TModel
-@using MudBlazor
+@inject IStringLocalizer<EntityForm<TModel>> Localizer
 
 <MudForm @ref="mudForm" Model="Model">
+    <div style="display: flex" class="mb-4">
+        <MudText Typo="Typo.h5">@Title</MudText>
+        <MudSpacer/>
+        <MudStack Row="true">
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnSubmitAsync" Disabled="IsSaving">
+                @if (IsSaving)
+                {
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Sharp.Save" Class="mr-2" Size="Size.Small" />
+                }
+                <span>@(SaveButtonText ?? @Localizer["Spara"])</span>
+            </MudButton>
+        </MudStack>
+    </div>
+    
     @ChildContent
-    <MudButton Color="Color.Primary" OnClick="OnSubmitAsync" Disabled="IsSaving">
-        @if (IsSaving)
-        {
-            <MudProgressCircular Indeterminate="true" Size="Size.Large" Class="mr-2" />
-            <span>Sparar...</span>
-        }
-        else
-        {
-            <span>@(SaveButtonText ?? "Spara")</span>
-        }
-    </MudButton>
 </MudForm>
 
 @code {
@@ -21,6 +28,7 @@
     [Parameter] public RenderFragment ChildContent { get; set; } = default!;
     [Parameter] public EventCallback OnValidSubmit { get; set; }
     [Parameter] public string? SaveButtonText { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
 
     private MudForm? mudForm;
     private bool IsSaving = false;

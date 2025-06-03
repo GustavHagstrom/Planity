@@ -1,49 +1,52 @@
 ﻿@page "/projects/{id}"
-
 @inject NavigationManager NavigationManager
 @inject IProjectService ProjectService
 @inject IStringLocalizer<ProjectDetailsPage> localizer
+@inject IJSRuntime JS
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">@localizer["Projektinformation"]</MudText>
-
-    <MudTextField T="string" Label="@localizer["Projektnamn"]" @bind-Value="Project.Name" />
-    <MudTextField T="string" Label="@localizer["Beskrivning"]" @bind-Value="Project.Description" />
-    <MudSelect T="ProjectStatus" Label="@localizer["Status"]" @bind-Value="Project.Status">
-        @foreach (var status in Enum.GetValues<ProjectStatus>())
+    <EntityForm TModel="Project" Model="Project" OnValidSubmit="SaveProject" Title="@localizer["Projektinformation"]">
+        @if (Project == null)
         {
-            <MudSelectItem Value="@status">@status</MudSelectItem>
+            <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
         }
-    </MudSelect>
-
-    <MudDivider Class="my-4" />
-
-    <EntityList TItem="ProjectTask" Title="@localizer["Uppgifter"]" Items="Project.Tasks">
-        <ItemTemplate Context="task">
-            <MudText>
-                <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(task.Id)">@task.Name</MudLink>
-            </MudText>
-            <MudChip T="string" Color="Color.Info">@task.Status</MudChip>
-        </ItemTemplate>
-    </EntityList>
-
-    <EntityList TItem="Milestone" Title="Milestones" Items="Project.Milestones">
-        <ItemTemplate Context="milestone">
-            <MudText>
-                <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>
-            </MudText>
-            <MudChip T="string" Color="@(milestone.IsCompleted ? Color.Success : Color.Default)">@((milestone.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
-        </ItemTemplate>
-    </EntityList>
-
-    <MudButton Color="Color.Primary" OnClick="SaveProject">@localizer["Spara ändringar"]</MudButton>
+        else
+        {
+        
+            <MudTextField T="string" Label="@localizer["Projektnamn"]" @bind-Value="Project.Name" For="() => Project.Name" Required="true"></MudTextField>
+            <MudTextField T="string" Label="@localizer["Beskrivning"]" @bind-Value="Project.Description" For="() => Project.Description"></MudTextField>
+            <MudSelect T="ProjectStatus" Label="@localizer["Status"]" @bind-Value="Project.Status">
+                @foreach (var status in Enum.GetValues<ProjectStatus>())
+                {
+                    <MudSelectItem Value="@status">@status</MudSelectItem>
+                }
+            </MudSelect>
+        
+            <MudDivider Class="my-4"></MudDivider>
+            <EntityList TItem="ProjectTask" Title="@localizer["Uppgifter"]" Items="Project.Tasks">
+                <ItemTemplate Context="task">
+                    <MudText>
+                        <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(task.Id)">@task.Name</MudLink>
+                    </MudText>
+                    <MudChip T="string" Color="Color.Info">@task.Status</MudChip>
+                </ItemTemplate>
+            </EntityList>
+            <EntityList TItem="Milestone" Title="Milestones" Items="Project.Milestones">
+                <ItemTemplate Context="milestone">
+                    <MudText>
+                        <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>
+                    </MudText>
+                    <MudChip T="string" Color="@(milestone.IsCompleted ? Color.Success : Color.Default)">@((milestone.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
+                </ItemTemplate>
+            </EntityList>
+        }
+    </EntityForm>
 </MudPaper>
 
 @code {
     [Parameter] public string? Id { get; set; }
 
     private Project Project = new();
-    private bool IsLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,12 +56,11 @@
             if (project != null)
                 Project = project;
         }
-        IsLoading = false;
     }
 
     private async Task SaveProject()
     {
         await ProjectService.UpdateProjectAsync(Project);
-        NavigationManager.NavigateTo("/projects");
+        await JS.InvokeVoidAsync("history.back");
     }
 }

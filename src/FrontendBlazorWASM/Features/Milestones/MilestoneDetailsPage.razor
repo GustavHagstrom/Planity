@@ -1,24 +1,25 @@
 @page "/milestones/{MilestoneId}"
-@using Planity.FrontendBlazorWASM.Shared.Models
 @inject IProjectService ProjectService
 @inject NavigationManager NavigationManager
-@using MudBlazor
+@inject IJSRuntime JS
+@inject IStringLocalizer<MilestoneDetailsPage> localizer
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Milestoneinformation</MudText>
-    @if (milestone == null)
-    {
-        <MudProgressCircular Indeterminate Color="Color.Primary" />
-    }
-    else
-    {
-        <MudTextField Label="Namn" @bind-Value="milestone.Name" />
-        <MudTextField Label="Beskrivning" @bind-Value="milestone.Description" />
-        <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
-        <MudCheckBox T="bool" @bind-Checked="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
-        <MudButton Color="Color.Primary" OnClick="SaveMilestone">Spara ändringar</MudButton>
-    }
-    <MudButton Variant="Variant.Text" OnClick="GoBack">Tillbaka till översikt</MudButton>
+    <EntityForm TModel="Milestone" Model="milestone" OnValidSubmit="SaveMilestone" Title="@localizer["Milstensinformation"]">
+        @if (milestone == null)
+        {
+            <MudProgressCircular Indeterminate Color="Color.Primary"></MudProgressCircular>
+        }
+        else
+        {
+        
+            <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true"></MudTextField>
+            <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description"></MudTextField>
+            <MudDatePicker @bind-Date="milestone.Date" Label="Datum"></MudDatePicker>
+            <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar"></MudCheckBox>
+        
+        }
+    </EntityForm>
 </MudPaper>
 
 @code {
@@ -41,12 +42,7 @@
         if (milestone != null && projectId != null)
         {
             await ProjectService.UpdateMilestoneAsync(projectId, milestone);
-            NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
+            await JS.InvokeVoidAsync("history.back");
         }
-    }
-
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
     }
 }
