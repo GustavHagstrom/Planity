@@ -10,16 +10,6 @@
     </MainContent>
 </EntityFormsPageLayout>
 
-<MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Ny milestone</MudText>
-    <MudSelect T="string" Label="Projekt" @bind-Value="selectedProjectId" Required="true">
-        @foreach (var project in Projects)
-        {
-            <MudSelectItem Value="@project.Id">@project.Name</MudSelectItem>
-        }
-    </MudSelect>
-    <MilestoneForm OnSaved="OnMilestoneSaved" />
-</MudPaper>
 
 @code {
     private List<Project> Projects = new();

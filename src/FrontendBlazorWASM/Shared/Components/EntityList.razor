@@ -1,21 +1,26 @@
 @typeparam TItem
-@using MudBlazor
 
-<MudText Typo="Typo.h6">@Title</MudText>
-<MudList T="TItem">
+@if(Title is not null)
+{
+    <MudText Typo="Typo.h6">@Title</MudText>
+}
+@* <MudList T="TItem">
     @if (Items != null)
     {
         @foreach (var item in Items)
         {
             <MudListItem>
-                @ItemTemplate(item)
+                @RowTemplate(item)
             </MudListItem>
         }
     }
-</MudList>
+</MudList> *@
+
+<MudTable T="TItem" Items="@Items" Hover="true" Dense="true" HeaderContent="HeaderContent" RowTemplate="RowTemplate"/>
 
 @code {
-    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Title { get; set; }
     [Parameter] public IEnumerable<TItem>? Items { get; set; }
-    [Parameter] public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment<TItem> RowTemplate { get; set; } = default!;
 }

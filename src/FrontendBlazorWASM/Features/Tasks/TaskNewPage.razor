@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<TaskNewPage> localizer
 
-<EntityFormsPageLayout Title="@localizer["Ny uppgift"]" is null" OnSave="Save">
+<EntityFormsPageLayout Title="@localizer["Ny uppgift"]" IsLoading="newTask is null" OnSave="Save">
     <MainContent>
         <TaskForm TaskModel="newTask" />
     </MainContent>
