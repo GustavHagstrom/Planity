@@ -16,7 +16,6 @@ public class MockProjectService : IProjectService
                 Id = "P1",
                 Name = "Bygg nytt garage",
                 Description = "Bygga ett nytt dubbelgarage.",
-                OrganizationId = "Org1",
                 Status = ProjectStatus.InProgress,
                 Tasks = new List<ProjectTask>
                 {
@@ -33,7 +32,6 @@ public class MockProjectService : IProjectService
                 Id = "P2",
                 Name = "Renovera kök",
                 Description = "Totalrenovering av kök.",
-                OrganizationId = "Org1",
                 Status = ProjectStatus.NotStarted,
                 Tasks = new List<ProjectTask>(),
                 Milestones = new List<Milestone>()

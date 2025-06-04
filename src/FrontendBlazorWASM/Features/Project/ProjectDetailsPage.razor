@@ -7,43 +7,63 @@
 <EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null" OnSave="Save">
     <MainContent>
 
-        <ProjectForm ProjectModel="Project"/>
+        <ProjectForm ProjectModel="Project" />
 
         <MudDivider Class="my-4"></MudDivider>
 
-        <EntityList TItem="ProjectTask" Title="@localizer["Uppgifter"]" Items="Project?.Tasks">
+        <EntityTable Title="@localizer["Uppgifter"]" Items="Project?.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
                 <MudTh>@localizer["Status"]</MudTh>
+                <MudTh>@localizer["Startdatum"]</MudTh>
+                <MudTh>@localizer["Slutdatum"]</MudTh>
+                <MudTh>@localizer["Tilldelad resurs"]</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>
-                    <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(context.Id)" Typo="Typo.inherit">@context.Name</MudLink>
+                    @context.Name
                 </MudTd>
                 <MudTd>
                     <MudChip T="string" Color="Color.Info" Size="Size.Small">@context.Status</MudChip>
                 </MudTd>
+                <MudTd>
+                    @context.Start?.ToString("yyyy-MM-dd")
+                </MudTd>
+                <MudTd>
+                    @context.End?.ToString("yyyy-MM-dd")
+                </MudTd>
+                <MudTd>
+                    @context.AssignedResourceName
+                </MudTd>
             </RowTemplate>
-        </EntityList>
+        </EntityTable>
 
-        <EntityList TItem="Milestone" Title="Milestones" Items="Project?.Milestones">
+        <EntityTable Title="@localizer["Milstenar"]" Items="Project?.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
                 <MudTh>@localizer["Status"]</MudTh>
+                <MudTh>@localizer["Datum"]</MudTh>
+                <MudTh>@localizer["Beskrivning"]</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>
+                    @context.Name
                     <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(context.Id)" Typo="Typo.inherit">@context.Name</MudLink>
                 </MudTd>
                 <MudTd>
                     <MudChip T="string" Color="@(context.IsCompleted? Color.Success: Color.Default)" Size="Size.Small">@((context.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
                 </MudTd>
+                <MudTd>
+                    @context.Date?.ToString("yyyy-MM-dd")
+                </MudTd>
+                <MudTd>
+                    @context.Description
+                </MudTd>
             </RowTemplate>
-        </EntityList>
+        </EntityTable>
 
     </MainContent>
 </EntityFormsPageLayout>
-
 
 @code {
     [Parameter] public string? Id { get; set; }

@@ -14,25 +14,20 @@
 
     </Filters>
     <MainContent>
-        <MudTable Items="@Milestones" Hover="true" Dense="true">
+        <EntityTable Items="@Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
             <HeaderContent>
                 <MudTh>Namn</MudTh>
                 <MudTh>Datum</MudTh>
                 <MudTh>Status</MudTh>
                 <MudTh>Projekt</MudTh>
-                <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
                 <MudTd>@context.Date.ToString()</MudTd>
                 <MudTd>@(context.IsCompleted ? "Klar" : "Ej klar")</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
-                <MudTd>
-                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary" Size="Size.Small"
-                                   OnClick="@(() => NavigationManager.NavigateTo($"/milestones/{context.Id}"))" />
-                </MudTd>
             </RowTemplate>
-        </MudTable>
+        </EntityTable>
     </MainContent>
 </OverviewPageLayout>
 

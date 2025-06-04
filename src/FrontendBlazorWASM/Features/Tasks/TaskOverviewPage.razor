@@ -13,14 +13,13 @@
 
     </Filters>
     <MainContent>
-        <MudTable Items="@Tasks" Hover="true" Dense="true">
+        <EntityTable Items="@Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
             <HeaderContent>
                 <MudTh>Namn</MudTh>
                 <MudTh>Status</MudTh>
                 <MudTh>Start</MudTh>
                 <MudTh>Slut</MudTh>
                 <MudTh>Projekt</MudTh>
-                <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
@@ -28,12 +27,8 @@
                 <MudTd>@context.Start?.ToShortDateString()</MudTd>
                 <MudTd>@context.End?.ToShortDateString()</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
-                <MudTd>
-                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary" Size="Size.Small"
-                                   OnClick="@(() => NavigationManager.NavigateTo($"/tasks/{context.Id}"))" />
-                </MudTd>
             </RowTemplate>
-        </MudTable>
+        </EntityTable>
     </MainContent>
 </OverviewPageLayout>
 

@@ -1,9 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
 <AuthorizeView>
+
     <Authorized>
+
         <MudLayout>
-            <MudDrawer Open="true" Variant="DrawerVariant.Mini" Anchor="Anchor.Left" Elevation="1" Class="mud-width-220" ClipMode="DrawerClipMode.Always">
+            <MudDrawer Open="true" Variant="DrawerVariant.Mini" Elevation="1" ClipMode="DrawerClipMode.Always" Breakpoint="Breakpoint.Sm">
                 <MudNavMenu>
                     @foreach (var route in Routes.AllRoutes)
                     {
@@ -25,7 +27,10 @@
                 @Body
             </MudMainContent>
         </MudLayout>
+
     </Authorized>
+
+
 
     <NotAuthorized>
         <RedirectToLogin/>

@@ -15,21 +15,16 @@
 
     </Filters>
     <MainContent>
-        <MudTable Items="@resources" Hover="true" Dense="true">
+        <EntityTable Items="@resources" EditLinkFunction="x => Routes.ResourceDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
                 <MudTh>@localizer["Roll"]</MudTh>
-                <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
                 <MudTd>@context.Role</MudTd>
-                <MudTd>
-                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Primary" Size="Size.Small"
-                                   OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ResourceDetails(context.Id)))" />
-                </MudTd>
             </RowTemplate>
-        </MudTable>
+        </EntityTable>
     </MainContent>
 </OverviewPageLayout>
 
