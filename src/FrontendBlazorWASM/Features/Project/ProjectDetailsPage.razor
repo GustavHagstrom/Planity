@@ -10,33 +10,37 @@
         <ProjectForm ProjectModel="Project"/>
 
         <MudDivider Class="my-4"></MudDivider>
+
         <EntityList TItem="ProjectTask" Title="@localizer["Uppgifter"]" Items="Project?.Tasks">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
                 <MudTh>@localizer["Status"]</MudTh>
             </HeaderContent>
-            <RowTemplate Context="task">
+            <RowTemplate>
                 <MudTd>
-                    <MudText>
-                        <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(task.Id)">@task.Name</MudLink>
-                    </MudText>
+                    <MudLink Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(context.Id)" Typo="Typo.inherit">@context.Name</MudLink>
                 </MudTd>
                 <MudTd>
-                    <MudChip T="string" Color="Color.Info">@task.Status</MudChip>
+                    <MudChip T="string" Color="Color.Info" Size="Size.Small">@context.Status</MudChip>
                 </MudTd>
             </RowTemplate>
         </EntityList>
-        <EntityList TItem="Milestone" Title="Milestones" Items="Project.Milestones">
-            <RowTemplate Context="milestone">
-                <div class="d-flex">
-                    <MudText>
-                        <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(milestone.Id)">@milestone.Name</MudLink>
-                    </MudText>
-                    <MudChip T="string" Color="@(milestone.IsCompleted? Color.Success: Color.Default)">@((milestone.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
-                </div>
+
+        <EntityList TItem="Milestone" Title="Milestones" Items="Project?.Milestones">
+            <HeaderContent>
+                <MudTh>@localizer["Namn"]</MudTh>
+                <MudTh>@localizer["Status"]</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(context.Id)" Typo="Typo.inherit">@context.Name</MudLink>
+                </MudTd>
+                <MudTd>
+                    <MudChip T="string" Color="@(context.IsCompleted? Color.Success: Color.Default)" Size="Size.Small">@((context.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
+                </MudTd>
             </RowTemplate>
         </EntityList>
-        
+
     </MainContent>
 </EntityFormsPageLayout>
 
