@@ -48,7 +48,6 @@
             <RowTemplate>
                 <MudTd>
                     @context.Name
-                    <MudLink Href="@Planity.FrontendBlazorWASM.Routes.MilestoneDetails(context.Id)" Typo="Typo.inherit">@context.Name</MudLink>
                 </MudTd>
                 <MudTd>
                     <MudChip T="string" Color="@(context.IsCompleted? Color.Success: Color.Default)" Size="Size.Small">@((context.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
