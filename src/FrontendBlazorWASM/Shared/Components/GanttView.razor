@@ -1,61 +1,56 @@
 ﻿@using System.Globalization
 @inject IJSRuntime JS
 
-<div class="gantt-container-flex">
-    <div class="gantt-left" style="width:@LeftWidthPx; min-width:100px; max-width:600px;">
-        @LeftContent
+<div>
+
+    <div class="gantt-header" style="display:flex; position:relative;">
+        @foreach (var day in EachDay(Start, End))
+        {
+            <div class="gantt-header-cell" style="flex: 0 0 @(PixelsPerDay)px; width:@PixelsPerDay px; min-width:@PixelsPerDay px; max-width:@PixelsPerDay px; border-right:1px solid #e0e0e0; text-align:center; font-size:0.8em;">
+                @day.ToString("dd MMM", CultureInfo.CurrentCulture)
+            </div>
+        }
     </div>
-    <div class="gantt-resizer" @onmousedown="StartResize"></div>
-    <div class="gantt-right">
-        <div class="gantt-header" style="display:flex; position:relative;">
-            @foreach (var day in EachDay(Start, End))
-            {
-                <div class="gantt-header-cell" style="flex: 0 0 @(PixelsPerDay)px; width:@PixelsPerDay px; min-width:@PixelsPerDay px; max-width:@PixelsPerDay px; border-right:1px solid #e0e0e0; text-align:center; font-size:0.8em;">
-                    @day.ToString("dd MMM", CultureInfo.CurrentCulture)
-                </div>
-            }
+
+    <div class="gantt-container-flex">
+
+        <div class="gantt-left" style="width: @LeftWidthPx;"></div>
+
+        <div class="gantt-right">
+
+            <div class="gantt-grid" style="display:flex; position:relative; height:40px;">
+                @foreach (var day in EachDay(Start, End))
+                {
+                    <div class="gantt-grid-cell" style="flex: 0 0 @(PixelsPerDay)px; width:@PixelsPerDay px; min-width:@PixelsPerDay px; max-width:@PixelsPerDay px; border-right:1px solid #e0e0e0; height:100%;"></div>
+                }
+            </div>
         </div>
-        <div class="gantt-grid" style="display:flex; position:relative; height:40px;">
-            @foreach (var day in EachDay(Start, End))
-            {
-                <div class="gantt-grid-cell" style="flex: 0 0 @(PixelsPerDay)px; width:@PixelsPerDay px; min-width:@PixelsPerDay px; max-width:@PixelsPerDay px; border-right:1px solid #e0e0e0; height:100%;"></div>
-            }
-        </div>
-        <CascadingValue Value="Start">
-            <CascadingValue Value="End">
-                <CascadingValue Value="PixelsPerDay">
-                    <div class="gantt-content" style="position:relative;">
-                        @RightContent
-                    </div>
-                </CascadingValue>
-            </CascadingValue>
+
+        <CascadingValue Value="this">
+            <div class="gantt-content">
+                @ChildContent
+            </div>
         </CascadingValue>
+
     </div>
+    
+
 </div>
+
+
 
 @code {
     [Parameter] public DateTime Start { get; set; }
     [Parameter] public DateTime End { get; set; }
     [Parameter] public double PixelsPerDay { get; set; } = 50;
-    [Parameter] public RenderFragment? LeftContent { get; set; }
-    [Parameter] public RenderFragment? RightContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    private double LeftWidth { get; set; } = 220;
-    private string LeftWidthPx => $"{LeftWidth}px";
-    private bool resizing = false;
+    public double LeftWidth { get; set; } = 220;
+    public string LeftWidthPx => $"{LeftWidth}px";
+    public double RowHeight { get; set; } = 40;
+    public string RowHeightPx => $"{RowHeight}px";
 
-    private void StartResize(MouseEventArgs e)
-    {
-        resizing = true;
-        _ = JS.InvokeVoidAsync("ganttResizer.init", DotNetObjectReference.Create(this), e);
-    }
 
-    [JSInvokable]
-    public void SetLeftWidth(double width)
-    {
-        LeftWidth = Math.Max(100, Math.Min(600, width));
-        StateHasChanged();
-    }
 
     private IEnumerable<DateTime> EachDay(DateTime from, DateTime to)
     {

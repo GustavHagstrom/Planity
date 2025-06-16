@@ -19,17 +19,9 @@
     transition: width 0.1s;
 }
 
-.gantt-resizer {
-    width: 6px;
-    cursor: col-resize;
-    background: #e0e0e0;
-    height: 100%;
-    z-index: 2;
-}
+
 
 .gantt-right {
-    flex: 1 1 0%;
-    min-width: 0;
     overflow-x: auto;
     position: relative;
     background: #fafbfc;
@@ -68,6 +60,4 @@
     left: 0;
     top: 0;
     width: 100%;
-    height: 40px;
-    pointer-events: none;
 }
