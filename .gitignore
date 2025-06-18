@@ -399,3 +399,69 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+
+# === Node Modules ===
+node_modules/
+
+# === SvelteKit & Vite build directories ===
+.svelte-kit/
+build/
+dist/
+
+# === Environment files ===
+.env
+.env.*          # .env.local, .env.production etc
+
+# === Test coverage ===
+coverage/
+
+# === Logs ===
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# === OS / System Files ===
+.DS_Store
+Thumbs.db
+
+# === IDEs / Editors ===
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === Cache ===
+.cache/
+.svelte-cache/
+.vite/
+*.tsbuildinfo
+
+# === Deployment Artifacts ===
+.vercel/
+.netlify/
+output/             # används av vissa adapters
+.serverless/        # om du experimenterar med serverless
+
+# === Miscellaneous ===
+*.local
+*.example           # t.ex. env.example kan sparas, men *.example annars ignoreras
+*.bak
+*.tmp
+
+# === Mac/Linux-specific ===
+*.orig              # merge conflict-filer
+
+# === Windows-specific ===
+ehthumbs.db
+Desktop.ini
+
+# === Optional: lockfiles (om du vill bara ha en) ===
+# yarn.lock
+# package-lock.json
+# pnpm-lock.yaml
