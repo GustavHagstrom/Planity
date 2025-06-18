@@ -21,5 +21,7 @@ public class ProjectTask : IGanttItem
     public IEnumerable<IGanttItem>? Children => [];
 
     public bool IsExpanded { get; set; } = false;
+
+    
 }
  

@@ -1,6 +1,8 @@
-﻿namespace Planity.FrontendBlazorWASM.Shared.Models;
+﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
 
-public class Milestone
+namespace Planity.FrontendBlazorWASM.Shared.Models;
+
+public class Milestone : IGanttItem
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string OrganizationId { get; set; } = string.Empty;
@@ -14,4 +16,14 @@ public class Milestone
 
     // Statusindikator om den är uppnådd
     public bool IsCompleted { get; set; } = false;
+
+    public DateTime? Start => Date;
+
+    public DateTime? End => null;
+
+    public GanttItemType Type => GanttItemType.Milestone;
+
+    public IEnumerable<IGanttItem>? Children => null;
+
+    public bool IsExpanded { get; set; }
 }

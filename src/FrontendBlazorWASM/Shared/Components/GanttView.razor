@@ -1,54 +1,70 @@
 ﻿@using System.Globalization
-@inject IJSRuntime JS
 
-<div>
+@if(Items is not null)
+{
+    <div>
 
-    <div class="gantt-header" style="display:flex; position:relative;">
-        @foreach (var day in EachDay(Start, End))
-        {
-            <div class="gantt-header-cell" style="flex: 0 0 @(PixelsPerDay)px; width:@PixelsPerDay px; min-width:@PixelsPerDay px; max-width:@PixelsPerDay px; border-right:1px solid #e0e0e0; text-align:center; font-size:0.8em;">
-                @day.ToString("dd MMM", CultureInfo.CurrentCulture)
-            </div>
-        }
-    </div>
+        @* left side, edit for control per row *@
+        <div style="width: @LeftWidthPx; margin-top: @HeaderHeightPx;">
+            @foreach (var item in Items)
+            {
+                <div style="height: @RowHeightPx; width: 100%;">
+                    <div class="gantt-row-content">
+                        @* Render item content here, e.g. item.Name *@
+                        @item.Name
+                    </div>
+                </div>
 
-    <div class="gantt-container-flex">
+            }
 
-        <div class="gantt-left" style="width: @LeftWidthPx;"></div>
-
-        <div class="gantt-right">
-
-            <div class="gantt-grid" style="display:flex; position:relative; height:40px;">
-                @foreach (var day in EachDay(Start, End))
-                {
-                    <div class="gantt-grid-cell" style="flex: 0 0 @(PixelsPerDay)px; width:@PixelsPerDay px; min-width:@PixelsPerDay px; max-width:@PixelsPerDay px; border-right:1px solid #e0e0e0; height:100%;"></div>
-                }
-            </div>
         </div>
 
-        <CascadingValue Value="this">
-            <div class="gantt-content">
-                @ChildContent
-            </div>
-        </CascadingValue>
+        @* right side *@
+        <div>
+            <svg style="height: 100%; width: 100%;">
+
+                <text>Right side</text>
+            </svg>
+        </div>
 
     </div>
+}
+
     
 
-</div>
+
 
 
 
 @code {
+
+    public enum GanttViewMode
+    {
+        Year,
+        Month,
+        Week,
+        Day
+    }
+
     [Parameter] public DateTime Start { get; set; }
     [Parameter] public DateTime End { get; set; }
+    [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
     [Parameter] public double PixelsPerDay { get; set; } = 50;
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public double RowPixelHeight { get; set; } = 50;
+    [Parameter] public double LeftPixelWidth { get; set; } = 220;
+    [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
 
-    public double LeftWidth { get; set; } = 220;
-    public string LeftWidthPx => $"{LeftWidth}px";
-    public double RowHeight { get; set; } = 40;
-    public string RowHeightPx => $"{RowHeight}px";
+    public string UnitWidthpx => Mode switch
+    {
+        GanttViewMode.Year => $"{PixelsPerDay * 365 / 12}px",
+        GanttViewMode.Month => $"{PixelsPerDay * 30}px",
+        GanttViewMode.Week => $"{PixelsPerDay * 7}px",
+        GanttViewMode.Day => $"{PixelsPerDay}px",
+        _ => throw new ArgumentOutOfRangeException()
+    };
+    public string LeftWidthPx => $"{LeftPixelWidth}px";
+    public string RowHeightPx => $"{RowPixelHeight}px";
+    public string HeaderHeightPx => $"50px";
 
 
 

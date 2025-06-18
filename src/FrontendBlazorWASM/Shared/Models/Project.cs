@@ -13,7 +13,9 @@ public class Project : IGanttItem
     public List<ProjectTask> Tasks { get; set; } = new();
     public List<Milestone> Milestones { get; set; } = new();
     public string? Color => null;
-    public IEnumerable<IGanttItem>? Children => Tasks;
+    public IEnumerable<IGanttItem>? Children => new IGanttItem[]{}.Concat(Tasks).Concat(Milestones);
     public bool IsExpanded { get; set; } = false;
+
+
     GanttItemType IGanttItem.Type => GanttItemType.Project;
 }
