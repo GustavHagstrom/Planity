@@ -14,27 +14,23 @@
                         @item.Name
                     </div>
                 </div>
-
             }
-
         </div>
 
         @* right side *@
         <div class="flex-grow-1" style="overflow-x: scroll; overflow-y: hidden;">
-            <svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx; background-color: red; margin-top: @HeaderHeightPx;">
-
+            <svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx; margin-top: @HeaderHeightPx;">
                 <rect x="0" y="0" width="600px" height="@HeaderHeightPx" fill="lightgray" />
+                @* ...här kan du rendera tasks, milstolpar etc... *@
+                @* Rutnätet, renderas sist över allt annat *@
+                @foreach (var x in GetGridLineXs())
+                {
+                    <rect x="@x" y="0" width="1" height="100%" stroke="black" stroke-width="1" opacity="0.7" />
+                }
             </svg>
         </div>
-
     </div>
 }
-
-    
-
-
-
-
 
 @code {
 
@@ -73,10 +69,25 @@
         _ => throw new ArgumentOutOfRangeException()
     };
 
+    // Dynamisk höjd för rutnätet (t.ex. antal rader * radpixlar)
+    double GridHeight => (Items?.Count() ?? 0) * RowPixelHeight;
+    string GridHeightPx => $"{GridHeight}";
 
-    private IEnumerable<DateTime> EachDay(DateTime from, DateTime to)
+    // Returnerar x-koordinater för vertikala rutnätslinjer baserat på Mode
+    private IEnumerable<double> GetGridLineXs()
     {
-        for (var day = from.Date; day <= to.Date; day = day.AddDays(1))
-            yield return day;
+        int interval = Mode switch
+        {
+            GanttViewMode.Year => PixelsPerDay,
+            GanttViewMode.Month => 30,
+            GanttViewMode.Week => 7,
+            GanttViewMode.Day => 1,
+            _ => 1
+        };
+        int totalDays = (End - Start).Days;
+        for (int i = 0; i <= totalDays; i += interval)
+        {
+            yield return i * PixelsPerDay;
+        }
     }
 }
