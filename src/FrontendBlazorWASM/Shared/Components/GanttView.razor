@@ -2,10 +2,10 @@
 
 @if(Items is not null)
 {
-    <div>
+    <div class="d-flex" style="border-style: solid; border-width: 2px;">
 
         @* left side, edit for control per row *@
-        <div style="width: @LeftWidthPx; margin-top: @HeaderHeightPx;">
+        <div style="width: @LeftWidthPx; padding-top: @HeaderHeightPx; overflow-x: scroll;">
             @foreach (var item in Items)
             {
                 <div style="height: @RowHeightPx; width: 100%;">
@@ -20,10 +20,10 @@
         </div>
 
         @* right side *@
-        <div>
-            <svg style="height: 100%; width: 100%;">
+        <div class="flex-grow-1" style="overflow-x: scroll; overflow-y: hidden;">
+            <svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx; background-color: red; margin-top: @HeaderHeightPx;">
 
-                <text>Right side</text>
+                <rect x="0" y="0" width="600px" height="@HeaderHeightPx" fill="lightgray" />
             </svg>
         </div>
 
@@ -49,23 +49,29 @@
     [Parameter] public DateTime Start { get; set; }
     [Parameter] public DateTime End { get; set; }
     [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
-    [Parameter] public double PixelsPerDay { get; set; } = 50;
     [Parameter] public double RowPixelHeight { get; set; } = 50;
-    [Parameter] public double LeftPixelWidth { get; set; } = 220;
     [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
 
-    public string UnitWidthpx => Mode switch
+    double PixelsPerDay => Mode switch
     {
-        GanttViewMode.Year => $"{PixelsPerDay * 365 / 12}px",
-        GanttViewMode.Month => $"{PixelsPerDay * 30}px",
-        GanttViewMode.Week => $"{PixelsPerDay * 7}px",
-        GanttViewMode.Day => $"{PixelsPerDay}px",
+        GanttViewMode.Year => 1,
+        GanttViewMode.Month => 54,
+        GanttViewMode.Week => 216,
+        GanttViewMode.Day => 1080,
         _ => throw new ArgumentOutOfRangeException()
     };
-    public string LeftWidthPx => $"{LeftPixelWidth}px";
-    public string RowHeightPx => $"{RowPixelHeight}px";
-    public string HeaderHeightPx => $"50px";
-
+    string LeftWidthPx => $"220px";
+    string RowHeightPx => $"50px";
+    string HeaderHeightPx => $"50px";
+    
+    string SvgWidthPx => Mode switch
+    {
+        GanttViewMode.Year => $"{PixelsPerDay * (End - Start).Days}px",
+        GanttViewMode.Month => $"{PixelsPerDay * (End - Start).Days}px",
+        GanttViewMode.Week => $"{PixelsPerDay * (End - Start).Days}px",
+        GanttViewMode.Day => $"{PixelsPerDay * (End - Start).Days}px",
+        _ => throw new ArgumentOutOfRangeException()
+    };
 
 
     private IEnumerable<DateTime> EachDay(DateTime from, DateTime to)

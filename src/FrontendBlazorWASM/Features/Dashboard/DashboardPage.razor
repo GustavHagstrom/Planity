@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject IProjectService ProjectService
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -12,7 +13,19 @@
     }
 </div>
 
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(40)">
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(10)" Items="projects" Mode="GanttView.GanttViewMode.Week">
     
 </GanttView>
 
+@code{
+    List<Project> projects = new List<Project>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var projects = await ProjectService.GetProjectsAsync();
+        if (projects is not null)
+        {
+            this.projects = projects.ToList();
+        }
+    }
+}
