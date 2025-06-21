@@ -19,7 +19,7 @@ public class MockProjectService : IProjectService
                 Status = ProjectStatus.InProgress,
                 Tasks = new List<ProjectTask>
                 {
-                    new ProjectTask { Id = "T1", Name = "Gr�vning", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today, End = DateTime.Today.AddDays(2), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
+                    new ProjectTask { Id = "T1", Name = "Gr�vning", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today, End = DateTime.Today.AddDays(2), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
                     new ProjectTask { Id = "T2", Name = "Gjutning platta", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(5), AssignedResourceId = "3", AssignedResourceName = "Cecilia Carlsson" }
                 },
                 Milestones = new List<Milestone>
@@ -30,11 +30,50 @@ public class MockProjectService : IProjectService
             new Project
             {
                 Id = "P2",
-                Name = "Renovera k�k",
-                Description = "Totalrenovering av k�k.",
+                Name = "Renovera k�k",
+                Description = "Totalrenovering av k�k.",
                 Status = ProjectStatus.NotStarted,
-                Tasks = new List<ProjectTask>(),
+                Tasks = new List<ProjectTask>
+                {
+                    //Mockade v�rdeen
+                    new ProjectTask { Id = "T3", Name = "Spika", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(8.5), End = DateTime.Today.AddDays(20.1), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
+                    new ProjectTask { Id = "T4", Name = "Gjutning platta", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(9), End = DateTime.Today.AddDays(28.8), AssignedResourceId = "3", AssignedResourceName = "Cecilia Carlsson" }
+                },
                 Milestones = new List<Milestone>()
+            },
+            new Project
+            {
+                Id = "P3",
+                Name = "Måla om huset",
+                Description = "Fasadmålning och fönsterrenovering.",
+                Status = ProjectStatus.Completed,
+                Tasks = new List<ProjectTask>
+                {
+                    new ProjectTask { Id = "T5", Name = "Skrapa färg", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-30), End = DateTime.Today.AddDays(-28), AssignedResourceId = "4", AssignedResourceName = "David Dahl" },
+                    new ProjectTask { Id = "T6", Name = "Grundmåla", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-27), End = DateTime.Today.AddDays(-25), AssignedResourceId = "5", AssignedResourceName = "Eva Ek" },
+                    new ProjectTask { Id = "T7", Name = "Slutmåla", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-24), End = DateTime.Today.AddDays(-20), AssignedResourceId = "4", AssignedResourceName = "David Dahl" }
+                },
+                Milestones = new List<Milestone>
+                {
+                    new Milestone { Id = "M2", Name = "Halva huset klart", Date = DateTime.Today.AddDays(-23), IsCompleted = true, ProjectId = Guid.Empty },
+                    new Milestone { Id = "M3", Name = "Färdigt!", Date = DateTime.Today.AddDays(-20), IsCompleted = true, ProjectId = Guid.Empty }
+                }
+            },
+            new Project
+            {
+                Id = "P4",
+                Name = "Trädgårdsanläggning",
+                Description = "Anlägga ny trädgård med uteplats och gångar.",
+                Status = ProjectStatus.InProgress,
+                Tasks = new List<ProjectTask>
+                {
+                    new ProjectTask { Id = "T8", Name = "Markberedning", Status = ProjectTaskStatus.InProgress, Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(2), AssignedResourceId = "6", AssignedResourceName = "Filip Fors" },
+                    new ProjectTask { Id = "T9", Name = "Lägga plattor", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(7), AssignedResourceId = "7", AssignedResourceName = "Greta Gran" }
+                },
+                Milestones = new List<Milestone>
+                {
+                    new Milestone { Id = "M4", Name = "Uteplats klar", Date = DateTime.Today.AddDays(7), IsCompleted = false, ProjectId = Guid.Empty }
+                }
             }
         };
     }

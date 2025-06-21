@@ -9,23 +9,29 @@
             @foreach (var item in Items)
             {
                 <div style="height: @RowHeightPx; width: 100%;">
-                    <div class="gantt-row-content">
-                        @* Render item content here, e.g. item.Name *@
-                        @item.Name
-                    </div>
+                    @* Render item content here, e.g. item.Name *@
+                    @item.Name
                 </div>
             }
         </div>
 
         @* right side *@
-        <div class="flex-grow-1" style="overflow-x: scroll; overflow-y: hidden;">
+        <div class="flex-grow-1" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden;">
             <svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx; margin-top: @HeaderHeightPx;">
-                <rect x="0" y="0" width="600px" height="@HeaderHeightPx" fill="lightgray" />
+                @* <rect x="0" y="0" width="600px" height="@RowPixelHeight" fill="lightgray" /> *@
                 @* ...här kan du rendera tasks, milstolpar etc... *@
+
+
+                @foreach (var (item, index) in ItemsWithExpand(Items).Select((item, index) => (item, index)))
+                {
+                    var startX = (item.Start! - Start).Value.TotalDays * PixelsPerDay;
+                    var width = (item.End! - item.Start!).Value.TotalDays * PixelsPerDay;
+                    <rect x="@startX" y="@($"{index * RowPixelHeight}px")" width="@width" height="@RowPixelHeight" fill="blue" opacity="0.7" />
+                }
                 @* Rutnätet, renderas sist över allt annat *@
                 @foreach (var x in GetGridLineXs())
                 {
-                    <rect x="@x" y="0" width="1" height="100%" stroke="black" stroke-width="1" opacity="0.7" />
+                    <rect x="@x" y="0" width="0.5" height="100%" fill="black" opacity="0.7" />
                 }
             </svg>
         </div>
@@ -39,35 +45,51 @@
         Year,
         Month,
         Week,
-        Day
+        // Day
     }
 
     [Parameter] public DateTime Start { get; set; }
     [Parameter] public DateTime End { get; set; }
     [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
-    [Parameter] public double RowPixelHeight { get; set; } = 50;
+    [Parameter] public double RowPixelHeight { get; set; } = 30;
     [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
+
+
+    IEnumerable<IGanttItem> ItemsWithExpand(IEnumerable<IGanttItem>? items)
+    {
+        foreach (var item in items ?? Enumerable.Empty<IGanttItem>())
+        {
+            yield return item;
+
+            if (item.IsExpanded && item.Children is not null)
+            {
+                foreach (var child in ItemsWithExpand(item.Children))
+                    yield return child;
+            }
+        }
+    }
 
     double PixelsPerDay => Mode switch
     {
         GanttViewMode.Year => 1,
-        GanttViewMode.Month => 54,
+        GanttViewMode.Month => 30,
         GanttViewMode.Week => 216,
-        GanttViewMode.Day => 1080,
+        // GanttViewMode.Day => 1080,
         _ => throw new ArgumentOutOfRangeException()
     };
     string LeftWidthPx => $"220px";
-    string RowHeightPx => $"50px";
+    string RowHeightPx => $"{RowPixelHeight}px";
     string HeaderHeightPx => $"50px";
     
-    string SvgWidthPx => Mode switch
+    double SvgWidth => Mode switch
     {
-        GanttViewMode.Year => $"{PixelsPerDay * (End - Start).Days}px",
-        GanttViewMode.Month => $"{PixelsPerDay * (End - Start).Days}px",
-        GanttViewMode.Week => $"{PixelsPerDay * (End - Start).Days}px",
-        GanttViewMode.Day => $"{PixelsPerDay * (End - Start).Days}px",
+        GanttViewMode.Year => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Month => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
+        // GanttViewMode.Day => PixelsPerDay * (End - Start).Days,
         _ => throw new ArgumentOutOfRangeException()
     };
+    string SvgWidthPx => $"{SvgWidth}px";
 
     // Dynamisk höjd för rutnätet (t.ex. antal rader * radpixlar)
     double GridHeight => (Items?.Count() ?? 0) * RowPixelHeight;
@@ -76,18 +98,23 @@
     // Returnerar x-koordinater för vertikala rutnätslinjer baserat på Mode
     private IEnumerable<double> GetGridLineXs()
     {
-        int interval = Mode switch
+        double interval = Mode switch
         {
-            GanttViewMode.Year => PixelsPerDay,
-            GanttViewMode.Month => 30,
-            GanttViewMode.Week => 7,
-            GanttViewMode.Day => 1,
+            GanttViewMode.Year => PixelsPerDay * 365 / 12,
+            GanttViewMode.Month => PixelsPerDay,
+            GanttViewMode.Week => PixelsPerDay,
+            // GanttViewMode.Day => PixelsPerDay / 24,
             _ => 1
         };
-        int totalDays = (End - Start).Days;
-        for (int i = 0; i <= totalDays; i += interval)
+        for (double x = interval; x < SvgWidth; x += interval)
         {
-            yield return i * PixelsPerDay;
+            yield return x;
         }
+        
+        // int totalDays = (End - Start).Days;
+        // for (int i = 0; i <= totalDays; i += interval)
+        // {
+        //     yield return i * PixelsPerDay;
+        // }
     }
 }
