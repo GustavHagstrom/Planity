@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@inject IStringLocalizer<GanttView> Localizer
 
 @if(Items is not null)
 {
@@ -16,8 +17,68 @@
         </div>
 
         @* right side *@
-        <div class="flex-grow-1" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden;">
-            <svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx; margin-top: @HeaderHeightPx;">
+        <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column">
+            <svg style="height: @HeaderHeightPx; width: @SvgWidthPx;">
+
+                <line x1="0" x2="@SvgWidthPx" y1="@(HeaderHeight / 2)" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="1" />
+                <line x1="0" x2="@SvgWidthPx" y1="@HeaderHeight" y2="@HeaderHeight" stroke="black" stroke-width="1" />
+
+                @if(Mode == GanttViewMode.Year)
+                {
+                    var currentDate = Start;
+                    while (currentDate < End)
+                    {
+                        var daysToNextYear = DaysToNextYear(currentDate);
+                        var daysToEnd = (End - currentDate).Days;
+                        var daysToRender = Math.Min(daysToNextYear, daysToEnd);
+                        var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+                        var textX = startX + (daysToRender * PixelsPerDay / 2);
+                        var year = currentDate.ToString("yyyy", CultureInfo.InvariantCulture);
+                        
+                        <rect x="@startX" y="0" width="@(daysToRender* PixelsPerDay)" height="@(HeaderHeight / 2)" fill="pink" />
+                        <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5"/>
+                        @((MarkupString)$"""<text x="{textX.ToString(CultureInfo.InvariantCulture)}" y="15" font-size="12" text-anchor="middle">{year}</text>""")
+
+                        currentDate = currentDate.AddDays(daysToRender);
+                    }
+
+
+                }
+                else if (Mode == GanttViewMode.Month)
+                {
+                    var currentDate = Start;
+                    while (currentDate < End)
+                    {
+                        var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+                        var monthName = currentDate.ToString("MMMM", CultureInfo.InvariantCulture);
+                        
+                        <rect x="@startX" y="0" width="@(PixelsPerDay * DateTime.DaysInMonth(currentDate.Year, currentDate.Month))" height="@($"{HeaderHeight / 2}px")" fill="lightblue" />
+                        <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5" />
+                        @((MarkupString)$"""<text x="{startX + PixelsPerDay * DateTime.DaysInMonth(currentDate.Year, currentDate.Month) / 2}" y="15" font-size="12" text-anchor="middle">{monthName}</text>""")
+                        
+                        currentDate = currentDate.AddMonths(1);
+                    }
+                }
+                else
+                {
+                    var currentDate = Start;
+                    while (currentDate < End)
+                    {
+                        var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+                        var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(currentDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+                        
+                        <rect x="@startX" y="0" width="@(7 * PixelsPerDay)" height="@($"{HeaderHeight / 2}px")" fill="lightgreen" />
+                        <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5" />
+                        @((MarkupString)$"""<text x="{startX + 3.5 * PixelsPerDay}" y="15" font-size="12" text-anchor="middle">{Localizer["Vecka"]}: {weekNumber}</text>""")
+                        
+                        currentDate = currentDate.AddDays(7);
+                    }
+                }
+
+
+
+            </svg>
+            <svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx;">
                 @* <rect x="0" y="0" width="600px" height="@RowPixelHeight" fill="lightgray" /> *@
                 @* ...här kan du rendera tasks, milstolpar etc... *@
 
@@ -73,13 +134,14 @@
     {
         GanttViewMode.Year => 1,
         GanttViewMode.Month => 30,
-        GanttViewMode.Week => 216,
+        GanttViewMode.Week => 108,
         // GanttViewMode.Day => 1080,
         _ => throw new ArgumentOutOfRangeException()
     };
     string LeftWidthPx => $"220px";
     string RowHeightPx => $"{RowPixelHeight}px";
-    string HeaderHeightPx => $"50px";
+    double HeaderHeight => 50;
+    string HeaderHeightPx => $"{HeaderHeight}px";
     
     double SvgWidth => Mode switch
     {
@@ -110,11 +172,11 @@
         {
             yield return x;
         }
-        
-        // int totalDays = (End - Start).Days;
-        // for (int i = 0; i <= totalDays; i += interval)
-        // {
-        //     yield return i * PixelsPerDay;
-        // }
+   
+    }
+    int DaysToNextYear(DateTime date)
+    {
+        var nextYear = new DateTime(date.Year + 1, 1, 1);
+        return (nextYear - date).Days;
     }
 }
