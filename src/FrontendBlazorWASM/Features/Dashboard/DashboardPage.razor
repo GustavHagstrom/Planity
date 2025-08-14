@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 @inject IProjectService ProjectService
 
 <PageTitle>Dashboard</PageTitle>
@@ -13,9 +14,9 @@
     }
 </div>
 
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttView.GanttViewMode.Year"/>
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttView.GanttViewMode.Month" />
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttView.GanttViewMode.Week" />
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year"/>
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" />
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" />
 
 @code{
     List<Project> projects = new List<Project>();

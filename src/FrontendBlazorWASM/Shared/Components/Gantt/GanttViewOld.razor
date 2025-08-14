@@ -1,28 +1,21 @@
-﻿@using System.Globalization
-@inject IStringLocalizer<GanttView> Localizer
+@using System.Globalization
+@inject IStringLocalizer<GanttViewOld> Localizer
 
 @if(Items is not null)
 {
     <div class="d-flex" style="border-style: solid; border-width: 2px;">
-
-        @* left side, edit for control per row *@
         <div style="width: @LeftWidthPx; padding-top: @HeaderHeightPx; overflow-x: scroll;">
             @foreach (var item in Items)
             {
                 <div style="height: @RowHeightPx; width: 100%;">
-                    @* Render item content here, e.g. item.Name *@
                     @item.Name
                 </div>
             }
         </div>
-
-        @* right side *@
         <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column">
             <svg style="height: @HeaderHeightPx; width: @SvgWidthPx;">
-
                 <line x1="0" x2="@SvgWidthPx" y1="@(HeaderHeight / 2)" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="1" />
                 <line x1="0" x2="@SvgWidthPx" y1="@HeaderHeight" y2="@HeaderHeight" stroke="black" stroke-width="1" />
-
                 @if(Mode == GanttViewMode.Year)
                 {
                     var currentDate = Start;
@@ -34,15 +27,11 @@
                         var startX = (currentDate - Start).TotalDays * PixelsPerDay;
                         var textX = startX + (daysToRender * PixelsPerDay / 2);
                         var year = currentDate.ToString("yyyy", CultureInfo.InvariantCulture);
-                        
                         <rect x="@startX" y="0" width="@(daysToRender* PixelsPerDay)" height="@(HeaderHeight / 2)" fill="pink" />
                         <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5"/>
                         @((MarkupString)$"""<text x="{textX.ToString(CultureInfo.InvariantCulture)}" y="15" font-size="12" text-anchor="middle">{year}</text>""")
-
                         currentDate = currentDate.AddDays(daysToRender);
                     }
-
-
                 }
                 else if (Mode == GanttViewMode.Month)
                 {
@@ -51,11 +40,9 @@
                     {
                         var startX = (currentDate - Start).TotalDays * PixelsPerDay;
                         var monthName = currentDate.ToString("MMMM", CultureInfo.InvariantCulture);
-                        
                         <rect x="@startX" y="0" width="@(PixelsPerDay * DateTime.DaysInMonth(currentDate.Year, currentDate.Month))" height="@($"{HeaderHeight / 2}px")" fill="lightblue" />
                         <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5" />
                         @((MarkupString)$"""<text x="{startX + PixelsPerDay * DateTime.DaysInMonth(currentDate.Year, currentDate.Month) / 2}" y="15" font-size="12" text-anchor="middle">{monthName}</text>""")
-                        
                         currentDate = currentDate.AddMonths(1);
                     }
                 }
@@ -66,30 +53,20 @@
                     {
                         var startX = (currentDate - Start).TotalDays * PixelsPerDay;
                         var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(currentDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-                        
                         <rect x="@startX" y="0" width="@(7 * PixelsPerDay)" height="@($"{HeaderHeight / 2}px")" fill="lightgreen" />
                         <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5" />
                         @((MarkupString)$"""<text x="{startX + 3.5 * PixelsPerDay}" y="15" font-size="12" text-anchor="middle">{Localizer["Vecka"]}: {weekNumber}</text>""")
-                        
                         currentDate = currentDate.AddDays(7);
                     }
                 }
-
-
-
             </svg>
             <svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx;">
-                @* <rect x="0" y="0" width="600px" height="@RowPixelHeight" fill="lightgray" /> *@
-                @* ...här kan du rendera tasks, milstolpar etc... *@
-
-
                 @foreach (var (item, index) in ItemsWithExpand(Items).Select((item, index) => (item, index)))
                 {
                     var startX = (item.Start! - Start).Value.TotalDays * PixelsPerDay;
                     var width = (item.End! - item.Start!).Value.TotalDays * PixelsPerDay;
                     <rect x="@startX" y="@($"{index * RowPixelHeight + 2}px")" width="@width" height="@($"{RowPixelHeight - 4}px")" fill="blue" opacity="0.7" />
                 }
-                @* Rutnätet, renderas sist över allt annat *@
                 @foreach (var x in GetGridLineXs())
                 {
                     <rect x="@x" y="0" width="0.5" height="100%" fill="black" opacity="0.7" />
@@ -100,28 +77,16 @@
 }
 
 @code {
-
-    public enum GanttViewMode
-    {
-        Year,
-        Month,
-        Week,
-        // Day
-    }
-
     [Parameter] public DateTime Start { get; set; }
     [Parameter] public DateTime End { get; set; }
     [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
     [Parameter] public double RowPixelHeight { get; set; } = 30;
     [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
-
-
     IEnumerable<IGanttItem> ItemsWithExpand(IEnumerable<IGanttItem>? items)
     {
         foreach (var item in items ?? Enumerable.Empty<IGanttItem>())
         {
             yield return item;
-
             if (item.IsExpanded && item.Children is not null)
             {
                 foreach (var child in ItemsWithExpand(item.Children))
@@ -129,35 +94,27 @@
             }
         }
     }
-
     double PixelsPerDay => Mode switch
     {
         GanttViewMode.Year => 1,
         GanttViewMode.Month => 30,
         GanttViewMode.Week => 108,
-        // GanttViewMode.Day => 1080,
         _ => throw new ArgumentOutOfRangeException()
     };
     string LeftWidthPx => $"220px";
     string RowHeightPx => $"{RowPixelHeight}px";
     double HeaderHeight => 50;
     string HeaderHeightPx => $"{HeaderHeight}px";
-    
     double SvgWidth => Mode switch
     {
         GanttViewMode.Year => PixelsPerDay * (End - Start).Days,
         GanttViewMode.Month => PixelsPerDay * (End - Start).Days,
         GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
-        // GanttViewMode.Day => PixelsPerDay * (End - Start).Days,
         _ => throw new ArgumentOutOfRangeException()
     };
     string SvgWidthPx => $"{SvgWidth}px";
-
-    // Dynamisk höjd för rutnätet (t.ex. antal rader * radpixlar)
     double GridHeight => (Items?.Count() ?? 0) * RowPixelHeight;
     string GridHeightPx => $"{GridHeight}";
-
-    // Returnerar x-koordinater för vertikala rutnätslinjer baserat på Mode
     private IEnumerable<double> GetGridLineXs()
     {
         double interval = Mode switch
@@ -165,14 +122,12 @@
             GanttViewMode.Year => PixelsPerDay * 365 / 12,
             GanttViewMode.Month => PixelsPerDay,
             GanttViewMode.Week => PixelsPerDay,
-            // GanttViewMode.Day => PixelsPerDay / 24,
             _ => 1
         };
         for (double x = interval; x < SvgWidth; x += interval)
         {
             yield return x;
         }
-   
     }
     int DaysToNextYear(DateTime date)
     {

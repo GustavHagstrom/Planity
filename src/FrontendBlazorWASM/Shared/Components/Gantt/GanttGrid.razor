@@ -1,0 +1,30 @@
+@using System.Collections.Generic
+@using System
+
+<svg style="width: @SvgWidthPx; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none;">
+    @foreach (var x in GetGridLineXs())
+    {
+        <rect x="@x" y="0" width="0.5" height="100%" fill="black" opacity="0.7" />
+    }
+</svg>
+
+@code {
+    [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
+    [Parameter] public double PixelsPerDay { get; set; } = 30;
+    [Parameter] public double SvgWidth { get; set; } = 600;
+    [Parameter] public string SvgWidthPx { get; set; } = "600px";
+    private IEnumerable<double> GetGridLineXs()
+    {
+        double interval = Mode switch
+        {
+            GanttViewMode.Year => PixelsPerDay * 365 / 12,
+            GanttViewMode.Month => PixelsPerDay,
+            GanttViewMode.Week => PixelsPerDay,
+            _ => 1
+        };
+        for (double x = interval; x < SvgWidth; x += interval)
+        {
+            yield return x;
+        }
+    }
+}

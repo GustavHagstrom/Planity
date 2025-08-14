@@ -1,0 +1,43 @@
+@using System.Globalization
+@inject IStringLocalizer<GanttView> Localizer
+
+@if(Items is not null)
+{
+    <div class="d-flex" style="border-style: solid; border-width: 2px;">
+        <GanttLeftPanel Items="Items" RowHeightPx="@RowHeightPx" HeaderHeightPx="@HeaderHeightPx" Width="LeftWidthPx" />
+        <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column">
+            <GanttHeader Start="@Start" End="@End" Mode="@Mode" PixelsPerDay="@PixelsPerDay" HeaderHeight="@HeaderHeight" HeaderHeightPx="@HeaderHeightPx" SvgWidthPx="@SvgWidthPx" />
+            <div style="position: relative; height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx;">
+                <GanttChart Items="Items" Start="@Start" End="@End" Mode="@Mode" RowPixelHeight="@RowPixelHeight" PixelsPerDay="@PixelsPerDay" SvgWidthPx="@SvgWidthPx" HeaderHeightPx="@HeaderHeightPx" />
+                <GanttGrid Mode="@Mode" PixelsPerDay="@PixelsPerDay" SvgWidth="@SvgWidth" SvgWidthPx="@SvgWidthPx" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public DateTime Start { get; set; }
+    [Parameter] public DateTime End { get; set; }
+    [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
+    [Parameter] public double RowPixelHeight { get; set; } = 30;
+    [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
+    double PixelsPerDay => Mode switch
+    {
+        GanttViewMode.Year => 1,
+        GanttViewMode.Month => 30,
+        GanttViewMode.Week => 108,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+    string LeftWidthPx => $"220px";
+    string RowHeightPx => $"{RowPixelHeight}px";
+    double HeaderHeight => 50;
+    string HeaderHeightPx => $"{HeaderHeight}px";
+    double SvgWidth => Mode switch
+    {
+        GanttViewMode.Year => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Month => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+    string SvgWidthPx => $"{SvgWidth}px";
+}

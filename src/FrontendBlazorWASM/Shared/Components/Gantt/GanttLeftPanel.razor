@@ -1,0 +1,21 @@
+@using System.Collections.Generic
+@using System
+
+@if (Items is not null)
+{
+    <div style="width: @Width; padding-top: @HeaderHeightPx;">
+        @foreach (var item in Items)
+        {
+            <div style="height: @RowHeightPx; width: 100%;">
+                @item.Name
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
+    [Parameter] public string RowHeightPx { get; set; } = "30px";
+    [Parameter] public string HeaderHeightPx { get; set; } = "50px";
+    [Parameter] public string Width { get; set; } = "220px";
+}
