@@ -87,7 +87,7 @@
                 {
                     var startX = (item.Start! - Start).Value.TotalDays * PixelsPerDay;
                     var width = (item.End! - item.Start!).Value.TotalDays * PixelsPerDay;
-                    <rect x="@startX" y="@($"{index * RowPixelHeight}px")" width="@width" height="@RowPixelHeight" fill="blue" opacity="0.7" />
+                    <rect x="@startX" y="@($"{index * RowPixelHeight + 2}px")" width="@width" height="@($"{RowPixelHeight - 4}px")" fill="blue" opacity="0.7" />
                 }
                 @* Rutnätet, renderas sist över allt annat *@
                 @foreach (var x in GetGridLineXs())
