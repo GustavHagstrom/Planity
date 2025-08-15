@@ -1,12 +1,17 @@
 @using System.Collections.Generic
 @using System
+@using System.Globalization
 
-<svg style="height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx;">
+<svg style="width: @SvgWidthPx;">
     @foreach (var (item, index) in ItemsWithExpand(Items).Select((item, index) => (item, index)))
     {
         var startX = (item.Start! - Start).Value.TotalDays * PixelsPerDay;
         var width = (item.End! - item.Start!).Value.TotalDays * PixelsPerDay;
-        <rect x="@startX" y="@($"{index * RowPixelHeight + 2}px")" width="@width" height="@($"{RowPixelHeight - 4}px")" fill="blue" opacity="0.7" />
+        <rect x="@startX.ToString(CultureInfo.InvariantCulture)"
+              y="@($"{(index * RowPixelHeight).ToString(CultureInfo.InvariantCulture)}px")"
+              width="@width.ToString(CultureInfo.InvariantCulture)"
+              height="@($"{(RowPixelHeight).ToString(CultureInfo.InvariantCulture)}px")"
+              fill="blue" opacity="0.7" />
     }
 </svg>
 

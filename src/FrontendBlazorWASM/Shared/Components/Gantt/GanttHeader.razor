@@ -1,52 +1,14 @@
 @using System.Globalization
+@using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 @inject IStringLocalizer<GanttHeader> Localizer
 
 <svg style="height: @HeaderHeightPx; width: @SvgWidthPx;">
-    <line x1="0" x2="@SvgWidthPx" y1="@(HeaderHeight / 2)" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="1" />
-    <line x1="0" x2="@SvgWidthPx" y1="@HeaderHeight" y2="@HeaderHeight" stroke="black" stroke-width="1" />
-    @if(Mode == GanttViewMode.Year)
+    @foreach (var segment in GetHeaderSegments())
     {
-        var currentDate = Start;
-        while (currentDate < End)
-        {
-            var daysToNextYear = DaysToNextYear(currentDate);
-            var daysToEnd = (End - currentDate).Days;
-            var daysToRender = Math.Min(daysToNextYear, daysToEnd);
-            var startX = (currentDate - Start).TotalDays * PixelsPerDay;
-            var textX = startX + (daysToRender * PixelsPerDay / 2);
-            var year = currentDate.ToString("yyyy", CultureInfo.InvariantCulture);
-            <rect x="@startX" y="0" width="@(daysToRender* PixelsPerDay)" height="@(HeaderHeight / 2)" fill="pink" />
-            <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5"/>
-            @((MarkupString)$"""<text x="{textX.ToString(CultureInfo.InvariantCulture)}" y="15" font-size="12" text-anchor="middle">{year}</text>""")
-            currentDate = currentDate.AddDays(daysToRender);
-        }
+        @segment
     }
-    else if (Mode == GanttViewMode.Month)
-    {
-        var currentDate = Start;
-        while (currentDate < End)
-        {
-            var startX = (currentDate - Start).TotalDays * PixelsPerDay;
-            var monthName = currentDate.ToString("MMMM", CultureInfo.InvariantCulture);
-            <rect x="@startX" y="0" width="@(PixelsPerDay * DateTime.DaysInMonth(currentDate.Year, currentDate.Month))" height="@($"{HeaderHeight / 2}px")" fill="lightblue" />
-            <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5" />
-            @((MarkupString)$"""<text x="{startX + PixelsPerDay * DateTime.DaysInMonth(currentDate.Year, currentDate.Month) / 2}" y="15" font-size="12" text-anchor="middle">{monthName}</text>""")
-            currentDate = currentDate.AddMonths(1);
-        }
-    }
-    else
-    {
-        var currentDate = Start;
-        while (currentDate < End)
-        {
-            var startX = (currentDate - Start).TotalDays * PixelsPerDay;
-            var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(currentDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-            <rect x="@startX" y="0" width="@(7 * PixelsPerDay)" height="@($"{HeaderHeight / 2}px")" fill="lightgreen" />
-            <line x1="@(startX)" x2="@startX" y1="0" y2="@(HeaderHeight / 2)" stroke="black" stroke-width="0.5" />
-            @((MarkupString)$"""<text x="{startX + 3.5 * PixelsPerDay}" y="15" font-size="12" text-anchor="middle">{Localizer["Vecka"]}: {weekNumber}</text>""")
-            currentDate = currentDate.AddDays(7);
-        }
-    }
+    @GanttSvgHelper.RenderLine(0, SvgWidthPxNum, HeaderHeight / 2, HeaderHeight / 2, "black", 1)
+    @GanttSvgHelper.RenderLine(0, SvgWidthPxNum, HeaderHeight, HeaderHeight, "black", 1)
 </svg>
 
 @code {
@@ -57,9 +19,100 @@
     [Parameter] public double HeaderHeight { get; set; } = 50;
     [Parameter] public string HeaderHeightPx { get; set; } = "50px";
     [Parameter] public string SvgWidthPx { get; set; } = "600px";
+    private double SvgWidthPxNum => double.TryParse(SvgWidthPx.Replace("px", ""), out var val) ? val : 600;
     int DaysToNextYear(DateTime date)
     {
         var nextYear = new DateTime(date.Year + 1, 1, 1);
         return (nextYear - date).Days;
+    }
+
+    IEnumerable<MarkupString> GetHeaderSegments()
+    {
+        if (Mode == GanttViewMode.Year)
+        {
+            foreach (var s in GetYearSegments()) yield return s;
+            foreach (var s in GetMonthSegments(true)) yield return s;
+        }
+        else if (Mode == GanttViewMode.Month)
+        {
+            foreach (var s in GetMonthSegments(false)) yield return s;
+            foreach (var s in GetWeekSegments()) yield return s;
+        }
+        else // Week
+        {
+            foreach (var s in GetWeekSegments(true)) yield return s;
+            foreach (var s in GetDaySegments()) yield return s;
+        }
+    }
+
+    IEnumerable<MarkupString> GetYearSegments()
+    {
+        var currentDate = Start;
+        while (currentDate < End)
+        {
+            var daysToNextYear = DaysToNextYear(currentDate);
+            var daysToEnd = (End - currentDate).Days;
+            var daysToRender = Math.Min(daysToNextYear, daysToEnd);
+            var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+            var textX = startX + (daysToRender * PixelsPerDay / 2);
+            var year = currentDate.ToString("yyyy", CultureInfo.InvariantCulture);
+            yield return GanttSvgHelper.RenderRect(startX, 0, daysToRender * PixelsPerDay, HeaderHeight / 2, "pink");
+            yield return GanttSvgHelper.RenderLine(startX, startX, 0, HeaderHeight / 2, "black", 0.5);
+            yield return GanttSvgHelper.RenderText(textX, 18, year);
+            currentDate = currentDate.AddDays(daysToRender);
+        }
+    }
+
+    IEnumerable<MarkupString> GetMonthSegments(bool shortName)
+    {
+        var currentDate = Start;
+        while (currentDate < End)
+        {
+            var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+            var monthDays = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+            var daysToNextMonth = monthDays - (currentDate.Day - 1);
+            var monthWidth = daysToNextMonth * PixelsPerDay;
+            var monthName = currentDate.ToString(shortName ? "MMM" : "MMMM", CultureInfo.InvariantCulture);
+            var textX = startX + (monthWidth / 2);
+            yield return GanttSvgHelper.RenderRect(startX, HeaderHeight / 2, monthWidth, HeaderHeight / 2, "lightblue");
+            yield return GanttSvgHelper.RenderLine(startX, startX, HeaderHeight / 2, HeaderHeight, "black", 0.5);
+            yield return GanttSvgHelper.RenderText(textX, HeaderHeight / 2 + 18, monthName);
+            currentDate = currentDate.AddDays(daysToNextMonth);
+        }
+    }
+
+    IEnumerable<MarkupString> GetWeekSegments(bool onlyTop = false)
+    {
+        var currentDate = Start;
+        while (currentDate < End)
+        {
+            var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+            var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(currentDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            var daysToNextWeek = 7 - (int)currentDate.DayOfWeek;
+            var weekWidth = daysToNextWeek * PixelsPerDay;
+            var weekText = onlyTop ? $"{Localizer["Vecka"]}: {weekNumber}" : Localizer["v."] + $" {weekNumber}";
+            var y = onlyTop ? 0 : HeaderHeight / 2;
+            var textY = onlyTop ? 18 : HeaderHeight / 2 + 18;
+            var fill = onlyTop ? "lightgreen" : "lightblue";
+            yield return GanttSvgHelper.RenderRect(startX, y, weekWidth, HeaderHeight / 2, fill);
+            yield return GanttSvgHelper.RenderLine(startX, startX, y, y + HeaderHeight / 2, "black", 0.5);
+            yield return GanttSvgHelper.RenderText(startX + (weekWidth / 2), textY, weekText);
+            currentDate = currentDate.AddDays(daysToNextWeek);
+        }
+    }
+
+    IEnumerable<MarkupString> GetDaySegments()
+    {
+        var currentDate = Start;
+        while (currentDate < End)
+        {
+            var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+            var dayText = currentDate.ToString("ddd");
+            var textX = startX + (PixelsPerDay / 2);
+            yield return GanttSvgHelper.RenderRect(startX, HeaderHeight / 2, PixelsPerDay, HeaderHeight / 2, "lightblue");
+            yield return GanttSvgHelper.RenderLine(startX, startX, HeaderHeight / 2, HeaderHeight, "black", 0.5);
+            yield return GanttSvgHelper.RenderText(textX, HeaderHeight / 2 + 18, dayText);
+            currentDate = currentDate.AddDays(1);
+        }
     }
 }

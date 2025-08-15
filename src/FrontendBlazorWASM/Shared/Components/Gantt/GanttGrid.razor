@@ -1,11 +1,27 @@
 @using System.Collections.Generic
 @using System
 
+
 <svg style="width: @SvgWidthPx; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none;">
+    @* Horisontella svarta linjer mellan varje rad *@
+    @for (var i = 1; i <= RowCount; i++)
+    {
+        var y = i * RowHeight;
+        <line x1="0" x2="@SvgWidth.ToString(CultureInfo.InvariantCulture)" y1="@y.ToString(CultureInfo.InvariantCulture)" y2="@y.ToString(CultureInfo.InvariantCulture)" stroke="black" stroke-width="1" />
+
+       @*  <rect x="0" width="@SvgWidth.ToString(CultureInfo.InvariantCulture)"
+              y="@y.ToString(CultureInfo.InvariantCulture)" height="1"
+              stroke="black" stroke-width="1" /> *@
+    }
+
+    @* Vertikala linjer med bakgrundsfärg (vit) *@
     @foreach (var x in GetGridLineXs())
     {
-        <rect x="@x" y="0" width="0.5" height="100%" fill="black" opacity="0.7" />
+        <rect x="@x.ToString(CultureInfo.InvariantCulture)" y="0" width="1"
+              height="@($"{(RowHeight * RowCount).ToString(CultureInfo.InvariantCulture)}px")"
+              fill="black" opacity="0.5" />
     }
+    
 </svg>
 
 @code {
@@ -13,18 +29,33 @@
     [Parameter] public double PixelsPerDay { get; set; } = 30;
     [Parameter] public double SvgWidth { get; set; } = 600;
     [Parameter] public string SvgWidthPx { get; set; } = "600px";
+    [Parameter] public int RowCount { get; set; } = 0;
+    [Parameter] public double RowHeight { get; set; } = 30;
+    [Parameter, EditorRequired] public DateTime Start { get; set; } = DateTime.Now;
+    [Parameter, EditorRequired] public DateTime End { get; set; } = DateTime.Now;
+
     private IEnumerable<double> GetGridLineXs()
     {
-        double interval = Mode switch
+        if(Mode == GanttViewMode.Year)
         {
-            GanttViewMode.Year => PixelsPerDay * 365 / 12,
-            GanttViewMode.Month => PixelsPerDay,
-            GanttViewMode.Week => PixelsPerDay,
-            _ => 1
-        };
-        for (double x = interval; x < SvgWidth; x += interval)
+            var currentDate = Start;
+            var nextLineX = 0.0;
+            while(currentDate < End)
+            {
+                var monthDays = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
+                var daysToNextMounth = monthDays - (currentDate.Day - 1);
+                nextLineX += daysToNextMounth * PixelsPerDay;
+                yield return nextLineX;
+                currentDate = currentDate.AddDays(daysToNextMounth);
+            }
+            
+        }
+        else
         {
-            yield return x;
+            for (double x = PixelsPerDay; x < SvgWidth; x += PixelsPerDay)
+            {
+                yield return x;
+            }
         }
     }
 }

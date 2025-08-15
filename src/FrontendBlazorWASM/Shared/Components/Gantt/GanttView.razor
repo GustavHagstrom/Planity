@@ -1,15 +1,14 @@
-@using System.Globalization
 @inject IStringLocalizer<GanttView> Localizer
 
 @if(Items is not null)
 {
-    <div class="d-flex" style="border-style: solid; border-width: 2px;">
-        <GanttLeftPanel Items="Items" RowHeightPx="@RowHeightPx" HeaderHeightPx="@HeaderHeightPx" Width="LeftWidthPx" />
+    <div class="d-flex" style="border-style: solid; border-width: 1px;">
+        <GanttLeftPanel Items="Items" RowHeightPx="@RowHeightPx" HeaderHeightPx="@HeaderHeightPx" RowCount="@RowCount" Width="@LeftWidthPx" />
         <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column">
             <GanttHeader Start="@Start" End="@End" Mode="@Mode" PixelsPerDay="@PixelsPerDay" HeaderHeight="@HeaderHeight" HeaderHeightPx="@HeaderHeightPx" SvgWidthPx="@SvgWidthPx" />
-            <div style="position: relative; height: calc(100% - @HeaderHeightPx); width: @SvgWidthPx;">
+            <div style="position: relative; width: @SvgWidthPx;">
                 <GanttChart Items="Items" Start="@Start" End="@End" Mode="@Mode" RowPixelHeight="@RowPixelHeight" PixelsPerDay="@PixelsPerDay" SvgWidthPx="@SvgWidthPx" HeaderHeightPx="@HeaderHeightPx" />
-                <GanttGrid Mode="@Mode" PixelsPerDay="@PixelsPerDay" SvgWidth="@SvgWidth" SvgWidthPx="@SvgWidthPx" />
+                <GanttGrid Mode="@Mode" PixelsPerDay="@PixelsPerDay" SvgWidth="@SvgWidth" SvgWidthPx="@SvgWidthPx" RowCount="@RowCount" RowHeight="@RowPixelHeight" Start="@Start" End="@End"/>
             </div>
         </div>
     </div>
@@ -23,14 +22,14 @@
     [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
     double PixelsPerDay => Mode switch
     {
-        GanttViewMode.Year => 1,
+        GanttViewMode.Year => 5,
         GanttViewMode.Month => 30,
         GanttViewMode.Week => 108,
         _ => throw new ArgumentOutOfRangeException()
     };
     string LeftWidthPx => $"220px";
     string RowHeightPx => $"{RowPixelHeight}px";
-    double HeaderHeight => 50;
+    double HeaderHeight => 60;
     string HeaderHeightPx => $"{HeaderHeight}px";
     double SvgWidth => Mode switch
     {
@@ -40,4 +39,5 @@
         _ => throw new ArgumentOutOfRangeException()
     };
     string SvgWidthPx => $"{SvgWidth}px";
+    int RowCount => Items?.Count() ?? 0;
 }
