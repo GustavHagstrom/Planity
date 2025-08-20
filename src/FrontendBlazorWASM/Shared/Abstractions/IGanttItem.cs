@@ -8,4 +8,8 @@ public interface IGanttItem
     GanttItemType Type { get; }     // t.ex. "Task", "Project"
     IEnumerable<IGanttItem>? Children { get; } // För projekt med tasks
     bool IsExpanded { get; set; }
+
+    // Beroenden
+    IEnumerable<IGanttItem>? Predecessors { get; } // Items som måste vara klara innan detta kan starta
+    IEnumerable<IGanttItem>? Successors { get; }   // Items som startar efter detta är klart
 }

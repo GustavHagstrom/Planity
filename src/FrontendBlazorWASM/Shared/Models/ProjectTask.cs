@@ -22,6 +22,6 @@ public class ProjectTask : IGanttItem
 
     public bool IsExpanded { get; set; } = false;
 
-    
+    public IEnumerable<IGanttItem>? Predecessors { get; set; } = [];
+    public IEnumerable<IGanttItem>? Successors { get; set; } = [];
 }
- 

@@ -1,0 +1,43 @@
+﻿@using Planity.FrontendBlazorWASM.Shared.Abstractions
+@using Microsoft.AspNetCore.Components
+
+<div class="@RowClass" style="height: @RowHeightPx;" @onclick="HandleRowClick">
+    @if (HasChildren)
+    {
+        <button class="toggle-btn" @onclick:stopPropagation="true" @onclick="ToggleExpand">
+            @(Item.IsExpanded ? "▼" : "▶")
+        </button>
+    }
+    @Item.Name
+</div>
+@if (HasChildren && Item.IsExpanded)
+{
+    @foreach (var child in Item.Children ?? Enumerable.Empty<IGanttItem>())
+    {
+        <GanttLeftPanelRow Item="child" Level="@(Level + 1)" RowHeightPx="@RowHeightPx" SelectedItem="SelectedItem" OnRowClick="OnRowClick" OnExpandCollapse="OnExpandCollapse" />
+    }
+}
+
+@code {
+    [Parameter] public IGanttItem Item { get; set; } = default!;
+    [Parameter] public int Level { get; set; } = 0;
+    [Parameter] public string RowHeightPx { get; set; } = "30px";
+    [Parameter] public IGanttItem? SelectedItem { get; set; }
+    [Parameter] public EventCallback<IGanttItem> OnRowClick { get; set; }
+    [Parameter] public EventCallback OnExpandCollapse { get; set; }
+
+    private bool IsSelected => SelectedItem == Item;
+    private bool HasChildren => Item.Children != null && Item.Children.Any();
+    private string RowClass => $"bottom-border gantt-row{(IsSelected ? " selected" : "")}{(Level > 0 ? " child" : "")}";
+
+    private async Task HandleRowClick()
+    {
+        await OnRowClick.InvokeAsync(Item);
+    }
+
+    private async Task ToggleExpand()
+    {
+        Item.IsExpanded = !Item.IsExpanded;
+        await OnExpandCollapse.InvokeAsync();
+    }
+}

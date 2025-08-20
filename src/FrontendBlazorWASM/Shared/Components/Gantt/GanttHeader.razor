@@ -31,11 +31,11 @@
         if (Mode == GanttViewMode.Year)
         {
             foreach (var s in GetYearSegments()) yield return s;
-            foreach (var s in GetMonthSegments(true)) yield return s;
+            foreach (var s in GetMonthSegments(false)) yield return s;
         }
         else if (Mode == GanttViewMode.Month)
         {
-            foreach (var s in GetMonthSegments(false)) yield return s;
+            foreach (var s in GetMonthSegments(true)) yield return s;
             foreach (var s in GetWeekSegments()) yield return s;
         }
         else // Week
@@ -53,17 +53,21 @@
             var daysToNextYear = DaysToNextYear(currentDate);
             var daysToEnd = (End - currentDate).Days;
             var daysToRender = Math.Min(daysToNextYear, daysToEnd);
+            var width = daysToRender * PixelsPerDay;
+            var height = HeaderHeight / 2;
+            
             var startX = (currentDate - Start).TotalDays * PixelsPerDay;
+
             var textX = startX + (daysToRender * PixelsPerDay / 2);
             var year = currentDate.ToString("yyyy", CultureInfo.InvariantCulture);
-            yield return GanttSvgHelper.RenderRect(startX, 0, daysToRender * PixelsPerDay, HeaderHeight / 2, "pink");
-            yield return GanttSvgHelper.RenderLine(startX, startX, 0, HeaderHeight / 2, "black", 0.5);
+            yield return GanttSvgHelper.RenderRect(startX, 0, width, height, "pink");
+            yield return GanttSvgHelper.RenderLine(startX, startX, 0, height, "black", 0.5);
             yield return GanttSvgHelper.RenderText(textX, 18, year);
             currentDate = currentDate.AddDays(daysToRender);
         }
     }
 
-    IEnumerable<MarkupString> GetMonthSegments(bool shortName)
+    IEnumerable<MarkupString> GetMonthSegments(bool onTop = false)
     {
         var currentDate = Start;
         while (currentDate < End)
@@ -71,17 +75,21 @@
             var startX = (currentDate - Start).TotalDays * PixelsPerDay;
             var monthDays = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
             var daysToNextMonth = monthDays - (currentDate.Day - 1);
-            var monthWidth = daysToNextMonth * PixelsPerDay;
-            var monthName = currentDate.ToString(shortName ? "MMM" : "MMMM", CultureInfo.InvariantCulture);
-            var textX = startX + (monthWidth / 2);
-            yield return GanttSvgHelper.RenderRect(startX, HeaderHeight / 2, monthWidth, HeaderHeight / 2, "lightblue");
-            yield return GanttSvgHelper.RenderLine(startX, startX, HeaderHeight / 2, HeaderHeight, "black", 0.5);
-            yield return GanttSvgHelper.RenderText(textX, HeaderHeight / 2 + 18, monthName);
+            var width = daysToNextMonth * PixelsPerDay;
+            var height = HeaderHeight / 2;
+            var monthText = currentDate.ToString(onTop ? "MMMM" : "MMM", CultureInfo.InvariantCulture);
+            var y = onTop ? 0 : height;
+            var textY = onTop ? 18 : height + 18;
+            var textX = startX + (width / 2);
+            var fillColor = onTop ? "goldenrod" : "lightblue";
+            yield return GanttSvgHelper.RenderRect(startX, y, width, height, fillColor);
+            yield return GanttSvgHelper.RenderLine(startX, startX, y, y + height, "black", 0.5);
+            yield return GanttSvgHelper.RenderText(textX, textY, monthText);
             currentDate = currentDate.AddDays(daysToNextMonth);
         }
     }
 
-    IEnumerable<MarkupString> GetWeekSegments(bool onlyTop = false)
+    IEnumerable<MarkupString> GetWeekSegments(bool onTop = false)
     {
         var currentDate = Start;
         while (currentDate < End)
@@ -89,14 +97,15 @@
             var startX = (currentDate - Start).TotalDays * PixelsPerDay;
             var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(currentDate, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
             var daysToNextWeek = 7 - (int)currentDate.DayOfWeek;
-            var weekWidth = daysToNextWeek * PixelsPerDay;
-            var weekText = onlyTop ? $"{Localizer["Vecka"]}: {weekNumber}" : Localizer["v."] + $" {weekNumber}";
-            var y = onlyTop ? 0 : HeaderHeight / 2;
-            var textY = onlyTop ? 18 : HeaderHeight / 2 + 18;
-            var fill = onlyTop ? "lightgreen" : "lightblue";
-            yield return GanttSvgHelper.RenderRect(startX, y, weekWidth, HeaderHeight / 2, fill);
-            yield return GanttSvgHelper.RenderLine(startX, startX, y, y + HeaderHeight / 2, "black", 0.5);
-            yield return GanttSvgHelper.RenderText(startX + (weekWidth / 2), textY, weekText);
+            var width = daysToNextWeek * PixelsPerDay;
+            var height = HeaderHeight / 2;
+            var weekText = onTop ? $"{Localizer["Vecka"]}: {weekNumber}" : Localizer["v."] + $" {weekNumber}";
+            var y = onTop ? 0 : height;
+            var textY = onTop ? 18 : height + 18;
+            var fill = onTop ? "lightgreen" : "lightblue";
+            yield return GanttSvgHelper.RenderRect(startX, y, width, height, fill);
+            yield return GanttSvgHelper.RenderLine(startX, startX, y, y + height, "black", 0.5);
+            yield return GanttSvgHelper.RenderText(startX + (width / 2), textY, weekText);
             currentDate = currentDate.AddDays(daysToNextWeek);
         }
     }

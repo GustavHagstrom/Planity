@@ -11,21 +11,43 @@
         .gantt-row {
             width: 100%;
             position: relative;
+            cursor: pointer;
+            transition: box-shadow 0.2s, border 0.2s;
+            display: flex;
+            align-items: center;
         }
-
+        .gantt-row.selected {
+            background-color: transparent;
+            box-shadow: 0 0 8px 2px #3a6ea5;
+            font-weight: bold;
+        }
+        .gantt-row.child {
+            padding-left: 24px;
+            border-left: 2px solid #3a6ea5;
+            background: rgba(58, 110, 165, 0.05);
+        }
+        .toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 4px;
+            font-size: 16px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
-    <div style="border-right: 1px solid Black;">
+    <div style="border-right: 1px solid Black; padding-bottom: 10px;">
         <div style="width: @Width; height: @HeaderHeightPx;" class="bottom-border"></div>
         <div style="width: @Width; position: relative;">
-            @foreach (var (item, index) in Items.Select((item, index) => (item, index)))
+            @foreach (var item in Items ?? Enumerable.Empty<IGanttItem>())
             {
-                <div class="bottom-border gantt-row" style="height: @RowHeightPx;">
-                    @item.Name
-                </div>
+                <GanttLeftPanelRow Item="item" Level="0" RowHeightPx="@RowHeightPx" SelectedItem="SelectedItem" OnRowClick="EventCallback.Factory.Create<IGanttItem>(this, OnRowClick)" OnExpandCollapse="OnExpandCollapse" />
             }
         </div>
     </div>
-    
 }
 
 @code {
@@ -34,4 +56,16 @@
     [Parameter] public string HeaderHeightPx { get; set; } = "50px";
     [Parameter] public int RowCount { get; set; } = 0;
     [Parameter] public string Width { get; set; } = "220px";
+    [Parameter] public IGanttItem? SelectedItem { get; set; }
+    [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
+    [Parameter] public EventCallback OnExpandCollapse { get; set; }
+
+    private async Task OnRowClick(IGanttItem item)
+    {
+        if (SelectedItem != item)
+        {
+            SelectedItem = item;
+            await SelectedItemChanged.InvokeAsync(item);
+        }
+    }
 }

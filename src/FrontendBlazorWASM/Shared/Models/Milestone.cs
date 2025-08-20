@@ -19,11 +19,14 @@ public class Milestone : IGanttItem
 
     public DateTime? Start => Date;
 
-    public DateTime? End => null;
+    public DateTime? End => Date;
 
     public GanttItemType Type => GanttItemType.Milestone;
 
     public IEnumerable<IGanttItem>? Children => null;
 
     public bool IsExpanded { get; set; }
+
+    public IEnumerable<IGanttItem>? Predecessors { get; set; } = [];
+    public IEnumerable<IGanttItem>? Successors { get; set; } = [];
 }

@@ -22,4 +22,7 @@ public class Resource : IGanttItem
     public IEnumerable<IGanttItem>? Children => throw new NotImplementedException();
 
     public bool IsExpanded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public IEnumerable<IGanttItem>? Predecessors { get; set; } = [];
+    public IEnumerable<IGanttItem>? Successors { get; set; } = [];
 }

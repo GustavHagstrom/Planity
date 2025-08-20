@@ -1,17 +1,50 @@
 @using System.Collections.Generic
 @using System
 @using System.Globalization
+@using Planity.FrontendBlazorWASM.Shared.Services
 
-<svg style="width: @SvgWidthPx;">
-    @foreach (var (item, index) in ItemsWithExpand(Items).Select((item, index) => (item, index)))
+<style>
+    svg {
+        transition: filter 0.2s;
+    }
+</style>
+
+<svg style="width: @SvgWidthPx; height: 100%; position: absolute; top: 0; left: 0;">
+    <defs>
+        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="red" flood-opacity="1.0" />
+            <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="red" flood-opacity="1.0" />
+        </filter>
+    </defs>
+    @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, index) => (tuple, index)))
     {
-        var startX = (item.Start! - Start).Value.TotalDays * PixelsPerDay;
-        var width = (item.End! - item.Start!).Value.TotalDays * PixelsPerDay;
-        <rect x="@startX.ToString(CultureInfo.InvariantCulture)"
-              y="@($"{(index * RowPixelHeight).ToString(CultureInfo.InvariantCulture)}px")"
-              width="@width.ToString(CultureInfo.InvariantCulture)"
-              height="@($"{(RowPixelHeight).ToString(CultureInfo.InvariantCulture)}px")"
-              fill="blue" opacity="0.7" />
+        var isSelected = SelectedItem == item;
+        var filter = isSelected ? "url(#glow)" : null;
+        var fillColor = level == 0 ? "plum" : "lightblue";
+        var opacity = 1.0;
+        if(item.Type == GanttItemType.Milestone && item.Start != null)
+        {
+            var centerX = ((item.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
+            var centerY = (index * RowPixelHeight) + (RowPixelHeight / 2);
+            var halfSize = RowPixelHeight / 2 * 0.7;
+            var centerXStr = centerX.ToString(CultureInfo.InvariantCulture);
+            var centerYStr = centerY.ToString(CultureInfo.InvariantCulture);
+            var topY = (centerY - halfSize).ToString(CultureInfo.InvariantCulture);
+            var rightX = (centerX + halfSize).ToString(CultureInfo.InvariantCulture);
+            var bottomY = (centerY + halfSize).ToString(CultureInfo.InvariantCulture);
+            var leftX = (centerX - halfSize).ToString(CultureInfo.InvariantCulture);
+            var points = $"{centerXStr},{topY} {rightX},{centerYStr} {centerXStr},{bottomY} {leftX},{centerYStr}";
+            <polygon points="@points" fill="@fillColor" opacity="@opacity" style="cursor:pointer;" filter="@filter" @onclick="() => OnBarClick(item)" />
+        }
+        else if(item.Start != null && item.End != null)
+        {
+            var x = ((item.Start.Value - Start).TotalDays * PixelsPerDay).ToString(CultureInfo.InvariantCulture);
+            var y = (index * RowPixelHeight).ToString(CultureInfo.InvariantCulture);
+            var width = ((item.End.Value - item.Start.Value).TotalDays * PixelsPerDay).ToString(CultureInfo.InvariantCulture);
+            var height = RowPixelHeight.ToString(CultureInfo.InvariantCulture);
+            <rect x="@x" y="@y" width="@width" height="@height" fill="@fillColor" opacity="@opacity"
+                  style="cursor:pointer;" filter="@filter" @onclick="() => OnBarClick(item)" />
+        }
     }
 </svg>
 
@@ -24,16 +57,15 @@
     [Parameter] public double PixelsPerDay { get; set; } = 30;
     [Parameter] public string SvgWidthPx { get; set; } = "600px";
     [Parameter] public string HeaderHeightPx { get; set; } = "50px";
-    IEnumerable<IGanttItem> ItemsWithExpand(IEnumerable<IGanttItem>? items)
+    [Parameter] public IGanttItem? SelectedItem { get; set; }
+    [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
+
+    private async Task OnBarClick(IGanttItem item)
     {
-        foreach (var item in items ?? Enumerable.Empty<IGanttItem>())
+        if (SelectedItem != item)
         {
-            yield return item;
-            if (item.IsExpanded && item.Children is not null)
-            {
-                foreach (var child in ItemsWithExpand(item.Children))
-                    yield return child;
-            }
+            SelectedItem = item;
+            await SelectedItemChanged.InvokeAsync(item);
         }
     }
 }
