@@ -10,6 +10,6 @@ public interface IGanttItem
     bool IsExpanded { get; set; }
 
     // Beroenden
-    IEnumerable<IGanttItem>? Predecessors { get; } // Items som måste vara klara innan detta kan starta
-    IEnumerable<IGanttItem>? Successors { get; }   // Items som startar efter detta är klart
+    IEnumerable<IGanttItem>? Predecessors { get; set; } // Items som måste vara klara innan detta kan starta
+    IEnumerable<IGanttItem>? Successors { get; set; }   // Items som startar efter detta är klart
 }

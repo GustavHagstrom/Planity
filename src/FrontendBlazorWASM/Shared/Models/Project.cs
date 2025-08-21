@@ -15,8 +15,10 @@ public class Project : IGanttItem
     public string? Color => null;
     public IEnumerable<IGanttItem>? Children => new IGanttItem[]{}.Concat(Tasks).Concat(Milestones);
     public bool IsExpanded { get; set; } = false;
-    public IEnumerable<IGanttItem>? Predecessors { get; set; } = [];
-    public IEnumerable<IGanttItem>? Successors { get; set; } = [];
+    public List<IGanttItem> Predecessors { get; set; } = new();
+    public List<IGanttItem> Successors { get; set; } = new();
 
     GanttItemType IGanttItem.Type => GanttItemType.Project;
+    IEnumerable<IGanttItem>? IGanttItem.Predecessors { get => Predecessors; set => Predecessors = value?.ToList() ?? new List<IGanttItem>(); }
+    IEnumerable<IGanttItem>? IGanttItem.Successors { get => Successors; set => Successors = value?.ToList() ?? new List<IGanttItem>(); }
 }

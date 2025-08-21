@@ -2,26 +2,64 @@
 @using System
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Services
+@using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 
 <style>
     svg {
         transition: filter 0.2s;
     }
+    .gantt-handle {
+        cursor: grab;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+        stroke: transparent;
+        stroke-width: 2px;
+        fill: black;
+    }
+    .gantt-handle:hover {
+        fill: gold;
+        stroke: black;
+        stroke-width: 2px;
+    }
+    .gantt-bar:hover .gantt-handle {
+        opacity: 1;
+        pointer-events: all;
+    }
+    .gantt-chart {
+        position: relative;
+    }
+    .gantt-chart.grabbing {
+        cursor: grabbing;
+    }
+    .gantt-chart.grabbing .gantt-handle {
+        cursor: grabbing !important;
+    }
 </style>
 
-<svg style="width: @SvgWidthPx; height: 100%; position: absolute; top: 0; left: 0;">
+<svg class="gantt-chart@(IsDragging ? " grabbing" : "")" style="width: @SvgWidthPx; height: 100%; position: absolute; top: 0; left: 0;"
+     @onpointermove="OnPointerMove" @onpointerup="OnPointerUp">
     <defs>
         <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="red" flood-opacity="1.0" />
-            <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="red" flood-opacity="1.0" />
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="gold" flood-opacity="1.0" />
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="gold" flood-opacity="1.0" />
         </filter>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#3a6ea5" />
+        </marker>
+        @if (IsDragging)
+        {
+            <marker id="arrowhead-gold" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                <polygon points="0 0, 10 3.5, 0 7" fill="gold" />
+            </marker>
+        }
     </defs>
     @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, index) => (tuple, index)))
     {
         var isSelected = SelectedItem == item;
-        var filter = isSelected ? "url(#glow)" : null;
         var fillColor = level == 0 ? "plum" : "lightblue";
         var opacity = 1.0;
+        var handleRadius = 5;
         if(item.Type == GanttItemType.Milestone && item.Start != null)
         {
             var centerX = ((item.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
@@ -34,17 +72,117 @@
             var bottomY = (centerY + halfSize).ToString(CultureInfo.InvariantCulture);
             var leftX = (centerX - halfSize).ToString(CultureInfo.InvariantCulture);
             var points = $"{centerXStr},{topY} {rightX},{centerYStr} {centerXStr},{bottomY} {leftX},{centerYStr}";
-            <polygon points="@points" fill="@fillColor" opacity="@opacity" style="cursor:pointer;" filter="@filter" @onclick="() => OnBarClick(item)" />
+            <g class="gantt-bar">
+                <polygon points="@points" fill="@fillColor" opacity="@opacity" @onclick="() => OnBarClick(item)" />
+                <circle cx="@centerXStr" cy="@centerYStr" r="@handleRadius" class="gantt-handle"
+                        @onpointerdown="(e) => OnHandlePointerDown(item, GanttHandleType.Milestone, e)"
+                        @onpointerup="(e) => OnHandlePointerUp(item, GanttHandleType.Milestone, e)" />
+            </g>
+   
         }
         else if(item.Start != null && item.End != null)
         {
-            var x = ((item.Start.Value - Start).TotalDays * PixelsPerDay).ToString(CultureInfo.InvariantCulture);
-            var y = (index * RowPixelHeight).ToString(CultureInfo.InvariantCulture);
-            var width = ((item.End.Value - item.Start.Value).TotalDays * PixelsPerDay).ToString(CultureInfo.InvariantCulture);
-            var height = RowPixelHeight.ToString(CultureInfo.InvariantCulture);
-            <rect x="@x" y="@y" width="@width" height="@height" fill="@fillColor" opacity="@opacity"
-                  style="cursor:pointer;" filter="@filter" @onclick="() => OnBarClick(item)" />
+            var x = ((item.Start.Value - Start).TotalDays * PixelsPerDay);
+            var y = (index * RowPixelHeight);
+            var width = ((item.End.Value - item.Start.Value).TotalDays * PixelsPerDay);
+            var height = RowPixelHeight;
+            var xStr = x.ToString(CultureInfo.InvariantCulture);
+            var yStr = y.ToString(CultureInfo.InvariantCulture);
+            var cxStrStart = (x + handleRadius).ToString(CultureInfo.InvariantCulture);
+            var cxStrEnd = (x + width - handleRadius).ToString(CultureInfo.InvariantCulture);
+            var cyStr = (y + height / 2).ToString(CultureInfo.InvariantCulture);
+            var widthStr = width.ToString(CultureInfo.InvariantCulture);
+            var heightStr = height.ToString(CultureInfo.InvariantCulture);
+            <g class="gantt-bar">
+                <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@fillColor" opacity="@opacity" @onclick="() => OnBarClick(item)" />
+                
+                <circle cx="@cxStrStart" cy="@cyStr" r="@handleRadius" class="gantt-handle"
+                        @onpointerdown="(e) => OnHandlePointerDown(item, GanttHandleType.Start, e)"
+                        @onpointerup="(e) => OnHandlePointerUp(item, GanttHandleType.Start, e)" />
+                <circle cx="@cxStrEnd" cy="@cyStr" r="@handleRadius" class="gantt-handle"
+                        @onpointerdown="(e) => OnHandlePointerDown(item, GanttHandleType.End, e)"
+                        @onpointerup="(e) => OnHandlePointerUp(item, GanttHandleType.End, e)" />
+            </g>
         }
+    }
+    // Visualisera kopplingar mellan items
+    @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, index) => (tuple, index)))
+    {
+        if (item.Predecessors != null)
+        {
+            foreach (var predecessor in item.Predecessors)
+            {
+                // Hämta index för predecessor
+                var predIndex = GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == predecessor).idx;
+                if (predIndex < 0) continue;
+                // Beräkna endpunkt för predecessor (slut-handle)
+                double predX = 0, predY = 0;
+                if (predecessor.Type == GanttItemType.Milestone && predecessor.Start != null)
+                {
+                    predX = ((predecessor.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
+                    predY = (predIndex * RowPixelHeight) + (RowPixelHeight / 2);
+                }
+                else if (predecessor.Start != null && predecessor.End != null)
+                {
+                    var x = ((predecessor.Start.Value - Start).TotalDays * PixelsPerDay);
+                    var width = ((predecessor.End.Value - predecessor.Start.Value).TotalDays * PixelsPerDay);
+                    predX = x + width - 5; // End-handle
+                    predY = (predIndex * RowPixelHeight) + (RowPixelHeight / 2);
+                }
+                // Beräkna startpunkt för item (start-handle)
+                double itemX = 0, itemY = 0;
+                if (item.Type == GanttItemType.Milestone && item.Start != null)
+                {
+                    itemX = ((item.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
+                    itemY = (index * RowPixelHeight) + (RowPixelHeight / 2);
+                }
+                else if (item.Start != null && item.End != null)
+                {
+                    var x = ((item.Start.Value - Start).TotalDays * PixelsPerDay);
+                    itemX = x + 5; // Start-handle
+                    itemY = (index * RowPixelHeight) + (RowPixelHeight / 2);
+                }
+                // Polyline med 90-graders sväng (elbow)
+                var points = $"{predX},{predY} {itemX},{predY} {itemX},{itemY}";
+                <polyline points="@points" stroke="#3a6ea5" stroke-width="2" marker-end="url(#arrowhead)" style="pointer-events:none;fill:none;" />
+            }
+        }
+    }
+    @if (IsDragging && DragSourceItem != null && DragSourceType != null)
+    {
+        // Beräkna startpunkt för linjen
+        string startX = "0";
+        string startY = "0";
+        if (DragSourceItem.Type == GanttItemType.Milestone && DragSourceItem.Start != null)
+        {
+            var index = GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == DragSourceItem).idx;
+            var centerX = ((DragSourceItem.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
+            var centerY = (index * RowPixelHeight) + (RowPixelHeight / 2);
+            startX = centerX.ToString(CultureInfo.InvariantCulture);
+            startY = centerY.ToString(CultureInfo.InvariantCulture);
+        }
+        else if (DragSourceItem.Start != null && DragSourceItem.End != null)
+        {
+            var index = GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == DragSourceItem).idx;
+            var x = ((DragSourceItem.Start.Value - Start).TotalDays * PixelsPerDay);
+            var width = ((DragSourceItem.End.Value - DragSourceItem.Start.Value).TotalDays * PixelsPerDay);
+            var handleRadius = 5;
+            var y = (index * RowPixelHeight);
+            var cy = (y + RowPixelHeight / 2).ToString(CultureInfo.InvariantCulture);
+            if (DragSourceType == GanttHandleType.Start)
+            {
+                startX = (x + handleRadius).ToString(CultureInfo.InvariantCulture);
+                startY = cy;
+            }
+            else if (DragSourceType == GanttHandleType.End)
+            {
+                startX = (x + width - handleRadius).ToString(CultureInfo.InvariantCulture);
+                startY = cy;
+            }
+        }
+        // Polyline med 90-graders sväng (elbow)
+        var points = $"{startX},{startY} {PointerX},{startY} {PointerX},{PointerY}";
+        <polyline points="@points" stroke="gold" stroke-width="2" marker-end="url(#arrowhead-gold)" style="pointer-events:none;fill:none;" />
     }
 </svg>
 
@@ -59,6 +197,78 @@
     [Parameter] public string HeaderHeightPx { get; set; } = "50px";
     [Parameter] public IGanttItem? SelectedItem { get; set; }
     [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
+
+    // Drag state
+    private IGanttItem? DragSourceItem;
+    private GanttHandleType? DragSourceType;
+    private bool IsDragging;
+    private string PointerX = "0";
+    private string PointerY = "0";
+
+    private void OnHandlePointerDown(IGanttItem item, GanttHandleType type, PointerEventArgs e)
+    {
+        DragSourceItem = item;
+        DragSourceType = type;
+        IsDragging = true;
+        PointerX = e.OffsetX.ToString(CultureInfo.InvariantCulture);
+        PointerY = e.OffsetY.ToString(CultureInfo.InvariantCulture);
+    }
+
+    private void OnHandlePointerUp(IGanttItem targetItem, GanttHandleType targetType, PointerEventArgs e)
+    {
+        if (!IsDragging || DragSourceItem == null || DragSourceType == null)
+            return;
+        // Förhindra att koppla till sig själv
+        if (targetItem == DragSourceItem)
+            return;
+
+        // Koppla DragSourceItem som predecessor eller successor
+        if (targetType == GanttHandleType.Start || targetType == GanttHandleType.Milestone)
+        {
+            // Lägg till DragSourceItem som predecessor till targetItem om den inte redan finns
+            if (targetItem is { Predecessors: List<IGanttItem> preds })
+            {
+                if (!preds.Contains(DragSourceItem))
+                    preds.Add(DragSourceItem);
+            }
+        }
+        else if (targetType == GanttHandleType.End)
+        {
+            // Lägg till DragSourceItem som successor till targetItem om den inte redan finns
+            if (targetItem is { Successors: List<IGanttItem> succs })
+            {
+                if (!succs.Contains(DragSourceItem))
+                    succs.Add(DragSourceItem);
+            }
+        }
+        // Nollställ drag-state
+        IsDragging = false;
+        DragSourceItem = null;
+        DragSourceType = null;
+        PointerX = "0";
+        PointerY = "0";
+        StateHasChanged();
+    }
+
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (IsDragging)
+        {
+            PointerX = e.OffsetX.ToString(CultureInfo.InvariantCulture);
+            PointerY = e.OffsetY.ToString(CultureInfo.InvariantCulture);
+            StateHasChanged();
+        }
+    }
+
+    private void OnPointerUp(PointerEventArgs e)
+    {
+        IsDragging = false;
+        DragSourceItem = null;
+        DragSourceType = null;
+        PointerX = "0";
+        PointerY = "0";
+        StateHasChanged();
+    }
 
     private async Task OnBarClick(IGanttItem item)
     {
