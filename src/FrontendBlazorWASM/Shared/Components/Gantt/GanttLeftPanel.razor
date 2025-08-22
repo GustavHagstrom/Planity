@@ -1,7 +1,7 @@
 @using System.Collections.Generic
 @using System
 
-@if (Items is not null)
+@if (View.Items is not null)
 {
     <style>
         .bottom-border {
@@ -40,32 +40,33 @@
         }
     </style>
     <div style="border-right: 1px solid Black; padding-bottom: 10px;">
-        <div style="width: @Width; height: @HeaderHeightPx;" class="bottom-border"></div>
-        <div style="width: @Width; position: relative;">
-            @foreach (var item in Items ?? Enumerable.Empty<IGanttItem>())
+        <div style="width: @View.LeftWidthPx; height: @View.HeaderHeightPx;" class="bottom-border"></div>
+        <div style="width: @View.LeftWidthPx; position: relative;">
+            @foreach (var item in View.Items ?? Enumerable.Empty<IGanttItem>())
             {
-                <GanttLeftPanelRow Item="item" Level="0" RowHeightPx="@RowHeightPx" SelectedItem="SelectedItem" OnRowClick="EventCallback.Factory.Create<IGanttItem>(this, OnRowClick)" OnExpandCollapse="OnExpandCollapse" />
+                <GanttLeftPanelRow Item="item" Level="0" RowHeightPx="@View.RowHeightPx" SelectedItem="View.SelectedItem" OnRowClick="EventCallback.Factory.Create<IGanttItem>(this, OnRowClick)" OnExpandCollapse="View.TriggerStateHasChanged" />
             }
         </div>
     </div>
 }
 
+
 @code {
-    [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
-    [Parameter] public string RowHeightPx { get; set; } = "30px";
-    [Parameter] public string HeaderHeightPx { get; set; } = "50px";
-    [Parameter] public int RowCount { get; set; } = 0;
-    [Parameter] public string Width { get; set; } = "220px";
-    [Parameter] public IGanttItem? SelectedItem { get; set; }
-    [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
-    [Parameter] public EventCallback OnExpandCollapse { get; set; }
+    [CascadingParameter] public GanttView View { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        if (View is null)
+        {
+            throw new InvalidOperationException("GanttView cascading parameter must not be null.");
+        }
+    }
 
     private async Task OnRowClick(IGanttItem item)
     {
-        if (SelectedItem != item)
+        if (View.SelectedItem != item)
         {
-            SelectedItem = item;
-            await SelectedItemChanged.InvokeAsync(item);
+            await View.SelectItemAsync(item);
         }
     }
 }

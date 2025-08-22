@@ -2,51 +2,59 @@
 
 @if(Items is not null)
 {
-    <div class="d-flex" style="border-style: solid; border-width: 1px;">
-        <GanttLeftPanel Items="Items" RowHeightPx="@RowHeightPx" HeaderHeightPx="@HeaderHeightPx" RowCount="@RowCount" Width="@LeftWidthPx" SelectedItem="@SelectedItem" SelectedItemChanged="@OnSelectedItemChanged" OnExpandCollapse="StateHasChanged"/>
-        <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
-            <GanttHeader Start="@Start" End="@End" Mode="@Mode" PixelsPerDay="@PixelsPerDay" HeaderHeight="@HeaderHeight" HeaderHeightPx="@HeaderHeightPx" SvgWidthPx="@SvgWidthPx" />
-            <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
-                <GanttChart Items="Items" Start="@Start" End="@End" Mode="@Mode" RowPixelHeight="@RowPixelHeight" PixelsPerDay="@PixelsPerDay" SvgWidthPx="@SvgWidthPx" HeaderHeightPx="@HeaderHeightPx" SelectedItem="@SelectedItem" SelectedItemChanged="@OnSelectedItemChanged" />
-                <GanttGrid Mode="@Mode" PixelsPerDay="@PixelsPerDay" SvgWidth="@SvgWidth" SvgWidthPx="@SvgWidthPx" RowCount="@RowCount" RowHeight="@RowPixelHeight" Start="@Start" End="@End"/>
+    <CascadingValue Value="this">
+        <div class="d-flex" style="border-style: solid; border-width: 1px;">
+            <GanttLeftPanel/>
+            <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
+                <GanttHeader />
+                <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
+                    <GanttChart/>
+                    <GanttGrid />
+                </div>
             </div>
         </div>
-    </div>
+    </CascadingValue>
+    
 }
 
 @code {
     [Parameter] public DateTime Start { get; set; }
     [Parameter] public DateTime End { get; set; }
     [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
-    [Parameter] public double RowPixelHeight { get; set; } = 30;
     [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
     [Parameter] public IGanttItem? SelectedItem { get; set; }
     [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
-    double PixelsPerDay => Mode switch
+
+    public double PixelsPerDay => Mode switch
     {
         GanttViewMode.Year => 5,
         GanttViewMode.Month => 30,
         GanttViewMode.Week => 108,
         _ => throw new ArgumentOutOfRangeException()
     };
-    string LeftWidthPx => $"220px";
-    string RowHeightPx => $"{RowPixelHeight}px";
-    double HeaderHeight => 60;
-    string HeaderHeightPx => $"{HeaderHeight}px";
-    double SvgWidth => Mode switch
+    public string LeftWidthPx => $"220px";
+    public double RowHeight { get; set; } = 30;
+    public string RowHeightPx => $"{RowHeight}px";
+    public double HeaderHeight => 60;
+    public string HeaderHeightPx => $"{HeaderHeight}px";
+    public double SvgWidth => Mode switch
     {
         GanttViewMode.Year => PixelsPerDay * (End - Start).Days,
         GanttViewMode.Month => PixelsPerDay * (End - Start).Days,
         GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
         _ => throw new ArgumentOutOfRangeException()
     };
-    string SvgWidthPx => $"{SvgWidth}px";
-    int RowCount => GanttItemUtils.ItemsWithExpand(Items).Count();
+    public string SvgWidthPx => $"{SvgWidth}px";
+    public int RowCount => GanttItemUtils.ItemsWithExpand(Items).Count();
 
-    private async Task OnSelectedItemChanged(IGanttItem? item)
+    public async Task SelectItemAsync(IGanttItem? item)
     {
         SelectedItem = item;
         await SelectedItemChanged.InvokeAsync(item);
+        StateHasChanged();
+    }
+    public void TriggerStateHasChanged()
+    {
         StateHasChanged();
     }
 }

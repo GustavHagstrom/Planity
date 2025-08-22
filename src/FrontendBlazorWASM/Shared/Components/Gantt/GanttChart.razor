@@ -37,7 +37,7 @@
     }
 </style>
 
-<svg class="gantt-chart@(IsDragging ? " grabbing" : "")" style="width: @SvgWidthPx; height: 100%; position: absolute; top: 0; left: 0;"
+<svg class="gantt-chart@(IsDragging ? " grabbing" : "")" style="width: @View.SvgWidthPx ; height: 100%; position: absolute; top: 0; left: 0;"
      @onpointermove="OnPointerMove" @onpointerup="OnPointerUp">
     <defs>
         <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
@@ -54,17 +54,17 @@
             </marker>
         }
     </defs>
-    @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, index) => (tuple, index)))
+    @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, index) => (tuple, index)))
     {
-        var isSelected = SelectedItem == item;
+        var isSelected = View.SelectedItem == item;
         var fillColor = level == 0 ? "plum" : "lightblue";
         var opacity = 1.0;
         var handleRadius = 5;
         if(item.Type == GanttItemType.Milestone && item.Start != null)
         {
-            var centerX = ((item.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
-            var centerY = (index * RowPixelHeight) + (RowPixelHeight / 2);
-            var halfSize = RowPixelHeight / 2 * 0.7;
+            var centerX = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay) + (View.RowHeight / 2);
+            var centerY = (index * View.RowHeight) + (View.RowHeight / 2);
+            var halfSize = View.RowHeight / 2 * 0.7;
             var centerXStr = centerX.ToString(CultureInfo.InvariantCulture);
             var centerYStr = centerY.ToString(CultureInfo.InvariantCulture);
             var topY = (centerY - halfSize).ToString(CultureInfo.InvariantCulture);
@@ -73,7 +73,7 @@
             var leftX = (centerX - halfSize).ToString(CultureInfo.InvariantCulture);
             var points = $"{centerXStr},{topY} {rightX},{centerYStr} {centerXStr},{bottomY} {leftX},{centerYStr}";
             <g class="gantt-bar">
-                <polygon points="@points" fill="@fillColor" opacity="@opacity" @onclick="() => OnBarClick(item)" />
+                <polygon points="@points" fill="@fillColor" opacity="@opacity" />
                 <circle cx="@centerXStr" cy="@centerYStr" r="@handleRadius" class="gantt-handle"
                         @onpointerdown="(e) => OnHandlePointerDown(item, GanttHandleType.Milestone, e)"
                         @onpointerup="(e) => OnHandlePointerUp(item, GanttHandleType.Milestone, e)" />
@@ -82,10 +82,10 @@
         }
         else if(item.Start != null && item.End != null)
         {
-            var x = ((item.Start.Value - Start).TotalDays * PixelsPerDay);
-            var y = (index * RowPixelHeight);
-            var width = ((item.End.Value - item.Start.Value).TotalDays * PixelsPerDay);
-            var height = RowPixelHeight;
+            var x = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
+            var y = (index * View.RowHeight);
+            var width = ((item.End.Value - item.Start.Value).TotalDays * View.PixelsPerDay);
+            var height = View.RowHeight;
             var xStr = x.ToString(CultureInfo.InvariantCulture);
             var yStr = y.ToString(CultureInfo.InvariantCulture);
             var cxStrStart = (x + handleRadius).ToString(CultureInfo.InvariantCulture);
@@ -94,7 +94,7 @@
             var widthStr = width.ToString(CultureInfo.InvariantCulture);
             var heightStr = height.ToString(CultureInfo.InvariantCulture);
             <g class="gantt-bar">
-                <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@fillColor" opacity="@opacity" @onclick="() => OnBarClick(item)" />
+                <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@fillColor" opacity="@opacity" />
                 
                 <circle cx="@cxStrStart" cy="@cyStr" r="@handleRadius" class="gantt-handle"
                         @onpointerdown="(e) => OnHandlePointerDown(item, GanttHandleType.Start, e)"
@@ -106,41 +106,41 @@
         }
     }
     // Visualisera kopplingar mellan items
-    @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, index) => (tuple, index)))
+    @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, index) => (tuple, index)))
     {
         if (item.Predecessors != null)
         {
             foreach (var predecessor in item.Predecessors)
             {
                 // Hämta index för predecessor
-                var predIndex = GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == predecessor).idx;
+                var predIndex = GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == predecessor).idx;
                 if (predIndex < 0) continue;
                 // Beräkna endpunkt för predecessor (slut-handle)
                 double predX = 0, predY = 0;
                 if (predecessor.Type == GanttItemType.Milestone && predecessor.Start != null)
                 {
-                    predX = ((predecessor.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
-                    predY = (predIndex * RowPixelHeight) + (RowPixelHeight / 2);
+                    predX = ((predecessor.Start.Value - View.Start).TotalDays * View.PixelsPerDay) + (View.RowHeight / 2);
+                    predY = (predIndex * View.RowHeight) + (View.RowHeight / 2);
                 }
                 else if (predecessor.Start != null && predecessor.End != null)
                 {
-                    var x = ((predecessor.Start.Value - Start).TotalDays * PixelsPerDay);
-                    var width = ((predecessor.End.Value - predecessor.Start.Value).TotalDays * PixelsPerDay);
+                    var x = ((predecessor.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
+                    var width = ((predecessor.End.Value - predecessor.Start.Value).TotalDays * View.PixelsPerDay);
                     predX = x + width - 5; // End-handle
-                    predY = (predIndex * RowPixelHeight) + (RowPixelHeight / 2);
+                    predY = (predIndex * View.RowHeight) + (View.RowHeight / 2);
                 }
                 // Beräkna startpunkt för item (start-handle)
                 double itemX = 0, itemY = 0;
                 if (item.Type == GanttItemType.Milestone && item.Start != null)
                 {
-                    itemX = ((item.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
-                    itemY = (index * RowPixelHeight) + (RowPixelHeight / 2);
+                    itemX = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay) + (View.RowHeight / 2);
+                    itemY = (index * View.RowHeight) + (View.RowHeight / 2);
                 }
                 else if (item.Start != null && item.End != null)
                 {
-                    var x = ((item.Start.Value - Start).TotalDays * PixelsPerDay);
+                    var x = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
                     itemX = x + 5; // Start-handle
-                    itemY = (index * RowPixelHeight) + (RowPixelHeight / 2);
+                    itemY = (index * View.RowHeight) + (View.RowHeight / 2);
                 }
                 // Polyline med 90-graders sväng (elbow)
                 var points = $"{predX},{predY} {itemX},{predY} {itemX},{itemY}";
@@ -155,20 +155,20 @@
         string startY = "0";
         if (DragSourceItem.Type == GanttItemType.Milestone && DragSourceItem.Start != null)
         {
-            var index = GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == DragSourceItem).idx;
-            var centerX = ((DragSourceItem.Start.Value - Start).TotalDays * PixelsPerDay) + (RowPixelHeight / 2);
-            var centerY = (index * RowPixelHeight) + (RowPixelHeight / 2);
+            var index = GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == DragSourceItem).idx;
+            var centerX = ((DragSourceItem.Start.Value - View.Start).TotalDays * View.PixelsPerDay) + (View.RowHeight / 2);
+            var centerY = (index * View.RowHeight) + (View.RowHeight / 2);
             startX = centerX.ToString(CultureInfo.InvariantCulture);
             startY = centerY.ToString(CultureInfo.InvariantCulture);
         }
         else if (DragSourceItem.Start != null && DragSourceItem.End != null)
         {
-            var index = GanttItemUtils.ItemsWithExpandLevel(Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == DragSourceItem).idx;
-            var x = ((DragSourceItem.Start.Value - Start).TotalDays * PixelsPerDay);
-            var width = ((DragSourceItem.End.Value - DragSourceItem.Start.Value).TotalDays * PixelsPerDay);
+            var index = GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == DragSourceItem).idx;
+            var x = ((DragSourceItem.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
+            var width = ((DragSourceItem.End.Value - DragSourceItem.Start.Value).TotalDays * View.PixelsPerDay);
             var handleRadius = 5;
-            var y = (index * RowPixelHeight);
-            var cy = (y + RowPixelHeight / 2).ToString(CultureInfo.InvariantCulture);
+            var y = (index * View.RowHeight);
+            var cy = (y + View.RowHeight / 2).ToString(CultureInfo.InvariantCulture);
             if (DragSourceType == GanttHandleType.Start)
             {
                 startX = (x + handleRadius).ToString(CultureInfo.InvariantCulture);
@@ -187,16 +187,15 @@
 </svg>
 
 @code {
-    [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
-    [Parameter] public DateTime Start { get; set; }
-    [Parameter] public DateTime End { get; set; }
-    [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
-    [Parameter] public double RowPixelHeight { get; set; } = 30;
-    [Parameter] public double PixelsPerDay { get; set; } = 30;
-    [Parameter] public string SvgWidthPx { get; set; } = "600px";
-    [Parameter] public string HeaderHeightPx { get; set; } = "50px";
-    [Parameter] public IGanttItem? SelectedItem { get; set; }
-    [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
+    [CascadingParameter] public GanttView View { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        if (View is null)
+        {
+            throw new InvalidOperationException("GanttView cascading parameter must not be null.");
+        }
+    }
 
     // Drag state
     private IGanttItem? DragSourceItem;
@@ -268,14 +267,5 @@
         PointerX = "0";
         PointerY = "0";
         StateHasChanged();
-    }
-
-    private async Task OnBarClick(IGanttItem item)
-    {
-        if (SelectedItem != item)
-        {
-            SelectedItem = item;
-            await SelectedItemChanged.InvokeAsync(item);
-        }
     }
 }
