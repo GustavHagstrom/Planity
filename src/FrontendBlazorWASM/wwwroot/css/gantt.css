@@ -1,0 +1,33 @@
+.gantt-handle {
+    cursor: grab;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    stroke: transparent;
+    stroke-width: 2px;
+    fill: black;
+}
+.gantt-handle:hover {
+    fill: gold;
+    stroke: black;
+    stroke-width: 2px;
+}
+.gantt-bar:hover .gantt-handle {
+    opacity: 1;
+    pointer-events: all;
+}
+.gantt-chart {
+    position: relative;
+}
+.gantt-chart.grabbing {
+    cursor: grabbing;
+}
+.gantt-chart.grabbing .gantt-handle {
+    cursor: grabbing !important;
+}
+.gantt-drag-overlay {
+    pointer-events: none;
+    fill: none;
+    stroke: gold;
+    stroke-width: 2px;
+}

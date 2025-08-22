@@ -1,0 +1,58 @@
+@using System.Globalization
+@using Planity.FrontendBlazorWASM.Shared.Components.Gantt
+
+<g class="gantt-bar">
+    @if(Item.Type == GanttItemType.Milestone && Item.Start != null)
+    {
+        var centerX = ((Item.Start.Value - ViewStart).TotalDays * PixelsPerDay) + (RowHeight / 2);
+        var centerY = (Index * RowHeight) + (RowHeight / 2);
+        var halfSize = RowHeight / 2 * 0.7;
+        var centerXStr = centerX.ToString(CultureInfo.InvariantCulture);
+        var centerYStr = centerY.ToString(CultureInfo.InvariantCulture);
+        var topY = (centerY - halfSize).ToString(CultureInfo.InvariantCulture);
+        var rightX = (centerX + halfSize).ToString(CultureInfo.InvariantCulture);
+        var bottomY = (centerY + halfSize).ToString(CultureInfo.InvariantCulture);
+        var leftX = (centerX - halfSize).ToString(CultureInfo.InvariantCulture);
+        var points = $"{centerXStr},{topY} {rightX},{centerYStr} {centerXStr},{bottomY} {leftX},{centerYStr}";
+        <polygon points="@points" fill="@FillColor" opacity="@Opacity" />
+        <circle cx="@centerXStr" cy="@centerYStr" r="@HandleRadius" class="gantt-handle"
+                @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Milestone, e))"
+                @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Milestone, e))" />
+    }
+    else if(Item.Start != null && Item.End != null)
+    {
+        var x = ((Item.Start.Value - ViewStart).TotalDays * PixelsPerDay);
+        var y = (Index * RowHeight);
+        var width = ((Item.End.Value - Item.Start.Value).TotalDays * PixelsPerDay);
+        var height = RowHeight;
+        var xStr = x.ToString(CultureInfo.InvariantCulture);
+        var yStr = y.ToString(CultureInfo.InvariantCulture);
+        var cxStrStart = (x + HandleRadius).ToString(CultureInfo.InvariantCulture);
+        var cxStrEnd = (x + width - HandleRadius).ToString(CultureInfo.InvariantCulture);
+        var cyStr = (y + height / 2).ToString(CultureInfo.InvariantCulture);
+        var widthStr = width.ToString(CultureInfo.InvariantCulture);
+        var heightStr = height.ToString(CultureInfo.InvariantCulture);
+        <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@FillColor" opacity="@Opacity" />
+        <circle cx="@cxStrStart" cy="@cyStr" r="@HandleRadius" class="gantt-handle"
+                @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Start, e))"
+                @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Start, e))" />
+        <circle cx="@cxStrEnd" cy="@cyStr" r="@HandleRadius" class="gantt-handle"
+                @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.End, e))"
+                @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.End, e))" />
+    }
+</g>
+
+@code {
+    [Parameter] public IGanttItem Item { get; set; } = null!;
+    [Parameter] public int Index { get; set; }
+    [Parameter] public int Level { get; set; }
+    [Parameter] public DateTime ViewStart { get; set; }
+    [Parameter] public double PixelsPerDay { get; set; }
+    [Parameter] public double RowHeight { get; set; }
+    [Parameter] public EventCallback<(IGanttItem, GanttHandleType, PointerEventArgs)> OnHandlePointerDown { get; set; }
+    [Parameter] public EventCallback<(IGanttItem, GanttHandleType, PointerEventArgs)> OnHandlePointerUp { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public string FillColor { get; set; } = "lightblue";
+    [Parameter] public double Opacity { get; set; } = 1.0;
+    [Parameter] public int HandleRadius { get; set; } = 5;
+}
