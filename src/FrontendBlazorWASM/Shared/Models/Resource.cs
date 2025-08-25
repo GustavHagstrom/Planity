@@ -11,17 +11,16 @@ public class Resource : IGanttItem
     public string? RoleId { get; set; } 
     public string? Role { get; set; } // t.ex. Snickare, Projektledare
 
-    public DateTime? Start => throw new NotImplementedException();
+    public DateTime? Start { get => null; set { } } // Kalkylerad, ej setbar
+    public DateTime? End { get => null; set { } }   // Kalkylerad, ej setbar
 
-    public DateTime? End => throw new NotImplementedException();
+    public GanttItemType Type => GanttItemType.Resource;
 
-    public GanttItemType Type => throw new NotImplementedException();
+    public string? Color => null;
 
-    public string? Color => throw new NotImplementedException();
+    public IEnumerable<IGanttItem>? Children => null;
 
-    public IEnumerable<IGanttItem>? Children => throw new NotImplementedException();
-
-    public bool IsExpanded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public bool IsExpanded { get; set; } = false;
 
     public IEnumerable<IGanttItem>? Predecessors { get; set; } = [];
     public IEnumerable<IGanttItem>? Successors { get; set; } = [];

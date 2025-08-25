@@ -1,0 +1,26 @@
+@using Planity.FrontendBlazorWASM.Shared.Components.Gantt
+
+<div style="padding-bottom: 8px; border-bottom: 1px solid black">
+    <label for="dragModeSelect">Drag-läge:</label>
+    <select id="dragModeSelect" @onchange="OnDragModeChanged" style="margin-left: 4px;">
+        <option value="None" selected="@(DragMode == GanttDragMode.None)">Inget</option>
+        <option value="EditDate" selected="@(DragMode == GanttDragMode.EditDate)">Ändra datum</option>
+        <option value="Link" selected="@(DragMode == GanttDragMode.Link)">Skapa koppling</option>
+    </select>
+</div>
+
+@code {
+    [Parameter] public GanttDragMode DragMode { get; set; }
+    [Parameter] public EventCallback<GanttDragMode> DragModeChanged { get; set; }
+
+    private async Task OnDragModeChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        if (value == "EditDate")
+            await DragModeChanged.InvokeAsync(GanttDragMode.EditDate);
+        else if (value == "Link")
+            await DragModeChanged.InvokeAsync(GanttDragMode.Link);
+        else
+            await DragModeChanged.InvokeAsync(GanttDragMode.None);
+    }
+}

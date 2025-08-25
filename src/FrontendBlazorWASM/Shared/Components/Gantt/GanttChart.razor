@@ -4,12 +4,12 @@
 @using Planity.FrontendBlazorWASM.Shared.Services
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 
-<svg class="gantt-chart@(IsDragging ? " grabbing" : "")" style="width: @View.SvgWidthPx ; height: 100%; position: absolute; top: 0; left: 0;"
-     @onpointermove="OnPointerMove" @onpointerup="OnPointerUp">
+<svg class="gantt-chart@(IsActive ? " grabbing" : "")" style="width: @View.SvgWidthPx ; height: 100%; position: absolute; top: 0; left: 0;"
+     @onpointermove="OnPointerMove" @onpointerup="@(e => OnPointerUp(e))">
     <defs>
         <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="gold" flood-opacity="1.0" />
-            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="gold" flood-opacity="1.0" />
+            <feDropShadow dx="0" dy="0" stdDeviation="1" flood-color="blue" flood-opacity="1.0" />
+            <feDropShadow dx="0" dy="0" stdDeviation="1" flood-color="blue" flood-opacity="1.0" />
         </filter>
         <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
             <polygon points="0 0, 10 3.5, 0 7" fill="#3a6ea5" />
@@ -26,13 +26,16 @@
         var handleRadius = 5;
         <GanttBar Item="@item" Index="@index" Level="@level" ViewStart="@View.Start" PixelsPerDay="@View.PixelsPerDay" RowHeight="@View.RowHeight"
                   OnHandlePointerDown="@HandlePointerDownProxy" OnHandlePointerUp="@HandlePointerUpProxy"
-                  IsSelected="@isSelected" FillColor="@fillColor" Opacity="@opacity" HandleRadius="@handleRadius" />
+                  IsSelected="@isSelected" FillColor="@fillColor" Opacity="@opacity" HandleRadius="@handleRadius" DragMode="@DragMode"
+                  OnBarPointerDown="@((args) => HandleBarPointerDown(args))" />
     }
     <GanttConnections Items="@View.Items" View="@View" />
-    <GanttDragOverlay IsDragging="@IsDragging" DragSourceItem="@DragSourceItem" DragSourceType="@DragSourceType" PointerX="@PointerX" PointerY="@PointerY" View="@View" />
+    <GanttDragOverlay IsDragging="@IsActive" DragSourceItem="@ActiveItem" DragSourceType="@DragSourceType" PointerX="@PointerX" PointerY="@PointerY" View="@View" />
 </svg>
 
 @code {
+    [Parameter] public GanttDragMode DragMode { get; set; } = GanttDragMode.EditDate;
+
     [CascadingParameter] public GanttView View { get; set; } = null!;
 
     protected override void OnParametersSet()
@@ -43,78 +46,78 @@
         }
     }
 
-    // Drag state
-    private IGanttItem? DragSourceItem;
+    // Drag/move state
+    private IGanttItem? ActiveItem;
     private GanttHandleType? DragSourceType;
-    private bool IsDragging;
+    private bool IsActive;
     private string PointerX = "0";
     private string PointerY = "0";
+    private double MoveStartOffsetDays;
 
     private void OnHandlePointerDown(IGanttItem item, GanttHandleType type, PointerEventArgs e)
     {
-        DragSourceItem = item;
+        ActiveItem = item;
         DragSourceType = type;
-        IsDragging = true;
+        IsActive = true;
         PointerX = e.OffsetX.ToString(CultureInfo.InvariantCulture);
         PointerY = e.OffsetY.ToString(CultureInfo.InvariantCulture);
+        // DragMode bestäms nu av parameter
     }
 
     private void OnHandlePointerUp(IGanttItem targetItem, GanttHandleType targetType, PointerEventArgs e)
     {
-        if (!IsDragging || DragSourceItem == null || DragSourceType == null)
+        if (!IsActive || ActiveItem == null || DragSourceType == null)
             return;
         // Förhindra att koppla till sig själv
-        if (targetItem == DragSourceItem)
+        if (targetItem == ActiveItem)
             return;
 
-        // Koppla DragSourceItem som predecessor eller successor
+        // Koppla ActiveItem som predecessor eller successor
         if (targetType == GanttHandleType.Start || targetType == GanttHandleType.Milestone)
         {
-            // Lägg till DragSourceItem som predecessor till targetItem om den inte redan finns
+            // Lägg till ActiveItem som predecessor till targetItem om den inte redan finns
             if (targetItem is { Predecessors: List<IGanttItem> preds })
             {
-                if (!preds.Contains(DragSourceItem))
-                    preds.Add(DragSourceItem);
+                if (!preds.Contains(ActiveItem))
+                    preds.Add(ActiveItem);
             }
         }
         else if (targetType == GanttHandleType.End)
         {
-            // Lägg till DragSourceItem som successor till targetItem om den inte redan finns
+            // Lägg till ActiveItem som successor till targetItem om den inte redan finns
             if (targetItem is { Successors: List<IGanttItem> succs })
             {
-                if (!succs.Contains(DragSourceItem))
-                    succs.Add(DragSourceItem);
+                if (!succs.Contains(ActiveItem))
+                    succs.Add(ActiveItem);
             }
         }
-        // Nollställ drag-state
-        IsDragging = false;
-        DragSourceItem = null;
-        DragSourceType = null;
-        PointerX = "0";
-        PointerY = "0";
+        ResetActiveState();
         StateHasChanged();
-    }
-
-    private void OnPointerMove(PointerEventArgs e)
-    {
-        if (IsDragging)
-        {
-            PointerX = e.OffsetX.ToString(CultureInfo.InvariantCulture);
-            PointerY = e.OffsetY.ToString(CultureInfo.InvariantCulture);
-            StateHasChanged();
-        }
     }
 
     private void OnPointerUp(PointerEventArgs e)
     {
-        IsDragging = false;
-        DragSourceItem = null;
+        if (DragMode == GanttDragMode.EditDate && IsActive && ActiveItem != null)
+        {
+            IsActive = false;
+            ActiveItem = null;
+            MoveStartOffsetDays = 0;
+            StateHasChanged();
+        }
+        else
+        {
+            ResetActiveState();
+            StateHasChanged();
+        }
+    }
+    void ResetActiveState()
+    {
+        IsActive = false;
+        ActiveItem = null;
         DragSourceType = null;
         PointerX = "0";
         PointerY = "0";
-        StateHasChanged();
     }
-
     private Task HandlePointerDownProxy((IGanttItem, GanttHandleType, PointerEventArgs) args)
     {
         OnHandlePointerDown(args.Item1, args.Item2, args.Item3);
@@ -124,5 +127,42 @@
     {
         OnHandlePointerUp(args.Item1, args.Item2, args.Item3);
         return Task.CompletedTask;
+    }
+
+    private void HandleBarPointerDown((IGanttItem item, PointerEventArgs e, string type) args)
+    {
+        if (DragMode != GanttDragMode.EditDate) return;
+        ActiveItem = args.item;
+        IsActive = true;
+        // Beräkna offset från musen till startdatum
+        if (ActiveItem?.Start != null)
+        {
+            var mouseDay = View.Start.AddDays(args.e.OffsetX / View.PixelsPerDay);
+            MoveStartOffsetDays = (mouseDay - ActiveItem.Start.Value).TotalDays;
+        }
+    }
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (IsActive && ActiveItem != null && DragMode == GanttDragMode.EditDate)
+        {
+            var mouseDay = View.Start.AddDays(e.OffsetX / View.PixelsPerDay - MoveStartOffsetDays);
+            if (ActiveItem.Type == GanttItemType.Milestone)
+            {
+                ActiveItem.Start = mouseDay;
+            }
+            else if (ActiveItem.Type == GanttItemType.Task && ActiveItem.Start != null && ActiveItem.End != null)
+            {
+                var duration = (ActiveItem.End.Value - ActiveItem.Start.Value).TotalDays;
+                ActiveItem.Start = mouseDay;
+                ActiveItem.End = mouseDay.AddDays(duration);
+            }
+            StateHasChanged();
+        }
+        else if (IsActive)
+        {
+            PointerX = e.OffsetX.ToString(CultureInfo.InvariantCulture);
+            PointerY = e.OffsetY.ToString(CultureInfo.InvariantCulture);
+            StateHasChanged();
+        }
     }
 }

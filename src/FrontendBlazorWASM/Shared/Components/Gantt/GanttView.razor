@@ -3,13 +3,16 @@
 @if(Items is not null)
 {
     <CascadingValue Value="this">
-        <div class="d-flex" style="border-style: solid; border-width: 1px;">
-            <GanttLeftPanel/>
-            <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
-                <GanttHeader />
-                <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
-                    <GanttChart/>
-                    <GanttGrid />
+        <div class="d-flex" style="border-style: solid; border-width: 1px; flex-direction: column;">
+            <GanttToolbar DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" />
+            <div class="d-flex" style="flex-grow: 1;">
+                <GanttLeftPanel/>
+                <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
+                    <GanttHeader />
+                    <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
+                        <GanttChart DragMode="@_dragMode" />
+                        <GanttGrid />
+                    </div>
                 </div>
             </div>
         </div>
@@ -24,6 +27,13 @@
     [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
     [Parameter] public IGanttItem? SelectedItem { get; set; }
     [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
+
+    private GanttDragMode _dragMode = GanttDragMode.None;
+    private void OnDragModeChanged(GanttDragMode mode)
+    {
+        _dragMode = mode;
+        StateHasChanged();
+    }
 
     public double PixelsPerDay => Mode switch
     {

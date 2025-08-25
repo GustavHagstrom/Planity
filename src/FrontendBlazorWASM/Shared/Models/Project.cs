@@ -7,8 +7,24 @@ public class Project : IGanttItem
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
-    public DateTime? Start => Tasks.Min(t => t.Start);
-    public DateTime? End => Tasks.Max(t => t.End);
+    public DateTime? Start
+    {
+        get => Tasks.Select(t => t.Start)
+            .Concat(Milestones.Select(m => m.Start))
+            .Where(d => d.HasValue)
+            .DefaultIfEmpty(null)
+            .Min();
+        set { }
+    }
+    public DateTime? End
+    {
+        get => Tasks.Select(T => T.End)
+            .Concat(Milestones.Select(m => m.End))
+            .Where(d => d.HasValue)
+            .DefaultIfEmpty(null)
+            .Max();
+        set { }
+    }
     public ProjectStatus Status { get; set; }
     public List<ProjectTask> Tasks { get; set; } = new();
     public List<Milestone> Milestones { get; set; } = new();

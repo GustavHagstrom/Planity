@@ -17,9 +17,8 @@ public class Milestone : IGanttItem
     // Statusindikator om den är uppnådd
     public bool IsCompleted { get; set; } = false;
 
-    public DateTime? Start => Date;
-
-    public DateTime? End => Date;
+    public DateTime? Start { get => Date; set => Date = value; }
+    public DateTime? End { get => Date; set => Date = value; }
 
     public GanttItemType Type => GanttItemType.Milestone;
 
