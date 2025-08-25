@@ -2,6 +2,8 @@
 @inject NavigationManager NavigationManager
 @inject IProjectService ProjectService
 @inject IStringLocalizer<TaskOverviewPage> localizer
+@inject IResourceService ResourceService
+@inject IGanttDateCalculator GanttDateCalculator
 
 <OverviewPageLayout Title="@localizer["Uppgiftsöversikt"]">
     <Actions>
@@ -25,7 +27,7 @@
                 <MudTd>@context.Name</MudTd>
                 <MudTd>@context.Status</MudTd>
                 <MudTd>@context.Start?.ToShortDateString()</MudTd>
-                <MudTd>@context.End?.ToShortDateString()</MudTd>
+                <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
             </RowTemplate>
         </EntityTable>
@@ -36,13 +38,14 @@
 @code {
     private List<ProjectTask> Tasks = new();
     private Dictionary<string, string> TaskProjectMap = new();
+    private List<Resource> Resources = new();
 
     protected override async Task OnInitializedAsync()
     {
         var projects = await ProjectService.GetProjectsAsync();
-        Tasks = projects.SelectMany(p => p.Tasks).ToList();
-        TaskProjectMap = projects
-            .SelectMany(p => p.Tasks.Select(t => new { t.Id, ProjectName = p.Name }))
+        Resources = await ResourceService.GetOrganizationResources();
+        Tasks = await ProjectService.GetAllTasksAsync();
+        TaskProjectMap = Tasks.Select(t => new { t.Id, ProjectName = projects.FirstOrDefault(p => p.Tasks.Any(x => x.Id == t.Id))?.Name ?? "" })
             .ToDictionary(x => x.Id, x => x.ProjectName);
     }
 

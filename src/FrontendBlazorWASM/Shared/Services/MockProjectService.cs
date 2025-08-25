@@ -1,5 +1,4 @@
 using Planity.FrontendBlazorWASM.Shared.Models;
-using Planity.FrontendBlazorWASM; // Importera enums
 
 namespace Planity.FrontendBlazorWASM.Shared.Services;
 
@@ -19,8 +18,8 @@ public class MockProjectService : IProjectService
                 Status = ProjectStatus.InProgress,
                 Tasks = new List<ProjectTask>
                 {
-                    new ProjectTask { Id = "T1", Name = "Gr�vning", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today, End = DateTime.Today.AddDays(2), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
-                    new ProjectTask { Id = "T2", Name = "Gjutning platta", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(5), AssignedResourceId = "3", AssignedResourceName = "Cecilia Carlsson" }
+                    new ProjectTask { Id = "T1", Name = "Grävning", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today, AssignedResourceId = "1" },
+                    new ProjectTask { Id = "T2", Name = "Gjutning platta", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), AssignedResourceId = "2"}
                 },
                 Milestones = new List<Milestone>
                 {
@@ -30,14 +29,13 @@ public class MockProjectService : IProjectService
             new Project
             {
                 Id = "P2",
-                Name = "Renovera k�k",
-                Description = "Totalrenovering av k�k.",
+                Name = "Renovera kök",
+                Description = "Totalrenovering av kök.",
                 Status = ProjectStatus.NotStarted,
                 Tasks = new List<ProjectTask>
                 {
-                    //Mockade v�rdeen
-                    new ProjectTask { Id = "T3", Name = "Spika", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(8.5), End = DateTime.Today.AddDays(20.1), AssignedResourceId = "2", AssignedResourceName = "Bertil Berg" },
-                    new ProjectTask { Id = "T4", Name = "Gjutning platta", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(9), End = DateTime.Today.AddDays(28.8), AssignedResourceId = "3", AssignedResourceName = "Cecilia Carlsson" }
+                    new ProjectTask { Id = "T3", Name = "Spika", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(8.5), AssignedResourceId = "2" },
+                    new ProjectTask { Id = "T4", Name = "Gjutning platta", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(9), AssignedResourceId = "3" }
                 },
                 Milestones = new List<Milestone>()
             },
@@ -49,9 +47,9 @@ public class MockProjectService : IProjectService
                 Status = ProjectStatus.Completed,
                 Tasks = new List<ProjectTask>
                 {
-                    new ProjectTask { Id = "T5", Name = "Skrapa färg", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-30), End = DateTime.Today.AddDays(-28), AssignedResourceId = "4", AssignedResourceName = "David Dahl" },
-                    new ProjectTask { Id = "T6", Name = "Grundmåla", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-27), End = DateTime.Today.AddDays(-25), AssignedResourceId = "5", AssignedResourceName = "Eva Ek" },
-                    new ProjectTask { Id = "T7", Name = "Slutmåla", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-24), End = DateTime.Today.AddDays(-20), AssignedResourceId = "4", AssignedResourceName = "David Dahl" }
+                    new ProjectTask { Id = "T5", Name = "Skrapa färg", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-30), AssignedResourceId = "3" },
+                    new ProjectTask { Id = "T6", Name = "Grundmåla", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-27), AssignedResourceId = "1" },
+                    new ProjectTask { Id = "T7", Name = "Slutmåla", Status = ProjectTaskStatus.Completed, Start = DateTime.Today.AddDays(-24), AssignedResourceId = "2" }
                 },
                 Milestones = new List<Milestone>
                 {
@@ -67,8 +65,8 @@ public class MockProjectService : IProjectService
                 Status = ProjectStatus.InProgress,
                 Tasks = new List<ProjectTask>
                 {
-                    new ProjectTask { Id = "T8", Name = "Markberedning", Status = ProjectTaskStatus.InProgress, Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(2), AssignedResourceId = "6", AssignedResourceName = "Filip Fors" },
-                    new ProjectTask { Id = "T9", Name = "Lägga plattor", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(7), AssignedResourceId = "7", AssignedResourceName = "Greta Gran" }
+                    new ProjectTask { Id = "T8", Name = "Markberedning", Status = ProjectTaskStatus.InProgress, Start = DateTime.Today.AddDays(-2), AssignedResourceId = "1"},
+                    new ProjectTask { Id = "T9", Name = "Lägga plattor", Status = ProjectTaskStatus.NotStarted, Start = DateTime.Today.AddDays(3), AssignedResourceId = "2"}
                 },
                 Milestones = new List<Milestone>
                 {
@@ -135,9 +133,7 @@ public class MockProjectService : IProjectService
                 existing.Description = task.Description;
                 existing.Status = task.Status;
                 existing.Start = task.Start;
-                existing.End = task.End;
                 existing.AssignedResourceId = task.AssignedResourceId;
-                existing.AssignedResourceName = task.AssignedResourceName;
             }
         }
         return Task.FromResult(task);

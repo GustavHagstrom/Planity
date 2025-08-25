@@ -4,6 +4,9 @@
 @using Planity.FrontendBlazorWASM.Shared.Services
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 
+@inject IGanttDateCalculator GanttDateCalculator
+@inject IResourceService ResourceService
+
 <svg class="gantt-chart@(IsActive ? " grabbing" : "")" style="width: @View.SvgWidthPx ; height: 100%; position: absolute; top: 0; left: 0;"
      @onpointermove="OnPointerMove" @onpointerup="@(e => OnPointerUp(e))">
     <defs>
@@ -24,10 +27,11 @@
         var fillColor = level == 0 ? "plum" : "lightblue";
         var opacity = 1.0;
         var handleRadius = 5;
+        var endDate = GanttDateCalculator.CalculateEnd(item, View.Resources);
         <GanttBar Item="@item" Index="@index" Level="@level" ViewStart="@View.Start" PixelsPerDay="@View.PixelsPerDay" RowHeight="@View.RowHeight"
                   OnHandlePointerDown="@HandlePointerDownProxy" OnHandlePointerUp="@HandlePointerUpProxy"
                   IsSelected="@isSelected" FillColor="@fillColor" Opacity="@opacity" HandleRadius="@handleRadius" DragMode="@DragMode"
-                  OnBarPointerDown="@((args) => HandleBarPointerDown(args))" />
+                  OnBarPointerDown="@((args) => HandleBarPointerDown(args))" EndDate="@endDate" />
     }
     <GanttConnections Items="@View.Items" View="@View" />
     <GanttDragOverlay IsDragging="@IsActive" DragSourceItem="@ActiveItem" DragSourceType="@DragSourceType" PointerX="@PointerX" PointerY="@PointerY" View="@View" />
@@ -146,17 +150,11 @@
         if (IsActive && ActiveItem != null && DragMode == GanttDragMode.EditDate)
         {
             var mouseDay = View.Start.AddDays(e.OffsetX / View.PixelsPerDay - MoveStartOffsetDays);
-            if (ActiveItem.Type == GanttItemType.Milestone)
+            if (ActiveItem.Type == GanttItemType.Milestone || ActiveItem.Type == GanttItemType.Task)
             {
                 ActiveItem.Start = mouseDay;
             }
-            else if (ActiveItem.Type == GanttItemType.Task && ActiveItem.Start != null && ActiveItem.End != null)
-            {
-                var duration = (ActiveItem.End.Value - ActiveItem.Start.Value).TotalDays;
-                ActiveItem.Start = mouseDay;
-                ActiveItem.End = mouseDay.AddDays(duration);
-            }
-            StateHasChanged();
+            // End-hantering flyttas till GanttDateCalculator
         }
         else if (IsActive)
         {

@@ -1,5 +1,6 @@
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
+@inject IGanttDateCalculator GanttDateCalculator
 
 <g class="gantt-bar">
     @if(Item.Type == GanttItemType.Milestone && Item.Start != null)
@@ -31,11 +32,11 @@
                     @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Milestone, e))" />
         }
     }
-    else if(Item.Start != null && Item.End != null)
+    else if(Item.Start != null && EndDate != null)
     {
         var x = ((Item.Start.Value - ViewStart).TotalDays * PixelsPerDay);
         var y = (Index * RowHeight);
-        var width = ((Item.End.Value - Item.Start.Value).TotalDays * PixelsPerDay);
+        var width = ((EndDate.Value - Item.Start.Value).TotalDays * PixelsPerDay);
         var height = RowHeight;
         var xStr = x.ToString(CultureInfo.InvariantCulture);
         var yStr = y.ToString(CultureInfo.InvariantCulture);
@@ -68,6 +69,9 @@
 </g>
 
 @code {
+    [CascadingParameter] public GanttView View { get; set; } = null!;
+
+
     [Parameter] public IGanttItem Item { get; set; } = null!;
     [Parameter] public int Index { get; set; }
     [Parameter] public int Level { get; set; }
@@ -82,12 +86,37 @@
     [Parameter] public int HandleRadius { get; set; } = 5;
     [Parameter] public GanttDragMode DragMode { get; set; } = GanttDragMode.EditDate;
     [Parameter] public EventCallback<(IGanttItem, PointerEventArgs, string)> OnBarPointerDown { get; set; }
+    [Parameter] public DateTime? EndDate { get; set; }
 
     private Task BarPointerDownInternal(PointerEventArgs e)
     {
         return OnBarPointerDown.InvokeAsync((Item, e, Item.Type == GanttItemType.Milestone ? "milestone" : "bar"));
     }
 
-    private bool HasBrokenDependency =>
-        Item.Predecessors?.Any(p => p.End.HasValue && Item.Start.HasValue && p.End.Value > Item.Start.Value) == true;
+    private bool HasBrokenDependency
+    {
+        get
+        {
+            if (Item.Predecessors is null || !Item.Start.HasValue)
+                return false;
+
+            foreach (var predecessor in Item.Predecessors)
+            {
+                DateTime? predecessorEnd = null;
+                if (predecessor is ProjectTask predTask)
+                {
+                    predecessorEnd = predTask.Start.HasValue ? GanttDateCalculator.CalculateEnd(predTask, View.Resources) : null;
+                }
+                else if (predecessor is Milestone milestone)
+                {
+                    predecessorEnd = milestone.Date;
+                }
+                // Lägg till fler typer om det behövs
+
+                if (predecessorEnd.HasValue && Item.Start.Value < predecessorEnd.Value)
+                    return true;
+            }
+            return false;
+        }
+    }
 }

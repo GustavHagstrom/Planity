@@ -12,7 +12,6 @@ public class Resource : IGanttItem
     public string? Role { get; set; } // t.ex. Snickare, Projektledare
 
     public DateTime? Start { get => null; set { } } // Kalkylerad, ej setbar
-    public DateTime? End { get => null; set { } }   // Kalkylerad, ej setbar
 
     public GanttItemType Type => GanttItemType.Resource;
 

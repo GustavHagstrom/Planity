@@ -1,4 +1,5 @@
 @inject IStringLocalizer<GanttView> Localizer
+@inject IResourceService ResourceService
 
 @if(Items is not null)
 {
@@ -56,6 +57,12 @@
     };
     public string SvgWidthPx => $"{SvgWidth}px";
     public int RowCount => GanttItemUtils.ItemsWithExpand(Items).Count();
+    public List<Resource> Resources { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Resources = await ResourceService.GetResourcesAsync() ?? new List<Resource>();
+    }
 
     public async Task SelectItemAsync(IGanttItem? item)
     {

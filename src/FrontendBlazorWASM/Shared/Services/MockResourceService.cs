@@ -2,7 +2,7 @@ using Planity.FrontendBlazorWASM.Shared.Models;
 
 namespace Planity.FrontendBlazorWASM.Shared.Services;
 
-public class MockResourceService : IResourceService
+public class MockResourceService(IAuthService authService) : IResourceService
 {
     private readonly List<Resource> _resources = new()
     {
@@ -42,5 +42,12 @@ public class MockResourceService : IResourceService
         if (resource != null)
             _resources.Remove(resource);
         return Task.CompletedTask;
+    }
+
+    public async Task<List<Resource>> GetOrganizationResources()
+    {
+        var orgId = await authService.GetOrganizationIdAsync();
+        var resources = _resources.Where(r => r.OrganizationId == orgId).ToList();
+        return resources;
     }
 }

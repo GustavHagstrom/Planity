@@ -1,14 +1,13 @@
 <MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true" />
 <MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description" />
 <MudDatePicker @bind-Date="task.Start" Label="Startdatum" />
-<MudDatePicker @bind-Date="task.End" Label="Slutdatum" />
 <MudSelect T="ProjectTaskStatus" Label="Status" @bind-Value="task.Status">
     @foreach (ProjectTaskStatus status in System.Enum.GetValues(typeof(TaskStatus)))
     {
         <MudSelectItem Value="@status">@status</MudSelectItem>
     }
 </MudSelect>
-<MudTextField T="string" @bind-Value="task.AssignedResourceName" Label="Tilldelad resurs" For="() => task.AssignedResourceName" />
+
 
 
 @code {
@@ -26,10 +25,8 @@
                 Name = TaskModel.Name,
                 Description = TaskModel.Description,
                 Start = TaskModel.Start,
-                End = TaskModel.End,
                 Status = TaskModel.Status,
                 AssignedResourceId = TaskModel.AssignedResourceId,
-                AssignedResourceName = TaskModel.AssignedResourceName,
                 OrganizationId = TaskModel.OrganizationId
             };
         }

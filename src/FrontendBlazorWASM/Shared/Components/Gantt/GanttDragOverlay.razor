@@ -1,5 +1,6 @@
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
+@inject IGanttDateCalculator GanttDateCalculator
 
 @if (IsDragging && DragSourceItem != null && DragSourceType != null)
 {
@@ -13,23 +14,28 @@
         startX = centerX.ToString(CultureInfo.InvariantCulture);
         startY = centerY.ToString(CultureInfo.InvariantCulture);
     }
-    else if (DragSourceItem.Start != null && DragSourceItem.End != null)
+    else if (DragSourceItem.Start != null)
     {
         var index = GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, idx) => (tuple, idx)).FirstOrDefault(t => t.tuple.item == DragSourceItem).idx;
-        var x = ((DragSourceItem.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
-        var width = ((DragSourceItem.End.Value - DragSourceItem.Start.Value).TotalDays * View.PixelsPerDay);
-        var handleRadius = 5;
-        var y = (index * View.RowHeight);
-        var cy = (y + View.RowHeight / 2).ToString(CultureInfo.InvariantCulture);
-        if (DragSourceType == GanttHandleType.Start)
+        var resources = View.Resources;
+        var endDate = GanttDateCalculator.CalculateEnd(DragSourceItem, resources);
+        if (endDate != null)
         {
-            startX = (x + handleRadius).ToString(CultureInfo.InvariantCulture);
-            startY = cy;
-        }
-        else if (DragSourceType == GanttHandleType.End)
-        {
-            startX = (x + width - handleRadius).ToString(CultureInfo.InvariantCulture);
-            startY = cy;
+            var x = ((DragSourceItem.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
+            var width = ((endDate.Value - DragSourceItem.Start.Value).TotalDays * View.PixelsPerDay);
+            var handleRadius = 5;
+            var y = (index * View.RowHeight);
+            var cy = (y + View.RowHeight / 2).ToString(CultureInfo.InvariantCulture);
+            if (DragSourceType == GanttHandleType.Start)
+            {
+                startX = (x + handleRadius).ToString(CultureInfo.InvariantCulture);
+                startY = cy;
+            }
+            else if (DragSourceType == GanttHandleType.End)
+            {
+                startX = (x + width - handleRadius).ToString(CultureInfo.InvariantCulture);
+                startY = cy;
+            }
         }
     }
     var points = $"{startX},{startY} {PointerX},{startY} {PointerX},{PointerY}";

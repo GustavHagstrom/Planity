@@ -1,17 +1,19 @@
 ﻿@page "/projects/{id}"
 @inject NavigationManager NavigationManager
 @inject IProjectService ProjectService
+@inject IResourceService ResourceService
 @inject IStringLocalizer<ProjectDetailsPage> localizer
 @inject IJSRuntime JS
+@inject IGanttDateCalculator GanttDateCalculator
 
-<EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null" OnSave="Save">
+<EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null || Resources is null" OnSave="Save">
     <MainContent>
 
         <ProjectForm ProjectModel="Project" />
 
         <MudDivider Class="my-4"></MudDivider>
 
-        <EntityTable Title="@localizer["Uppgifter"]" Items="Project?.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
+        <EntityTable Title="@localizer["Uppgifter"]" Items="Project!.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
                 <MudTh>@localizer["Status"]</MudTh>
@@ -30,15 +32,12 @@
                     @context.Start?.ToString("yyyy-MM-dd")
                 </MudTd>
                 <MudTd>
-                    @context.End?.ToString("yyyy-MM-dd")
-                </MudTd>
-                <MudTd>
-                    @context.AssignedResourceName
+                    @GanttDateCalculator.CalculateEnd(context, Resources!)
                 </MudTd>
             </RowTemplate>
         </EntityTable>
 
-        <EntityTable Title="@localizer["Milstenar"]" Items="Project?.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
+        <EntityTable Title="@localizer["Milstenar"]" Items="Project!.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
                 <MudTh>@localizer["Status"]</MudTh>
@@ -68,9 +67,12 @@
     [Parameter] public string? Id { get; set; }
 
     private Project? Project;
+    private List<Resource>? Resources;
 
     protected override async Task OnInitializedAsync()
     {
+        var resources = await ResourceService.GetResourcesAsync();
+        Resources = resources;
         if (!string.IsNullOrEmpty(Id))
         {
             var project = await ProjectService.GetProjectByIdAsync(Id);

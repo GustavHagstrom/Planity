@@ -16,15 +16,15 @@ public class Project : IGanttItem
             .Min();
         set { }
     }
-    public DateTime? End
-    {
-        get => Tasks.Select(T => T.End)
-            .Concat(Milestones.Select(m => m.End))
-            .Where(d => d.HasValue)
-            .DefaultIfEmpty(null)
-            .Max();
-        set { }
-    }
+    //public DateTime? End
+    //{
+    //    get => Tasks.Select(T => T.End)
+    //        .Concat(Milestones.Select(m => m.End))
+    //        .Where(d => d.HasValue)
+    //        .DefaultIfEmpty(null)
+    //        .Max();
+    //    set { }
+    //}
     public ProjectStatus Status { get; set; }
     public List<ProjectTask> Tasks { get; set; } = new();
     public List<Milestone> Milestones { get; set; } = new();

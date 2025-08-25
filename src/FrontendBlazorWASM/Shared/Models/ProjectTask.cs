@@ -9,10 +9,10 @@ public class ProjectTask : IGanttItem
     public string Name { get; set; } = "";
     public string? Description { get; set; }
     public DateTime? Start { get; set; }
-    public DateTime? End { get; set; }
+    // End borttagen, beräknas via service
+    public double WorkHours { get; set; } = 8; // Exempel: 8 timmar arbete
     public ProjectTaskStatus Status { get; set; }
     public string AssignedResourceId { get; set; } = string.Empty;
-    public string AssignedResourceName { get; set; } = string.Empty;
 
     public GanttItemType Type => GanttItemType.Task;
 

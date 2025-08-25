@@ -1,7 +1,9 @@
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
+@inject IGanttDateCalculator GanttDateCalculator
+@inject IResourceService ResourceService
 
-@foreach (var conn in GetConnections())
+@foreach (var conn in connections)
 {
     <GanttConnection Points="@conn.Points" StrokeColor="@(conn.IsBroken ? "red" : "#3a6ea5")" StrokeWidth="2" MarkerEnd="url(#arrowhead)" />
 }
@@ -12,23 +14,33 @@
 
     private record Connection(string Points, bool IsBroken);
 
-    private List<Connection> GetConnections()
+    private List<Connection> connections = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        connections = await GetConnectionsAsync();
+    }
+
+    private async Task<List<Connection>> GetConnectionsAsync()
     {
         var connections = new List<Connection>();
         var itemsWithLevel = GanttItemUtils.ItemsWithExpandLevel(Items).ToList();
         var itemIndex = itemsWithLevel.Select((tuple, idx) => new { tuple.item, idx }).ToDictionary(x => x.item, x => x.idx);
+        var resources = (await ResourceService.GetResourcesAsync()).ToList();
 
         for (int index = 0; index < itemsWithLevel.Count; index++)
         {
             var (item, level) = itemsWithLevel[index];
             if (item.Predecessors == null) continue;
+            var itemEnd = GanttDateCalculator.CalculateEnd(item, resources);
             foreach (var predecessor in item.Predecessors)
             {
                 if (!itemIndex.TryGetValue(predecessor, out var predIndex)) continue;
-                var (predX, predY) = GetHandlePosition(predecessor, predIndex, true);
-                var (itemX, itemY) = GetHandlePosition(item, index, false);
+                var predEnd = GanttDateCalculator.CalculateEnd(predecessor, resources);
+                var (predX, predY) = GetHandlePosition(predecessor, predIndex, predEnd, true);
+                var (itemX, itemY) = GetHandlePosition(item, index, itemEnd, false);
                 var points = $"{predX},{predY} {itemX},{predY} {itemX},{itemY}";
-                bool isBroken = predecessor.End.HasValue && item.Start.HasValue && predecessor.End.Value > item.Start.Value;
+                bool isBroken = predEnd.HasValue && item.Start.HasValue && predEnd.Value > item.Start.Value;
                 connections.Add(new Connection(points, isBroken));
             }
         }
@@ -36,18 +48,18 @@
     }
 
     // isEndHandle: true för predecessor, false för item
-    private (string x, string y) GetHandlePosition(IGanttItem item, int index, bool isEndHandle)
+    private (string x, string y) GetHandlePosition(IGanttItem item, int index, DateTime? endDate, bool isEndHandle)
     {
         if (item.Type == GanttItemType.Milestone && item.Start != null)
         {
-            var centerX = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay) + (View.RowHeight / 2);
+            var centerX = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
             var centerY = (index * View.RowHeight) + (View.RowHeight / 2);
             return (centerX.ToString(CultureInfo.InvariantCulture), centerY.ToString(CultureInfo.InvariantCulture));
         }
-        else if (item.Start != null && item.End != null)
+        else if (item.Start != null && endDate != null)
         {
             var x = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
-            var width = ((item.End.Value - item.Start.Value).TotalDays * View.PixelsPerDay);
+            var width = ((endDate.Value - item.Start.Value).TotalDays * View.PixelsPerDay);
             var handleRadius = 5;
             var y = (index * View.RowHeight) + (View.RowHeight / 2);
             if (isEndHandle)
@@ -58,3 +70,5 @@
         return ("0", "0");
     }
 }
+
+

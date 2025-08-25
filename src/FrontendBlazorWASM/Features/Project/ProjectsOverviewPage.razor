@@ -1,6 +1,9 @@
 ﻿@page "/projects"
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<ProjectsOverviewPage> localizer
+@inject IResourceService ResourceService
+@inject IGanttDateCalculator GanttDateCalculator
+@inject IProjectService ProjectService
 
 <OverviewPageLayout Title="@localizer["Projektöversikt"]">
     <Actions>
@@ -24,7 +27,7 @@
                 <MudTd>@context.Name</MudTd>
                 <MudTd>@context.Status</MudTd>
                 <MudTd>@context.Start?.ToShortDateString()</MudTd>
-                <MudTd>@context.End?.ToShortDateString()</MudTd>
+                <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
             </RowTemplate>
         </EntityTable>
     </MainContent>
@@ -33,11 +36,12 @@
 
 @code {
     private List<Project> Projects = new();
+    private List<Resource> Resources = new();
 
-    [Inject] private IProjectService ProjectService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         Projects = await ProjectService.GetProjectsAsync();
+        Resources = await ResourceService.GetOrganizationResources();
     }
 }
