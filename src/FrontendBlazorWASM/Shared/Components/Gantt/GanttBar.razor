@@ -4,7 +4,7 @@
 <g class="gantt-bar">
     @if(Item.Type == GanttItemType.Milestone && Item.Start != null)
     {
-        var centerX = ((Item.Start.Value - ViewStart).TotalDays * PixelsPerDay) + (RowHeight / 2);
+        var centerX = ((Item.Start.Value - ViewStart).TotalDays * PixelsPerDay);
         var centerY = (Index * RowHeight) + (RowHeight / 2);
         var halfSize = RowHeight / 2 * 0.7;
         var centerXStr = centerX.ToString(CultureInfo.InvariantCulture);
@@ -16,13 +16,13 @@
         var points = $"{centerXStr},{topY} {rightX},{centerYStr} {centerXStr},{bottomY} {leftX},{centerYStr}";
         @if (DragMode == GanttDragMode.EditDate)
         {
-            <polygon points="@points" fill="@FillColor" opacity="@Opacity" filter="url(#glow)"
+            <polygon points="@points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" filter="url(#glow)"
                 @onpointerdown="BarPointerDownInternal"
                 style="cursor:move" />
         }
         else
         {
-            <polygon points="@points" fill="@FillColor" opacity="@Opacity" />
+            <polygon points="@points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" />
         }
         @if (DragMode == GanttDragMode.Link)
         {
@@ -47,13 +47,13 @@
 
         @if (DragMode == GanttDragMode.EditDate && Item.Type == GanttItemType.Task)
         {
-            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@FillColor" opacity="@Opacity" filter="url(#glow)"
+            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" filter="url(#glow)"
                 style="cursor:move"
                 @onpointerdown="BarPointerDownInternal" />
         }
         else
         {
-            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@FillColor" opacity="@Opacity" style="cursor:default" />
+            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:default" />
         }
         @if (DragMode == GanttDragMode.Link)
         {
@@ -87,4 +87,7 @@
     {
         return OnBarPointerDown.InvokeAsync((Item, e, Item.Type == GanttItemType.Milestone ? "milestone" : "bar"));
     }
+
+    private bool HasBrokenDependency =>
+        Item.Predecessors?.Any(p => p.End.HasValue && Item.Start.HasValue && p.End.Value > Item.Start.Value) == true;
 }

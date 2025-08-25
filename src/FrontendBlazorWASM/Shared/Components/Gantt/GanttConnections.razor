@@ -3,14 +3,14 @@
 
 @foreach (var conn in GetConnections())
 {
-    <GanttConnection Points="@conn.Points" StrokeColor="#3a6ea5" StrokeWidth="2" MarkerEnd="url(#arrowhead)" />
+    <GanttConnection Points="@conn.Points" StrokeColor="@(conn.IsBroken ? "red" : "#3a6ea5")" StrokeWidth="2" MarkerEnd="url(#arrowhead)" />
 }
 
 @code {
     [Parameter] public IEnumerable<IGanttItem> Items { get; set; } = Enumerable.Empty<IGanttItem>();
     [Parameter] public GanttView View { get; set; } = null!;
 
-    private record Connection(string Points);
+    private record Connection(string Points, bool IsBroken);
 
     private List<Connection> GetConnections()
     {
@@ -28,7 +28,8 @@
                 var (predX, predY) = GetHandlePosition(predecessor, predIndex, true);
                 var (itemX, itemY) = GetHandlePosition(item, index, false);
                 var points = $"{predX},{predY} {itemX},{predY} {itemX},{itemY}";
-                connections.Add(new Connection(points));
+                bool isBroken = predecessor.End.HasValue && item.Start.HasValue && predecessor.End.Value > item.Start.Value;
+                connections.Add(new Connection(points, isBroken));
             }
         }
         return connections;
