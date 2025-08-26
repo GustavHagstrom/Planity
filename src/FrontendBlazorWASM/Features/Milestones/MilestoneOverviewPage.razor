@@ -18,13 +18,11 @@
             <HeaderContent>
                 <MudTh>Namn</MudTh>
                 <MudTh>Datum</MudTh>
-                <MudTh>Status</MudTh>
                 <MudTh>Projekt</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
-                <MudTd>@context.Date.ToString()</MudTd>
-                <MudTd>@(context.IsCompleted ? "Klar" : "Ej klar")</MudTd>
+                <MudTd>@context.Start.ToString()</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
             </RowTemplate>
         </EntityTable>

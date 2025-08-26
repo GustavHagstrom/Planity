@@ -118,7 +118,7 @@
         while (currentDate < View.End)
         {
             var startX = (currentDate - View.Start).TotalDays * View.PixelsPerDay;
-            var dayText = currentDate.ToString("ddd");
+            var dayText = currentDate.ToString("ddd d");
             var textX = startX + (View.PixelsPerDay / 2);
             yield return GanttSvgHelper.RenderRect(startX, View.HeaderHeight / 2, View.PixelsPerDay, View.HeaderHeight / 2, "lightblue");
             yield return GanttSvgHelper.RenderLine(startX, startX, View.HeaderHeight / 2, View.HeaderHeight, "black", 0.2);

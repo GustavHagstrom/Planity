@@ -1,11 +1,5 @@
 <MudTextField T="string" @bind-Value="project.Name" Label="Namn" For="() => project.Name" Required="true" />
 <MudTextField T="string" @bind-Value="project.Description" Label="Beskrivning" For="() => project.Description" />
-<MudSelect T="ProjectStatus" Label="Status" @bind-Value="project.Status">
-    @foreach (var status in Enum.GetValues<ProjectStatus>())
-    {
-        <MudSelectItem Value="@status">@status</MudSelectItem>
-    }
-</MudSelect>
 
 @code {
     [Parameter] public Project? ProjectModel { get; set; }
@@ -21,7 +15,6 @@
                 Id = ProjectModel.Id,
                 Name = ProjectModel.Name,
                 Description = ProjectModel.Description,
-                Status = ProjectModel.Status,
                 Tasks = ProjectModel.Tasks,
                 Milestones = ProjectModel.Milestones,
                 IsExpanded = ProjectModel.IsExpanded

@@ -2,7 +2,6 @@
 
 
 <MudTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
-<MudTextField T="string" @bind-Value="resource.Role" Label="@localizer["Roll"]" For="() => resource.Role" />
 <MudTextField T="string" @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
 
 
@@ -19,9 +18,7 @@
             {
                 Id = ResourceModel.Id,
                 Name = ResourceModel.Name,
-                Role = ResourceModel.Role,
                 OrganizationId = ResourceModel.OrganizationId,
-                RoleId = ResourceModel.RoleId
             };
         }
     }

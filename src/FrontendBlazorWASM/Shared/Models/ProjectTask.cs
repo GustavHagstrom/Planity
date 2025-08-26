@@ -6,25 +6,14 @@ public class ProjectTask : IGanttItem
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string OrganizationId { get; set; } = string.Empty;
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public DateTime? Start { get; set; }
-    // End borttagen, beräknas via service
-    public double WorkHours { get; set; } = 8; // Exempel: 8 timmar arbete
-    public ProjectTaskStatus Status { get; set; }
-    public string AssignedResourceId { get; set; } = string.Empty;
-
+    public double WorkHours { get; set; } = 8; // Exempel: 8 timmar arbete för att slutföra uppgiften
+    public string ResourceId { get; set; } = string.Empty;
     public GanttItemType Type => GanttItemType.Task;
-
-    public string? Color => null;
-
     public IEnumerable<IGanttItem>? Children => [];
-
     public bool IsExpanded { get; set; } = false;
-
-    public List<IGanttItem> Predecessors { get; set; } = new();
-    public List<IGanttItem> Successors { get; set; } = new();
-
-    IEnumerable<IGanttItem>? IGanttItem.Predecessors { get => Predecessors; set => Predecessors = value?.ToList() ?? new List<IGanttItem>(); }
-    IEnumerable<IGanttItem>? IGanttItem.Successors { get => Successors; set => Successors = value?.ToList() ?? new List<IGanttItem>(); }
+    public List<IGanttItem> Predecessors { get; set; } = [];
+    public List<IGanttItem> Successors { get; set; } = [];
 }

@@ -17,10 +17,22 @@ public class GanttDateCalculator(IResourceService resourceService) : IGanttDateC
 
         if (item is ProjectTask task)
         {
-            var resource = resources.FirstOrDefault(r => r.Id == task.AssignedResourceId);
-            if (resource is null) return null; // Ingen resurs tilldelad, kan inte beräkna slutdatum
-            var weeks = task.WorkHours / resource.Capacity;
-            return task.Start!.Value.AddDays(weeks * 7);
+            var resource = resources.FirstOrDefault(r => r.Id == task.ResourceId);
+            if (resource is null || resource.WorkCalendar is null) return null;
+            var workCalendar = resource.WorkCalendar;
+            var remainingHours = task.WorkHours;
+            var currentDate = task.Start!.Value;
+            while (remainingHours > 0)
+            {
+                var dayHours = GetWorkHours(workCalendar, currentDate);
+                var dayCapacity = dayHours * resource.Workers * resource.Efficiency;
+                remainingHours -= dayCapacity;
+                // Om arbetet är klart, returnera aktuellt datum
+                if (remainingHours <= 0)
+                    return currentDate;
+                currentDate = currentDate.AddDays(1);
+            }
+            return currentDate;
         }
         else if (item is Milestone milestone)
         {
@@ -38,5 +50,18 @@ public class GanttDateCalculator(IResourceService resourceService) : IGanttDateC
 
         // För Resource och andra typer kan du lägga till logik här
         return null;
+    }
+
+    public bool IsWorkDay(WorkCalendar calendar, DateTime date)
+    {
+        // Arbetsdag om arbetstimmar > 0 och inte helgdag
+        return calendar.WorkHoursByDayOfWeek.TryGetValue(date.DayOfWeek, out var h) && h > 0 && !calendar.Holidays.Contains(date.Date);
+    }
+
+    public double GetWorkHours(WorkCalendar calendar, DateTime date)
+    {
+        var baseHours = calendar.WorkHoursByDayOfWeek.TryGetValue(date.DayOfWeek, out var h) ? h : 0;
+        var overtime = calendar.OvertimeHours.TryGetValue(date.Date, out var ot) ? ot : 0;
+        return IsWorkDay(calendar, date) ? baseHours + overtime : overtime;
     }
 }

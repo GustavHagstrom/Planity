@@ -6,20 +6,25 @@
 
 <div class="pa-2">
     <h1>Dashboard</h1>
-
-    <h3 style="margin-top: 20px">Routes</h3>
-    @foreach (var route in Routes.AllRoutes)
-    {
-        <a href="@route"><h5>@route</h5></a>
-    }
+    <MudButton OnClick="() => routesExpanded = !routesExpanded">
+        <h3>Routes</h3>
+    </MudButton>
+    <MudCollapse Expanded="routesExpanded">
+        @foreach (var route in Routes.AllRoutes)
+        {
+            <a href="@route"><h5>@route</h5></a>
+        }
+    </MudCollapse>
+    
 </div>
 
 <GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year"/>
 <GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" />
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" />
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" Zoom="0.5" />
 
 @code{
     List<Project> projects = new List<Project>();
+    bool routesExpanded = false;
 
     protected override async Task OnInitializedAsync()
     {

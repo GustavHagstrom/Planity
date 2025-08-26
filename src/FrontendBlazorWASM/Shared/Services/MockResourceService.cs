@@ -1,36 +1,27 @@
 using Planity.FrontendBlazorWASM.Shared.Models;
+using Planity.FrontendBlazorWASM.Shared.Mock;
 
 namespace Planity.FrontendBlazorWASM.Shared.Services;
 
 public class MockResourceService(IAuthService authService) : IResourceService
 {
-    private readonly List<Resource> _resources = new()
-    {
-        new Resource { Id = "1", Name = "Anna Andersson", Role = "Projektledare", OrganizationId = "Org1" },
-        new Resource { Id = "2", Name = "Bertil Berg", Role = "Snickare", OrganizationId = "Org1" },
-        new Resource { Id = "3", Name = "Cecilia Carlsson", Role = "Elektriker", OrganizationId = "Org1" }
-    };
-
-    public Task<List<Resource>> GetResourcesAsync() => Task.FromResult(_resources.ToList());
+    public Task<List<Resource>> GetResourcesAsync() => Task.FromResult(MockedDataStore.Resources.Values.ToList());
 
     public Task<Resource?> GetResourceByIdAsync(string resourceId) =>
-        Task.FromResult(_resources.FirstOrDefault(r => r.Id == resourceId));
+        Task.FromResult(MockedDataStore.Resources.TryGetValue(resourceId, out var r) ? r : null);
 
     public Task<Resource> CreateResourceAsync(Resource resource)
     {
         resource.Id = Guid.NewGuid().ToString();
-        _resources.Add(resource);
+        MockedDataStore.Resources[resource.Id] = resource;
         return Task.FromResult(resource);
     }
 
     public Task<Resource> UpdateResourceAsync(Resource resource)
     {
-        var existing = _resources.FirstOrDefault(r => r.Id == resource.Id);
-        if (existing != null)
+        if (MockedDataStore.Resources.TryGetValue(resource.Id, out var existing))
         {
             existing.Name = resource.Name;
-            existing.Role = resource.Role;
-            existing.RoleId = resource.RoleId;
             existing.OrganizationId = resource.OrganizationId;
         }
         return Task.FromResult(resource);
@@ -38,16 +29,14 @@ public class MockResourceService(IAuthService authService) : IResourceService
 
     public Task DeleteResourceAsync(string resourceId)
     {
-        var resource = _resources.FirstOrDefault(r => r.Id == resourceId);
-        if (resource != null)
-            _resources.Remove(resource);
+        MockedDataStore.Resources.Remove(resourceId);
         return Task.CompletedTask;
     }
 
     public async Task<List<Resource>> GetOrganizationResources()
     {
         var orgId = await authService.GetOrganizationIdAsync();
-        var resources = _resources.Where(r => r.OrganizationId == orgId).ToList();
+        var resources = MockedDataStore.Resources.Values.Where(r => r.OrganizationId == orgId).ToList();
         return resources;
     }
 }

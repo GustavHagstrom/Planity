@@ -4,13 +4,15 @@
 
 <svg style="width: @View.SvgWidthPx; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none;">
     @* Horisontella svarta linjer mellan varje rad *@
-    @for (var i = 1; i <= View.RowCount; i++)
+    @for (var i = 0; i <= View.RowCount; i++)
     {
-        var y = i * View.RowHeight;
-        var fill = "black";
+       @*  var y = i * View.RowHeight;
+        var fill = i % 2 == 0 ? "lightgrey" : "transparent";
         var opacity = 1;
         var strokeWidth = 1;
-        @GanttSvgHelper.RenderLine(0, View.SvgWidth, y, y, fill, strokeWidth, opacity)
+        @GanttSvgHelper.RenderRect(0, y, View.SvgWidth, View.RowHeight, fill, opacity)
+        @GanttSvgHelper.RenderLine(0, View.SvgWidth, y, y, fill, strokeWidth, opacity) *@
+        
         
 
     }

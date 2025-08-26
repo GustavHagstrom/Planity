@@ -19,13 +19,11 @@
         <EntityTable Items="@Projects" EditLinkFunction="x => Routes.ProjectDetails(x.Id)">
             <HeaderContent>
                 <MudTh>Namn</MudTh>
-                <MudTh>Status</MudTh>
                 <MudTh>Start</MudTh>
                 <MudTh>Slut</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
-                <MudTd>@context.Status</MudTd>
                 <MudTd>@context.Start?.ToShortDateString()</MudTd>
                 <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
             </RowTemplate>

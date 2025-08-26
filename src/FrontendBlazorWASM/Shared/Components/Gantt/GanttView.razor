@@ -11,8 +11,8 @@
                 <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
                     <GanttHeader />
                     <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
-                        <GanttChart DragMode="@_dragMode" />
                         <GanttGrid />
+                        <GanttChart DragMode="@_dragMode" />
                     </div>
                 </div>
             </div>
@@ -28,6 +28,7 @@
     [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
     [Parameter] public IGanttItem? SelectedItem { get; set; }
     [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
+    [Parameter] public double Zoom { get; set; } = 1.0;
 
     private GanttDragMode _dragMode = GanttDragMode.None;
     private void OnDragModeChanged(GanttDragMode mode)
@@ -38,9 +39,9 @@
 
     public double PixelsPerDay => Mode switch
     {
-        GanttViewMode.Year => 5,
-        GanttViewMode.Month => 30,
-        GanttViewMode.Week => 108,
+        GanttViewMode.Year => 5 * Zoom,
+        GanttViewMode.Month => 30 * Zoom,
+        GanttViewMode.Week => 108 * Zoom,
         _ => throw new ArgumentOutOfRangeException()
     };
     public string LeftWidthPx => $"220px";

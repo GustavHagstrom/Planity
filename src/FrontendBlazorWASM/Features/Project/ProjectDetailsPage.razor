@@ -16,7 +16,6 @@
         <EntityTable Title="@localizer["Uppgifter"]" Items="Project!.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
-                <MudTh>@localizer["Status"]</MudTh>
                 <MudTh>@localizer["Startdatum"]</MudTh>
                 <MudTh>@localizer["Slutdatum"]</MudTh>
                 <MudTh>@localizer["Tilldelad resurs"]</MudTh>
@@ -26,13 +25,13 @@
                     @context.Name
                 </MudTd>
                 <MudTd>
-                    <MudChip T="string" Color="Color.Info" Size="Size.Small">@context.Status</MudChip>
-                </MudTd>
-                <MudTd>
                     @context.Start?.ToString("yyyy-MM-dd")
                 </MudTd>
                 <MudTd>
                     @GanttDateCalculator.CalculateEnd(context, Resources!)
+                </MudTd>
+                <MudTd>
+                    @Resources?.FirstOrDefault(r => r.Id == context.ResourceId)?.Name
                 </MudTd>
             </RowTemplate>
         </EntityTable>
@@ -40,7 +39,6 @@
         <EntityTable Title="@localizer["Milstenar"]" Items="Project!.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
-                <MudTh>@localizer["Status"]</MudTh>
                 <MudTh>@localizer["Datum"]</MudTh>
                 <MudTh>@localizer["Beskrivning"]</MudTh>
             </HeaderContent>
@@ -49,10 +47,7 @@
                     @context.Name
                 </MudTd>
                 <MudTd>
-                    <MudChip T="string" Color="@(context.IsCompleted? Color.Success: Color.Default)" Size="Size.Small">@((context.IsCompleted ? "Klar" : "Ej klar"))</MudChip>
-                </MudTd>
-                <MudTd>
-                    @context.Date?.ToString("yyyy-MM-dd")
+                    @context.Start?.ToString("yyyy-MM-dd")
                 </MudTd>
                 <MudTd>
                     @context.Description

@@ -17,17 +17,17 @@
         var points = $"{centerXStr},{topY} {rightX},{centerYStr} {centerXStr},{bottomY} {leftX},{centerYStr}";
         @if (DragMode == GanttDragMode.EditDate)
         {
-            <polygon points="@points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" filter="url(#glow)"
+            <polygon points="@points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" stroke="black" stroke-width="1" filter="url(#glow)"
                 @onpointerdown="BarPointerDownInternal"
                 style="cursor:move" />
         }
         else
         {
-            <polygon points="@points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" />
+            <polygon points="@points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" stroke="black" stroke-width="1" />
         }
         @if (DragMode == GanttDragMode.Link)
         {
-            <circle cx="@centerXStr" cy="@centerYStr" r="@HandleRadius" class="gantt-handle"
+            <circle cx="@centerXStr" cy="@centerYStr" r="@HandleRadius" class="gantt-link-handle"
                     @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Milestone, e))"
                     @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Milestone, e))" />
         }
@@ -35,9 +35,9 @@
     else if(Item.Start != null && EndDate != null)
     {
         var x = ((Item.Start.Value - ViewStart).TotalDays * PixelsPerDay);
-        var y = (Index * RowHeight);
+        var y = (Index * RowHeight + 4);
         var width = ((EndDate.Value - Item.Start.Value).TotalDays * PixelsPerDay);
-        var height = RowHeight;
+        var height = RowHeight - 8;
         var xStr = x.ToString(CultureInfo.InvariantCulture);
         var yStr = y.ToString(CultureInfo.InvariantCulture);
         var cxStrStart = (x + HandleRadius).ToString(CultureInfo.InvariantCulture);
@@ -48,20 +48,18 @@
 
         @if (DragMode == GanttDragMode.EditDate && Item.Type == GanttItemType.Task)
         {
-            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" filter="url(#glow)"
-                style="cursor:move"
-                @onpointerdown="BarPointerDownInternal" />
+            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:move" rx="0" ry="0" stroke="black" stroke-width="1" filter="url(#glow)" @onpointerdown="BarPointerDownInternal" />
         }
         else
         {
-            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:default" />
+            <rect x="@xStr" y="@yStr" width="@widthStr" height="@heightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:default" rx="1" ry="1" stroke="black" stroke-width="1" />
         }
         @if (DragMode == GanttDragMode.Link)
         {
-            <circle cx="@cxStrStart" cy="@cyStr" r="@HandleRadius" class="gantt-handle"
+            <circle cx="@cxStrStart" cy="@cyStr" r="@HandleRadius" class="gantt-link-handle"
                     @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Start, e))"
                     @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Start, e))" />
-            <circle cx="@cxStrEnd" cy="@cyStr" r="@HandleRadius" class="gantt-handle"
+            <circle cx="@cxStrEnd" cy="@cyStr" r="@HandleRadius" class="gantt-link-handle"
                     @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.End, e))"
                     @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.End, e))" />
         }
@@ -83,7 +81,7 @@
     [Parameter] public bool IsSelected { get; set; }
     [Parameter] public string FillColor { get; set; } = "lightblue";
     [Parameter] public double Opacity { get; set; } = 1.0;
-    [Parameter] public int HandleRadius { get; set; } = 5;
+    [Parameter] public int HandleRadius { get; set; } = 2;
     [Parameter] public GanttDragMode DragMode { get; set; } = GanttDragMode.EditDate;
     [Parameter] public EventCallback<(IGanttItem, PointerEventArgs, string)> OnBarPointerDown { get; set; }
     [Parameter] public DateTime? EndDate { get; set; }
@@ -109,7 +107,7 @@
                 }
                 else if (predecessor is Milestone milestone)
                 {
-                    predecessorEnd = milestone.Date;
+                    predecessorEnd = milestone.Start;
                 }
                 // Lägg till fler typer om det behövs
 

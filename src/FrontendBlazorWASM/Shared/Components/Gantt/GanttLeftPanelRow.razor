@@ -4,7 +4,7 @@
 <div class="@RowClass" style="height: @RowHeightPx;" @onclick="HandleRowClick">
     @if (HasChildren)
     {
-        <button class="toggle-btn" @onclick:stopPropagation="true" @onclick="ToggleExpand">
+        <button class="gantt-leftpanel-toggle-btn" @onclick:stopPropagation="true" @onclick="ToggleExpand">
             @(Item.IsExpanded ? "▼" : "▶")
         </button>
     }
@@ -28,7 +28,7 @@
 
     private bool IsSelected => SelectedItem == Item;
     private bool HasChildren => Item.Children != null && Item.Children.Any();
-    private string RowClass => $"bottom-border gantt-row{(IsSelected ? " selected" : "")}{(Level > 0 ? " child" : "")}";
+    private string RowClass => $"gantt-leftpanel-row{(IsSelected ? " gantt-leftpanel-selected" : "")}{(Level > 0 ? " gantt-leftpanel-child" : "")}";
 
     private async Task HandleRowClick()
     {

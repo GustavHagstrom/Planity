@@ -23,7 +23,7 @@ public class GanttItemValidator
     public List<string> ValidateDependencies(IGanttItem item, List<Resource> resources)
     {
         var warnings = new List<string>();
-        var itemResource = item is ProjectTask pt ? _resourceProvider(pt.AssignedResourceId) : null;
+        var itemResource = item is ProjectTask pt ? _resourceProvider(pt.ResourceId) : null;
         var itemEnd = _dateCalculator.CalculateEnd(item, resources);
 
         // Kontrollera Predecessors
@@ -31,7 +31,7 @@ public class GanttItemValidator
         {
             foreach (var predecessor in item.Predecessors)
             {
-                var predResource = predecessor is ProjectTask ptp ? _resourceProvider(ptp.AssignedResourceId) : null;
+                var predResource = predecessor is ProjectTask ptp ? _resourceProvider(ptp.ResourceId) : null;
                 var predEnd = _dateCalculator.CalculateEnd(predecessor, resources);
                 if (predEnd.HasValue && item.Start.HasValue && item.Start < predEnd)
                 {
@@ -45,7 +45,7 @@ public class GanttItemValidator
         {
             foreach (var successor in item.Successors)
             {
-                var succResource = successor is ProjectTask pts ? _resourceProvider(pts.AssignedResourceId) : null;
+                var succResource = successor is ProjectTask pts ? _resourceProvider(pts.ResourceId) : null;
                 var succStart = successor.Start;
                 var itemEndVal = itemEnd;
                 if (itemEndVal.HasValue && succStart.HasValue && itemEndVal > succStart)

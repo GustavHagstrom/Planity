@@ -1,8 +1,7 @@
 <MudStack Spacing="2">
     <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true" />
     <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description" />
-    <MudDatePicker @bind-Date="milestone.Date" Label="Datum" />
-    <MudCheckBox T="bool" @bind-Value="milestone.IsCompleted" Color="Color.Primary" Label="Klar" />
+    <MudDatePicker @bind-Date="milestone.Start" Label="Datum" />
 </MudStack>
 
 @code {
@@ -19,8 +18,6 @@
                 Id = MilestoneModel.Id,
                 Name = MilestoneModel.Name,
                 Description = MilestoneModel.Description,
-                Date = MilestoneModel.Date,
-                IsCompleted = MilestoneModel.IsCompleted,
                 OrganizationId = MilestoneModel.OrganizationId,
                 ProjectId = MilestoneModel.ProjectId
             };

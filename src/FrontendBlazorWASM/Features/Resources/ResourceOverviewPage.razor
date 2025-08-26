@@ -18,11 +18,9 @@
         <EntityTable Items="@resources" EditLinkFunction="x => Routes.ResourceDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
-                <MudTh>@localizer["Roll"]</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
-                <MudTd>@context.Role</MudTd>
             </RowTemplate>
         </EntityTable>
     </MainContent>
