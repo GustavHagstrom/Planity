@@ -4,26 +4,27 @@ public class WorkCalendar
 {
     // Identifierare för resursen
     public string ResourceId { get; set; } = string.Empty;
-    // Arbetstimmar per veckodag (alltid sju dagar, endast ändra värde)
-    private readonly Dictionary<DayOfWeek, double> _workHoursByDayOfWeek = new()
+
+    // Arbetspass per veckodag (t.ex. 08:00-12:00, 13:00-17:00)
+    private readonly Dictionary<DayOfWeek, List<(TimeSpan Start, TimeSpan End)>> _workPeriodsByDayOfWeek = new()
     {
-        { DayOfWeek.Monday, 8.5 },
-        { DayOfWeek.Tuesday, 8.5 },
-        { DayOfWeek.Wednesday, 8.5 },
-        { DayOfWeek.Thursday, 8.5 },
-        { DayOfWeek.Friday, 6 },
-        { DayOfWeek.Saturday, 0 },
-        { DayOfWeek.Sunday, 0 }
+        { DayOfWeek.Monday,    [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5)) ] }, // 08:00-16:30
+        { DayOfWeek.Tuesday,   [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5)) ] },
+        { DayOfWeek.Wednesday, [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5)) ] },
+        { DayOfWeek.Thursday,  [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5)) ] },
+        { DayOfWeek.Friday,    [ (TimeSpan.FromHours(8), TimeSpan.FromHours(14)) ] },   // 08:00-14:00
+        { DayOfWeek.Saturday,  [] },
+        { DayOfWeek.Sunday,    [] }
     };
-    public IReadOnlyDictionary<DayOfWeek, double> WorkHoursByDayOfWeek => _workHoursByDayOfWeek;
-    public void SetWorkHoursByDayOfWeek(DayOfWeek day, double hours)
+    public IReadOnlyDictionary<DayOfWeek, List<(TimeSpan Start, TimeSpan End)>> WorkPeriodsByDayOfWeek => _workPeriodsByDayOfWeek;
+
+    public void SetWorkPeriodsByDayOfWeek(DayOfWeek day, List<(TimeSpan Start, TimeSpan End)> periods)
     {
-        if (_workHoursByDayOfWeek.ContainsKey(day))
-            _workHoursByDayOfWeek[day] = hours;
+        _workPeriodsByDayOfWeek[day] = periods;
     }
+
     // Special-helgdagar (t.ex. påsk, midsommar)
     public HashSet<DateTime> Holidays { get; set; } = new();
     // Övertid per dag (datum -> antal extra timmar)
     public Dictionary<DateTime, double> OvertimeHours { get; set; } = new();
-
 }

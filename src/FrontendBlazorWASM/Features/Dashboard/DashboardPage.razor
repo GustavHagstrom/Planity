@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 @inject IProjectService ProjectService
+@inject IResourceService ResourceService
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -18,14 +19,18 @@
     
 </div>
 
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year"/>
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" />
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" Zoom="0.5" />
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year" Title="Årvy"/>
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" Title="Månadsvy"/>
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" Zoom="0.5" Title="Veckovy"/>
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="testResourceTasks" Mode="GanttViewMode.Week" Zoom="0.5" Title="@testResourceTitle" />
 
 @code{
     List<Project> projects = new List<Project>();
+    Resource testResource = null!;
+    List<ProjectTask> testResourceTasks = new List<ProjectTask>();
     bool routesExpanded = false;
 
+    string testResourceTitle => $"Tasks for resource {testResource.Name}";
     protected override async Task OnInitializedAsync()
     {
         var projects = await ProjectService.GetProjectsAsync();
@@ -33,5 +38,11 @@
         {
             this.projects = projects.ToList();
         }
+        var resources = await ResourceService.GetResourcesAsync();
+        if (resources is not null)
+        {
+            testResource = resources.First();
+        }
+        testResourceTasks = await ResourceService.GetTasksForResourceAsync(testResource.Id);
     }
 }

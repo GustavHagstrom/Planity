@@ -4,7 +4,7 @@
 @inject IResourceService ResourceService
 @inject IStringLocalizer<ProjectDetailsPage> localizer
 @inject IJSRuntime JS
-@inject IGanttDateCalculator GanttDateCalculator
+@inject IDateCalculator GanttDateCalculator
 
 <EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null || Resources is null" OnSave="Save">
     <MainContent>

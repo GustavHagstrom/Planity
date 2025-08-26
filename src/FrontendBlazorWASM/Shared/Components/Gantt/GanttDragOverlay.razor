@@ -1,6 +1,6 @@
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
-@inject IGanttDateCalculator GanttDateCalculator
+@inject IDateCalculator GanttDateCalculator
 
 @if (IsDragging && DragSourceItem != null && DragSourceType != null)
 {

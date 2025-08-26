@@ -4,7 +4,7 @@
 @using Planity.FrontendBlazorWASM.Shared.Services
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 
-@inject IGanttDateCalculator GanttDateCalculator
+@inject IDateCalculator GanttDateCalculator
 @inject IResourceService ResourceService
 
 <svg class="gantt-chart@(IsActive ? " grabbing" : "")" style="width: @View.SvgWidthPx ; height: 100%; position: absolute; top: 0; left: 0;"
@@ -24,7 +24,7 @@
     @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, index) => (tuple, index)))
     {
         var isSelected = View.SelectedItem == item;
-        var fillColor = level == 0 ? "plum" : "lightblue";
+        var fillColor = item.Type == GanttItemType.Project || item.Type == GanttItemType.Resource ? "plum" : "lightblue";
         var opacity = 1.0;
         var handleRadius = 5;
         var endDate = GanttDateCalculator.CalculateEnd(item, View.Resources);

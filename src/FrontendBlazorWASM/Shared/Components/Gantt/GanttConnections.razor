@@ -1,6 +1,6 @@
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
-@inject IGanttDateCalculator GanttDateCalculator
+@inject IDateCalculator GanttDateCalculator
 @inject IResourceService ResourceService
 
 @foreach (var conn in connections)

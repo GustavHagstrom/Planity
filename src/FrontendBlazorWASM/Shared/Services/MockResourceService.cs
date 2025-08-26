@@ -39,4 +39,14 @@ public class MockResourceService(IAuthService authService) : IResourceService
         var resources = MockedDataStore.Resources.Values.Where(r => r.OrganizationId == orgId).ToList();
         return resources;
     }
+
+    public async Task<List<ProjectTask>> GetTasksForResourceAsync(string resourceId)
+    {
+        // Samla alla tasks från alla projekt där ResourceId matchar
+        var tasks = MockedDataStore.Projects
+            .SelectMany(p => p.Tasks)
+            .Where(t => t.ResourceId == resourceId)
+            .ToList();
+        return await Task.FromResult(tasks);
+    }
 }

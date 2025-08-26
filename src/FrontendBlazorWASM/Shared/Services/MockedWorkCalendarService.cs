@@ -12,14 +12,11 @@ public class MockedWorkCalendarService : IWorkCalendarService
         return Task.FromResult(new WorkCalendar { ResourceId = resourceId });
     }
 
-    public Task SetWorkHoursByDayOfWeekAsync(string resourceId, Dictionary<DayOfWeek, double> workHoursByDayOfWeek)
+    public Task SetWorkPeriodsByDayOfWeekAsync(string resourceId, DayOfWeek day, List<(TimeSpan Start, TimeSpan End)> periods)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
         {
-            foreach (var kvp in workHoursByDayOfWeek)
-            {
-                calendar.SetWorkHoursByDayOfWeek(kvp.Key, kvp.Value);
-            }
+            calendar.SetWorkPeriodsByDayOfWeek(day, periods);
         }
         return Task.CompletedTask;
     }
@@ -44,7 +41,4 @@ public class MockedWorkCalendarService : IWorkCalendarService
             calendar.OvertimeHours[date.Date] = overtimeHours;
         return Task.CompletedTask;
     }
-
-
-    
 }

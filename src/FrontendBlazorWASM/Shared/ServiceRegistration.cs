@@ -11,7 +11,7 @@ public static class ServiceRegistration
         services.AddScoped<IAuthService, MockedAuthService>();
         services.AddScoped<IProjectService, MockProjectService>();
         services.AddScoped<IResourceService, MockResourceService>();
-        services.AddScoped<IGanttDateCalculator, GanttDateCalculator>();
+        services.AddScoped<IDateCalculator, DateCalculator>();
 
         return services;
     }

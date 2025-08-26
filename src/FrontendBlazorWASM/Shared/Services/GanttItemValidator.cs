@@ -7,10 +7,10 @@ namespace Planity.FrontendBlazorWASM.Shared.Services;
 public class GanttItemValidator
 {
     private readonly IStringLocalizer<GanttItemValidator> _localizer;
-    private readonly IGanttDateCalculator _dateCalculator;
+    private readonly IDateCalculator _dateCalculator;
     private readonly Func<string, Resource?> _resourceProvider;
 
-    public GanttItemValidator(IStringLocalizer<GanttItemValidator> localizer, IGanttDateCalculator dateCalculator, Func<string, Resource?> resourceProvider)
+    public GanttItemValidator(IStringLocalizer<GanttItemValidator> localizer, IDateCalculator dateCalculator, Func<string, Resource?> resourceProvider)
     {
         _localizer = localizer;
         _dateCalculator = dateCalculator;

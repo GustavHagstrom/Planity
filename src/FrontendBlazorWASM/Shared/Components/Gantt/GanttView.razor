@@ -5,6 +5,7 @@
 {
     <CascadingValue Value="this">
         <div class="d-flex" style="border-style: solid; border-width: 1px; flex-direction: column;">
+            <h4>@Title</h4>
             <GanttToolbar DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" />
             <div class="d-flex" style="flex-grow: 1;">
                 <GanttLeftPanel/>
@@ -29,6 +30,7 @@
     [Parameter] public IGanttItem? SelectedItem { get; set; }
     [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
     [Parameter] public double Zoom { get; set; } = 1.0;
+    [Parameter] public string Title { get; set; } = "Gantt Chart";
 
     private GanttDragMode _dragMode = GanttDragMode.None;
     private void OnDragModeChanged(GanttDragMode mode)

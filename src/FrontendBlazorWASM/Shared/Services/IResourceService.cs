@@ -10,4 +10,5 @@ public interface IResourceService
     Task<Resource> CreateResourceAsync(Resource resource);
     Task<Resource> UpdateResourceAsync(Resource resource);
     Task DeleteResourceAsync(string resourceId);
+    Task<List<ProjectTask>> GetTasksForResourceAsync(string resourceId);
 }
