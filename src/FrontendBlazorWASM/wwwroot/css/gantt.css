@@ -34,38 +34,19 @@
 
 /* GanttLeftPanel specific styles */
 .gantt-leftpanel-bottom-border {
-    box-sizing: border-box;
-    border-bottom: 1px solid Black;
+    /* Moved to GanttLeftPanel.razor */
 }
 .gantt-leftpanel-row {
-    width: 100%;
-    position: relative;
-    cursor: pointer;
-    transition: box-shadow 0.2s, border 0.2s;
-    display: flex;
-    align-items: center;
+    /* Moved to GanttLeftPanelRow.razor */
 }
 .gantt-leftpanel-row.gantt-leftpanel-selected {
-    background-color: transparent;
-    box-shadow: 0 0 8px 2px #3a6ea5;
-    font-weight: bold;
+    /* Moved to GanttLeftPanelRow.razor */
 }
 .gantt-leftpanel-row.gantt-leftpanel-child {
-    padding-left: 24px;
-    border-left: 2px solid #3a6ea5;
-    background: rgba(58, 110, 165, 0.05);
+    /* Moved to GanttLeftPanelRow.razor */
 }
 .gantt-leftpanel-toggle-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-right: 4px;
-    font-size: 16px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    /* Moved to GanttLeftPanelRow.razor */
 }
 
-/* Tar bort global scrollbar-CSS, nu flyttad till app.css */
+
