@@ -19,10 +19,10 @@
     
 </div>
 
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year" Title="Årvy"/>
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" Title="Månadsvy"/>
+@* <GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year" Title="Årvy"/>
+<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" Title="Månadsvy"/> *@
 <GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" Zoom="0.5" Title="Veckovy"/>
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="testResourceTasks" Mode="GanttViewMode.Week" Zoom="0.5" Title="@testResourceTitle" />
+@* <GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="testResourceTasks" Mode="GanttViewMode.Week" Zoom="0.5" Title="@testResourceTitle" /> *@
 
 @code{
     List<Project> projects = new List<Project>();

@@ -1,5 +1,7 @@
 @inject IStringLocalizer<GanttView> Localizer
 @inject IResourceService ResourceService
+@using Planity.FrontendBlazorWASM.Shared.Abstractions
+@using MudBlazor
 
 @if(Items is not null)
 {
@@ -18,8 +20,13 @@
                 </div>
             </div>
         </div>
+        <MudDrawer Anchor="Anchor.Right" @bind-Open="isDrawerOpen" Elevation="4" Width="400px" ClipMode="DrawerClipMode.Docked" >
+            @if (SelectedItem != null)
+            {
+                <GanttItemEditForm Item="SelectedItem"/>
+            }
+        </MudDrawer>
     </CascadingValue>
-    
 }
 
 @code {
@@ -67,12 +74,24 @@
         Resources = await ResourceService.GetResourcesAsync() ?? new List<Resource>();
     }
 
+    private bool isDrawerOpen = false;
+
     public async Task SelectItemAsync(IGanttItem? item)
     {
         SelectedItem = item;
+        isDrawerOpen = item != null;
         await SelectedItemChanged.InvokeAsync(item);
         StateHasChanged();
     }
+
+    private void CloseDrawer()
+    {
+        isDrawerOpen = false;
+        SelectedItem = null;
+        StateHasChanged();
+    }
+
+
     public void TriggerStateHasChanged()
     {
         StateHasChanged();

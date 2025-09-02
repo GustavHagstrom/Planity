@@ -2,7 +2,7 @@
 
 public interface IGanttItem
 {
-    string Name { get; }
+    string Name { get; set;  }
     DateTime? Start { get; set; }
     GanttItemType Type { get; }     // t.ex. "Task", "Project"
     IEnumerable<IGanttItem>? Children { get; } // För projekt med tasks
