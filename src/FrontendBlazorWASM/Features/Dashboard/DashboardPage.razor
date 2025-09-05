@@ -1,11 +1,12 @@
 ﻿@page "/"
+@layout FullHeightLayout
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 @inject IProjectService ProjectService
 @inject IResourceService ResourceService
 
 <PageTitle>Dashboard</PageTitle>
 
-<div class="pa-2">
+@* <div class="pa-2">
     <h1>Dashboard</h1>
     <MudButton OnClick="() => routesExpanded = !routesExpanded">
         <h3>Routes</h3>
@@ -17,7 +18,7 @@
         }
     </MudCollapse>
     
-</div>
+</div> *@
 
 @* <GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year" Title="Årvy"/>
 <GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" Title="Månadsvy"/> *@

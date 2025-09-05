@@ -6,7 +6,7 @@
 @if(Items is not null)
 {
     <CascadingValue Value="this">
-        <div class="d-flex" style="border-style: solid; border-width: 1px; flex-direction: column;">
+        <div class="d-flex" style="height: 100%; border-style: solid; border-width: 1px; flex-direction: column;">
             <h4>@Title</h4>
             <GanttToolbar DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" />
             <div class="d-flex" style="flex-grow: 1;">

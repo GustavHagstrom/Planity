@@ -23,7 +23,11 @@
         var fill = "black";
         var opacity = 0.2;
         var strokeWidth = 1;
-        @GanttSvgHelper.RenderLine(x, x, 0, View.RowHeight * View.RowCount, fill, strokeWidth, opacity)
+        @* @GanttSvgHelper.RenderLine(x, x, 0, View.RowHeight * View.RowCount, fill, strokeWidth, opacity) *@
+        @GanttSvgHelper.RenderLine(x.ToString(CultureInfo.InvariantCulture),
+                                   x.ToString(CultureInfo.InvariantCulture),
+                                   "0", "100%", fill, strokeWidth.ToString(),
+                                   opacity.ToString(CultureInfo.InvariantCulture))
     }
     
 </svg>
