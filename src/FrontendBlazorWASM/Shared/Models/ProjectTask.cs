@@ -16,4 +16,45 @@ public class ProjectTask : IGanttItem
     public bool IsExpanded { get; set; } = false;
     public List<IGanttItem> Predecessors { get; set; } = [];
     public List<IGanttItem> Successors { get; set; } = [];
+
+    public IGanttItem Clone()
+    {
+        return new ProjectTask
+        {
+            Id = this.Id,
+            OrganizationId = this.OrganizationId,
+            Name = this.Name,
+            Description = this.Description,
+            Start = this.Start,
+            WorkHours = this.WorkHours,
+            ResourceId = this.ResourceId,
+            IsExpanded = this.IsExpanded,
+            Predecessors = this.Predecessors?.Select(p => p.Clone()).ToList() ?? new List<IGanttItem>(),
+            Successors = this.Successors?.Select(s => s.Clone()).ToList() ?? new List<IGanttItem>()
+        };
+    }
+
+    public bool Equals(IGanttItem? other)
+    {
+        if (other is not ProjectTask t)
+            return false;
+        return Id == t.Id &&
+               OrganizationId == t.OrganizationId &&
+               Name == t.Name &&
+               Description == t.Description &&
+               Start == t.Start &&
+               WorkHours == t.WorkHours &&
+               ResourceId == t.ResourceId &&
+               IsExpanded == t.IsExpanded;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as IGanttItem);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, OrganizationId, Name, Description, Start, WorkHours, ResourceId, IsExpanded);
+    }
 }

@@ -6,10 +6,10 @@
 @if(Items is not null)
 {
     <CascadingValue Value="this">
-        <div class="d-flex" style="height: 100%; border-style: solid; border-width: 1px; flex-direction: column;">
-            <h4>@Title</h4>
-            <GanttToolbar DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" />
-            <div class="d-flex" style="flex-grow: 1;">
+        <div class="d-flex" style="height: 100%; flex-direction: column;">
+            <GanttToolbar Title="@Title" DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" />
+            <div class="d-flex" style="flex-grow: 1; border: 1px solid black;">
+                <GanttItemEditForm Item="SelectedItem" />
                 <GanttLeftPanel/>
                 <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
                     <GanttHeader />
@@ -20,12 +20,6 @@
                 </div>
             </div>
         </div>
-        <MudDrawer Anchor="Anchor.Right" @bind-Open="isDrawerOpen" Elevation="4" Width="400px" ClipMode="DrawerClipMode.Docked" >
-            @if (SelectedItem != null)
-            {
-                <GanttItemEditForm Item="SelectedItem"/>
-            }
-        </MudDrawer>
     </CascadingValue>
 }
 
@@ -38,6 +32,8 @@
     [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
     [Parameter] public double Zoom { get; set; } = 1.0;
     [Parameter] public string Title { get; set; } = "Gantt Chart";
+
+    List<IGanttItem> _sourceItems = new();
 
     private GanttDragMode _dragMode = GanttDragMode.None;
     private void OnDragModeChanged(GanttDragMode mode)
@@ -72,25 +68,18 @@
     protected override async Task OnInitializedAsync()
     {
         Resources = await ResourceService.GetResourcesAsync() ?? new List<Resource>();
+        foreach (var item in Items ?? [])
+        {
+            _sourceItems.Add(item.Clone());
+        }
     }
-
-    private bool isDrawerOpen = false;
 
     public async Task SelectItemAsync(IGanttItem? item)
     {
         SelectedItem = item;
-        isDrawerOpen = item != null;
         await SelectedItemChanged.InvokeAsync(item);
         StateHasChanged();
     }
-
-    private void CloseDrawer()
-    {
-        isDrawerOpen = false;
-        SelectedItem = null;
-        StateHasChanged();
-    }
-
 
     public void TriggerStateHasChanged()
     {

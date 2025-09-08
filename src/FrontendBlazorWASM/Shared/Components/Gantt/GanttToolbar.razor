@@ -1,17 +1,29 @@
-@using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 
-<div style="padding-bottom: 8px; border-bottom: 1px solid black">
-    <label for="dragModeSelect">Drag-läge:</label>
-    <select id="dragModeSelect" @onchange="OnDragModeChanged" style="margin-left: 4px;">
-        <option value="None" selected="@(DragMode == GanttDragMode.None)">Inget</option>
-        <option value="EditDate" selected="@(DragMode == GanttDragMode.EditDate)">Ändra datum</option>
-        <option value="Link" selected="@(DragMode == GanttDragMode.Link)">Skapa koppling</option>
-    </select>
-</div>
+<MudToolBar Dense="true">
+    <div class="left">
+        <MudText Typo="Typo.h6">@Title</MudText>
+        <div style="padding-bottom: 8px; border-bottom: 1px solid black">
+            <label for="dragModeSelect">Drag-läge:</label>
+            <select id="dragModeSelect" @onchange="OnDragModeChanged" style="margin-left: 4px;">
+                <option value="None" selected="@(DragMode == GanttDragMode.None)">Inget</option>
+                <option value="EditDate" selected="@(DragMode == GanttDragMode.EditDate)">Ändra datum</option>
+                <option value="Link" selected="@(DragMode == GanttDragMode.Link)">Skapa koppling</option>
+            </select>
+        </div>
+    </div>
+    <div class="center">
+
+    </div>
+    <div class="right">
+    </div>
+    
+
+</MudToolBar>
 
 @code {
     [Parameter] public GanttDragMode DragMode { get; set; }
     [Parameter] public EventCallback<GanttDragMode> DragModeChanged { get; set; }
+    [Parameter] public string? Title { get; set; }
 
     private async Task OnDragModeChanged(ChangeEventArgs e)
     {

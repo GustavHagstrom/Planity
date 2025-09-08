@@ -1,0 +1,10 @@
+﻿.container {
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+.active {
+    color: var(--mud-palette-primary);
+    font-weight: bold;
+    background: var(--mud-palette-action-default-hover);
+    
+}

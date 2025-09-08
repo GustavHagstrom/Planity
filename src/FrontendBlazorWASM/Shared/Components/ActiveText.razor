@@ -1,0 +1,35 @@
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager NavigationManager
+
+<div class="@_class" style="@_style">@ChildContent</div>
+
+@code {
+    [Parameter] public string Href { get; set; } = string.Empty;
+    [Parameter] public string ActiveClass { get; set; } = string.Empty;
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string Style { get; set; } = string.Empty;
+    [Parameter] public string ActiveStyle { get; set; } = string.Empty;
+    [Parameter] public NavLinkMatch Match { get; set; } = NavLinkMatch.All;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    string _class => _isActive ? $"container active {Class}" : $"container {Class}";
+    string _style => _isActive ? $"{Style}; {ActiveStyle}" : Style;
+    bool _isActive => IsActive();
+    bool IsActive()
+    {
+        var currentUri = NavigationManager.Uri;
+        var baseUri = NavigationManager.BaseUri.TrimEnd('/');
+        var targetUri = NavigationManager.ToAbsoluteUri(Href).ToString();
+
+        if (Match == NavLinkMatch.All)
+        {
+            return currentUri == targetUri || currentUri == $"{baseUri}{Href.TrimStart('/')}";
+        }
+        else if (Match == NavLinkMatch.Prefix)
+        {
+            return currentUri.StartsWith(targetUri) || currentUri.StartsWith($"{baseUri}{Href.TrimStart('/')}");
+        }
+        return false;
+    }
+
+}

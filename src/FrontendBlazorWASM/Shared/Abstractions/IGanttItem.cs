@@ -1,6 +1,8 @@
-﻿namespace Planity.FrontendBlazorWASM.Shared.Abstractions;
+﻿using MudBlazor.Utilities.Clone;
 
-public interface IGanttItem
+namespace Planity.FrontendBlazorWASM.Shared.Abstractions;
+
+public interface IGanttItem : IEquatable<IGanttItem>
 {
     string Name { get; set;  }
     DateTime? Start { get; set; }
@@ -10,4 +12,6 @@ public interface IGanttItem
     // Beroenden
     List<IGanttItem> Predecessors { get; set; } // Items som måste vara klara innan detta kan starta
     List<IGanttItem> Successors { get; set; }   // Items som startar efter detta är klart
+    IGanttItem Clone();
+
 }

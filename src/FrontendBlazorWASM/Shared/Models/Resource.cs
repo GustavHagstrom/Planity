@@ -18,4 +18,42 @@ public class Resource : IGanttItem
 
     // Koppling till WorkCalendar
     public WorkCalendar WorkCalendar { get; set; } = new WorkCalendar();
+
+    public IGanttItem Clone()
+    {
+        return new Resource
+        {
+            Id = this.Id,
+            OrganizationId = this.OrganizationId,
+            Name = this.Name,
+            Workers = this.Workers,
+            Efficiency = this.Efficiency,
+            IsExpanded = this.IsExpanded,
+            Predecessors = this.Predecessors?.Select(p => p.Clone()).ToList() ?? new List<IGanttItem>(),
+            Successors = this.Successors?.Select(s => s.Clone()).ToList() ?? new List<IGanttItem>(),
+            WorkCalendar = this.WorkCalendar // OBS: Om WorkCalendar ska klonas djupare, implementera Clone även där
+        };
+    }
+
+    public bool Equals(IGanttItem? other)
+    {
+        if (other is not Resource r)
+            return false;
+        return Id == r.Id &&
+               OrganizationId == r.OrganizationId &&
+               Name == r.Name &&
+               Workers == r.Workers &&
+               Efficiency == r.Efficiency &&
+               IsExpanded == r.IsExpanded;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as IGanttItem);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, OrganizationId, Name, Workers, Efficiency, IsExpanded);
+    }
 }

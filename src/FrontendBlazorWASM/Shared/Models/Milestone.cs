@@ -1,4 +1,5 @@
 ﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
+using System.Text.Json;
 
 namespace Planity.FrontendBlazorWASM.Shared.Models;
 
@@ -15,4 +16,41 @@ public class Milestone : IGanttItem
     public bool IsExpanded { get => false; set { } }
     public List<IGanttItem> Predecessors { get; set; } = [];
     public List<IGanttItem> Successors { get; set; } = [];
+
+    public IGanttItem Clone()
+    {
+        return new Milestone
+        {
+            Id = this.Id,
+            OrganizationId = this.OrganizationId,
+            Name = this.Name,
+            Description = this.Description,
+            ProjectId = this.ProjectId,
+            Start = this.Start,
+            Predecessors = this.Predecessors?.Select(p => p.Clone()).ToList() ?? new List<IGanttItem>(),
+            Successors = this.Successors?.Select(s => s.Clone()).ToList() ?? new List<IGanttItem>()
+        };
+    }
+
+    public bool Equals(IGanttItem? other)
+    {
+        if (other is not Milestone m)
+            return false;
+        return Id == m.Id &&
+               OrganizationId == m.OrganizationId &&
+               Name == m.Name &&
+               Description == m.Description &&
+               ProjectId == m.ProjectId &&
+               Nullable.Equals(Start, m.Start);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as IGanttItem);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, OrganizationId, Name, Description, ProjectId, Start);
+    }
 }
