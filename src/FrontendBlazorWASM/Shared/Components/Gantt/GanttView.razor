@@ -72,6 +72,7 @@
         {
             _sourceItems.Add(item.Clone());
         }
+        SelectedItem = Items?.FirstOrDefault();
     }
 
     public async Task SelectItemAsync(IGanttItem? item)

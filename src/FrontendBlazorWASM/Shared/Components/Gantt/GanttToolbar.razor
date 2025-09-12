@@ -1,15 +1,12 @@
-
+@inject IStringLocalizer<GanttToolbar> Localizer
 <MudToolBar Dense="true">
     <div class="left">
-        <MudText Typo="Typo.h6">@Title</MudText>
-        <div style="padding-bottom: 8px; border-bottom: 1px solid black">
-            <label for="dragModeSelect">Drag-läge:</label>
-            <select id="dragModeSelect" @onchange="OnDragModeChanged" style="margin-left: 4px;">
-                <option value="None" selected="@(DragMode == GanttDragMode.None)">Inget</option>
-                <option value="EditDate" selected="@(DragMode == GanttDragMode.EditDate)">Ändra datum</option>
-                <option value="Link" selected="@(DragMode == GanttDragMode.Link)">Skapa koppling</option>
-            </select>
-        </div>
+        <MudText Typo="Typo.h6" Align="Align.Center">@Title</MudText>
+        <MudSelect Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" T="GanttDragMode" MultiSelection="false" SelectedValuesChanged="(e) => DragModeChanged.InvokeAsync(e.FirstOrDefault())" ToStringFunc="ToStringFunc" MultiSelectionTextFunc="ToStringFunc">
+            <MudSelectItem Value="GanttDragMode.None">Inget</MudSelectItem>
+            <MudSelectItem Value="GanttDragMode.EditDate">Ändra datum</MudSelectItem>
+            <MudSelectItem Value="GanttDragMode.Link">Skapa koppling</MudSelectItem>
+        </MudSelect>
     </div>
     <div class="center">
 
@@ -24,6 +21,20 @@
     [Parameter] public GanttDragMode DragMode { get; set; }
     [Parameter] public EventCallback<GanttDragMode> DragModeChanged { get; set; }
     [Parameter] public string? Title { get; set; }
+
+    string ToStringFunc(GanttDragMode mode) 
+    {
+        string baseString = Localizer["Dragläge:"];
+        string modeString = mode switch
+        {
+            GanttDragMode.None => Localizer["Inget"],
+            GanttDragMode.EditDate => Localizer["Ändra datum"],
+            GanttDragMode.Link => Localizer["Skapa koppling"],
+            _ => mode.ToString()
+        };
+        return $"{baseString} {modeString}";
+    }
+    
 
     private async Task OnDragModeChanged(ChangeEventArgs e)
     {
