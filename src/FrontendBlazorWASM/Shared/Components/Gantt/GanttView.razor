@@ -7,7 +7,7 @@
 {
     <CascadingValue Value="this">
         <div class="d-flex" style="height: 100%; flex-direction: column;">
-            <GanttToolbar Title="@Title" DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" @bind-Start="start" @bind-End="end"/>
+            <GanttToolbar Title="@Title" DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" @bind-Start="Start" @bind-End="End"/>
             <div class="d-flex" style="flex-grow: 1; border: 1px solid black;">
                 <GanttItemEditForm Item="SelectedItem" />
                 <GanttLeftPanel/>
@@ -34,16 +34,12 @@
     [Parameter] public double Zoom { get; set; } = 1.0;
     [Parameter] public string Title { get; set; } = "Gantt Chart";
 
-    public DateTime start { get; set; }
-    public DateTime end { get; set; }
 
     List<IGanttItem> _sourceItems = new();
     private GanttDragMode _dragMode = GanttDragMode.None;
 
     protected override async Task OnInitializedAsync()
     {
-        start = Start;
-        end = End;
         Resources = await ResourceService.GetResourcesAsync() ?? new List<Resource>();
         foreach (var item in Items ?? [])
         {
@@ -72,9 +68,9 @@
     public string HeaderHeightPx => $"{HeaderHeight}px";
     public double SvgWidth => Mode switch
     {
-        GanttViewMode.Year => PixelsPerDay * (end - start).Days,
-        GanttViewMode.Month => PixelsPerDay * (end - start).Days,
-        GanttViewMode.Week => PixelsPerDay * (end - start).Days,
+        GanttViewMode.Year => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Month => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
         _ => throw new ArgumentOutOfRangeException()
     };
     public string SvgWidthPx => $"{SvgWidth}px";
