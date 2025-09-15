@@ -1,17 +1,23 @@
 @inject IStringLocalizer<GanttToolbar> Localizer
-<MudToolBar Dense="true">
+<MudToolBar Dense="true" Style="justify-content: space-between">
     <div class="left">
-        <MudText Typo="Typo.h6" Align="Align.Center">@Title</MudText>
-        <MudSelect Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" T="GanttDragMode" MultiSelection="false" SelectedValuesChanged="(e) => DragModeChanged.InvokeAsync(e.FirstOrDefault())" ToStringFunc="ToStringFunc" MultiSelectionTextFunc="ToStringFunc">
-            <MudSelectItem Value="GanttDragMode.None">Inget</MudSelectItem>
-            <MudSelectItem Value="GanttDragMode.EditDate">Ändra datum</MudSelectItem>
-            <MudSelectItem Value="GanttDragMode.Link">Skapa koppling</MudSelectItem>
+        <MudText Typo="Typo.h5" Align="Align.Center"><b>@Title</b></MudText>
+
+        <MudSelect InputClass="denser-input" Value="DragMode" ValueChanged="DragModeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" T="GanttDragMode" MultiSelection="false" Class="denser-input" RelativeWidth="DropdownWidth.Relative" Style="width: 170px;" ToStringFunc="ToStringFunc">
+            <MudSelectItem Value="GanttDragMode.None" />
+            <MudSelectItem Value="GanttDragMode.EditDate"/>
+            <MudSelectItem Value="GanttDragMode.Link"/>
         </MudSelect>
+        
+        <MudDateRangePicker DateRange="dateRange" DateRangeChanged="OnDateRangeChanged" Variant="Variant.Outlined"  Margin="Margin.Dense" Class="denser-input"  RelativeWidth="DropdownWidth.Ignore"/>
+        
     </div>
     <div class="center">
 
     </div>
     <div class="right">
+        <MudSwitch T="bool" @bind-Value="autoSave" Label="@Localizer["Autospar:"]" Color="Color.Primary" LabelPlacement="Placement.Left"/>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="autoSave" Size="Size.Medium"/>
     </div>
     
 
@@ -21,6 +27,14 @@
     [Parameter] public GanttDragMode DragMode { get; set; }
     [Parameter] public EventCallback<GanttDragMode> DragModeChanged { get; set; }
     [Parameter] public string? Title { get; set; }
+    [Parameter] public DateTime Start { get; set; }
+    [Parameter] public EventCallback<DateTime> StartChanged { get; set; }
+    [Parameter] public DateTime End { get; set; }
+    [Parameter] public EventCallback<DateTime> EndChanged { get; set; }
+
+    DateRange dateRange = new(DateTime.Today.AddMonths(-1), DateTime.Today.AddMonths(1));
+
+    bool autoSave = true;
 
     string ToStringFunc(GanttDragMode mode) 
     {
@@ -28,22 +42,30 @@
         string modeString = mode switch
         {
             GanttDragMode.None => Localizer["Inget"],
-            GanttDragMode.EditDate => Localizer["Ändra datum"],
-            GanttDragMode.Link => Localizer["Skapa koppling"],
+            GanttDragMode.EditDate => Localizer["Flytta"],
+            GanttDragMode.Link => Localizer["Länka"],
             _ => mode.ToString()
         };
         return $"{baseString} {modeString}";
     }
-    
-
-    private async Task OnDragModeChanged(ChangeEventArgs e)
+    protected override Task OnInitializedAsync()
     {
-        var value = e.Value?.ToString();
-        if (value == "EditDate")
-            await DragModeChanged.InvokeAsync(GanttDragMode.EditDate);
-        else if (value == "Link")
-            await DragModeChanged.InvokeAsync(GanttDragMode.Link);
-        else
-            await DragModeChanged.InvokeAsync(GanttDragMode.None);
+        dateRange.Start = Start;
+        dateRange.End = End;
+        return base.OnInitializedAsync();
     }
+    async Task OnDateRangeChanged(DateRange range)
+    {
+        if(Start != range.Start)
+        {
+            Start = range.Start ?? Start;
+            await StartChanged.InvokeAsync(Start);
+        }
+        if(End != range.End)
+        {
+            End = range.End ?? End;
+            await EndChanged.InvokeAsync(End);
+        }
+    }
+
 }
