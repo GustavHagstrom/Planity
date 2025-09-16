@@ -1,7 +1,9 @@
 @inject IStringLocalizer<GanttToolbar> Localizer
+
+
 <MudToolBar Dense="true" Style="justify-content: space-between">
     <div class="left">
-        <MudText Typo="Typo.h5" Align="Align.Center"><b>@Title</b></MudText>
+        <MudText Typo="Typo.h6" Align="Align.Center"><b>@Title</b></MudText>
 
         <MudSelect InputClass="denser-input" Value="DragMode" ValueChanged="DragModeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" T="GanttDragMode" MultiSelection="false" Class="denser-input" RelativeWidth="DropdownWidth.Relative" Style="width: 170px;" ToStringFunc="ToStringFunc">
             <MudSelectItem Value="GanttDragMode.None" />
@@ -9,7 +11,10 @@
             <MudSelectItem Value="GanttDragMode.Link"/>
         </MudSelect>
         
-        <MudDateRangePicker DateRange="dateRange" DateRangeChanged="OnDateRangeChanged" Variant="Variant.Outlined"  Margin="Margin.Dense" Class="denser-input"  RelativeWidth="DropdownWidth.Ignore"/>
+        <div class="date-picker">
+            <MudDateRangePicker DateRange="dateRange" DateRangeChanged="DateRangeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Class="denser-input" RelativeWidth="DropdownWidth.Adaptive" />
+        </div>
+        
         
     </div>
     <div class="center">
@@ -30,9 +35,10 @@
     [Parameter] public DateTime Start { get; set; }
     [Parameter] public EventCallback<DateTime> StartChanged { get; set; }
     [Parameter] public DateTime End { get; set; }
+    [Parameter] public EventCallback<DateRange> DateRangeChanged { get; set; }
     [Parameter] public EventCallback<DateTime> EndChanged { get; set; }
 
-    DateRange dateRange = new(DateTime.Today.AddMonths(-1), DateTime.Today.AddMonths(1));
+    DateRange dateRange => new(Start, End);
 
     bool autoSave = true;
 
@@ -48,12 +54,12 @@
         };
         return $"{baseString} {modeString}";
     }
-    protected override Task OnInitializedAsync()
-    {
-        dateRange.Start = Start;
-        dateRange.End = End;
-        return base.OnInitializedAsync();
-    }
+    // protected override Task OnInitializedAsync()
+    // {
+    //     dateRange.Start = Start;
+    //     dateRange.End = End;
+    //     return base.OnInitializedAsync();
+    // }
     async Task OnDateRangeChanged(DateRange range)
     {
         if(Start != range.Start)

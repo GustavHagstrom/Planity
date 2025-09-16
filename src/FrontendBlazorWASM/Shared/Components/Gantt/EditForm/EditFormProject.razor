@@ -1,0 +1,31 @@
+@using Planity.FrontendBlazorWASM.Shared.Models
+@using MudBlazor
+
+@if (Project is not null)
+{
+    <MudTextField @bind-Value="Project.Description" Label="Beskrivning" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    <MudText Typo="Typo.subtitle2">Tasks</MudText>
+    <ul class="gantt-list">
+        @foreach (var t in Project.Tasks)
+        {
+            <li class="gantt-list-item">
+                <span>@t.Name</span>
+                <MudIconButton Icon="@Icons.Material.Sharp.Edit" Color="Color.Primary" Size="Size.Small" />
+            </li>
+        }
+    </ul>
+    <MudText Typo="Typo.subtitle2">Milestones</MudText>
+    <ul class="gantt-list">
+        @foreach (var m in Project.Milestones)
+        {
+            <li class="gantt-list-item">
+                <span>@m.Name</span>
+                <MudIconButton Icon="@Icons.Material.Sharp.Edit" Color="Color.Primary" Size="Size.Small" />
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter] public Project? Project { get; set; }
+}

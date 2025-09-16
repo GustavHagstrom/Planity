@@ -1,0 +1,13 @@
+@using Planity.FrontendBlazorWASM.Shared.Models
+@using MudBlazor
+
+@if (Task is not null)
+{
+    <MudTextField @bind-Value="Task.WorkHours" Label="Arbetstimmar" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    <MudTextField @bind-Value="Task.ResourceId" Label="Resurs-ID" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    <MudTextField @bind-Value="Task.Description" Label="Beskrivning" Variant="Variant.Outlined" Margin="Margin.Dense" />
+}
+
+@code {
+    [Parameter] public ProjectTask? Task { get; set; }
+}

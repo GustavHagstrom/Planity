@@ -1,0 +1,31 @@
+.gantt-list {
+    padding-left: 0;
+    list-style: none;
+    margin-bottom: 1rem;
+}
+
+.gantt-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.gantt-list-item:last-child {
+    border-bottom: none;
+}
+
+.gantt-edit-btn {
+    background: none;
+    border: none;
+    color: #1976d2;
+    cursor: pointer;
+    font-size: 0.95em;
+    padding: 0.1em 0.5em;
+    text-decoration: underline;
+}
+.gantt-edit-btn:hover {
+    color: #1565c0;
+    text-decoration: none;
+}

@@ -6,30 +6,13 @@
 
 <PageTitle>Dashboard</PageTitle>
 
-@* <div class="pa-2">
-    <h1>Dashboard</h1>
-    <MudButton OnClick="() => routesExpanded = !routesExpanded">
-        <h3>Routes</h3>
-    </MudButton>
-    <MudCollapse Expanded="routesExpanded">
-        @foreach (var route in Routes.AllRoutes)
-        {
-            <a href="@route"><h5>@route</h5></a>
-        }
-    </MudCollapse>
-    
-</div> *@
+<GanttView StartTime="DateTime.Today" EndTime="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" Zoom="0.5" Title="Veckovy"/>
 
-@* <GanttView Start="DateTime.Today" End="DateTime.Today.AddYears(1)" Items="projects" Mode="GanttViewMode.Year" Title="Årvy"/>
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Month" Title="Månadsvy"/> *@
-<GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="projects" Mode="GanttViewMode.Week" Zoom="0.5" Title="Veckovy"/>
-@* <GanttView Start="DateTime.Today" End="DateTime.Today.AddDays(60)" Items="testResourceTasks" Mode="GanttViewMode.Week" Zoom="0.5" Title="@testResourceTitle" /> *@
 
 @code{
     List<Project> projects = new List<Project>();
     Resource testResource = null!;
     List<ProjectTask> testResourceTasks = new List<ProjectTask>();
-    bool routesExpanded = false;
 
     string testResourceTitle => $"Tasks for resource {testResource.Name}";
     protected override async Task OnInitializedAsync()

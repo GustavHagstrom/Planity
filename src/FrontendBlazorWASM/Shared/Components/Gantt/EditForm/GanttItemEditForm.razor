@@ -1,0 +1,70 @@
+@using Planity.FrontendBlazorWASM.Shared.Abstractions
+@using Planity.FrontendBlazorWASM.Shared.Models
+@using MudBlazor
+
+<MudPaper Class="pa-4" Style="width: 400px;">
+    @if(Item is not null)
+    {
+        <MudText Typo="Typo.h6"><b>Redigera @Item.Type.ToString()</b></MudText>
+        <MudTextField @bind-Value="Item.Name" Label="Namn" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudTextField @bind-Value="Item.Start" Label="Startdatum" Variant="Variant.Outlined" InputType="InputType.Date" Margin="Margin.Dense" />
+
+        @if (Item.Predecessors != null && Item.Predecessors.Count > 0)
+        {
+            <MudText Typo="Typo.subtitle2">Föregångare</MudText>
+            <ul class="gantt-list">
+                @foreach (var pred in Item.Predecessors)
+                {
+                    <li class="gantt-list-item">
+                        <span>@pred.Name</span>
+                        <MudIconButton Icon="@Icons.Material.Sharp.Edit" Color="Color.Primary" Size="Size.Small" OnClick="() => EditItem(pred)" />
+                    </li>
+                }
+            </ul>
+        }
+        @if (Item.Successors != null && Item.Successors.Count > 0)
+        {
+            <MudText Typo="Typo.subtitle2">Efterföljare</MudText>
+            <ul class="gantt-list">
+                @foreach (var succ in Item.Successors)
+                {
+                    <li class="gantt-list-item">
+                        <span>@succ.Name</span>
+                        <MudIconButton Icon="@Icons.Material.Sharp.Edit" Color="Color.Primary" Size="Size.Small" OnClick="() => EditItem(succ)" />
+                    </li>
+                }
+            </ul>
+        }
+
+        @switch (Item.Type)
+        {
+            case GanttItemType.Resource:
+                <EditFormResource Resource="@(Item as Resource)" />
+                break;
+            case GanttItemType.Task:
+                <EditFormTask Task="@(Item as ProjectTask)" />
+                break;
+            case GanttItemType.Milestone:
+                <EditFormMilestone Milestone="@(Item as Milestone)" />
+                break;
+            case GanttItemType.Project:
+                <EditFormProject Project="@(Item as Project)" />
+                break;
+        }
+    }
+</MudPaper>
+
+@code {
+    [CascadingParameter] public GanttView GanttView { get; set; } = null!;
+    [Parameter] public IGanttItem? Item { get; set; }
+
+    Task SelectItemAsync(IGanttItem item)
+    {
+        return GanttView.SelectItemAsync(item);
+    }
+
+    void EditItem(IGanttItem item)
+    {
+        SelectItemAsync(item);
+    }
+}

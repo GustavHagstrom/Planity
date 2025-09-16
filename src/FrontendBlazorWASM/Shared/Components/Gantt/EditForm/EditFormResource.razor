@@ -1,0 +1,12 @@
+@using Planity.FrontendBlazorWASM.Shared.Models
+@using MudBlazor
+
+@if (Resource is not null)
+{
+    <MudTextField @bind-Value="Resource.Workers" Label="Antal personer" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    <MudTextField @bind-Value="Resource.Efficiency" Label="Effektivitet" Variant="Variant.Outlined" Margin="Margin.Dense" />
+}
+
+@code {
+    [Parameter] public Resource? Resource { get; set; }
+}

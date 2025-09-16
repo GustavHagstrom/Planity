@@ -1,9 +1,12 @@
-﻿.left {
+﻿.date-picker > .mud-input {
+    width: 290px;
+}
+
+
+.left {
     display: flex;
     gap: 16px;
     align-items: center;
-
-
 }
 .center {
     display: flex;

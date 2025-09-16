@@ -1,0 +1,12 @@
+@using Planity.FrontendBlazorWASM.Shared.Models
+@using MudBlazor
+
+@if (Milestone is not null)
+{
+    <MudTextField @bind-Value="Milestone.Description" Label="Beskrivning" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    <MudTextField Value="@Milestone.ProjectId" Label="Projekt-ID" Variant="Variant.Outlined" Disabled="true" Margin="Margin.Dense" />
+}
+
+@code {
+    [Parameter] public Milestone? Milestone { get; set; }
+}
