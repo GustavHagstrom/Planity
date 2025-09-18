@@ -131,10 +131,12 @@
     {
         get
         {
-            if (Item.Predecessors is null || !Item.Start.HasValue)
+            if (View?.Links == null || !Item.Start.HasValue)
                 return false;
 
-            foreach (var predecessor in Item.Predecessors)
+            // Hitta alla länkar där Item är To (dvs. har predecessors)
+            var predecessors = View.Links.Where(l => l.To == Item).Select(l => l.From);
+            foreach (var predecessor in predecessors)
             {
                 DateTime? predecessorEnd = null;
                 if (predecessor is ProjectTask predTask)

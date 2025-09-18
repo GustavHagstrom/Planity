@@ -1,4 +1,5 @@
 ﻿using MudBlazor.Utilities.Clone;
+using Planity.FrontendBlazorWASM.Shared.Models;
 
 namespace Planity.FrontendBlazorWASM.Shared.Abstractions;
 
@@ -9,9 +10,5 @@ public interface IGanttItem : IEquatable<IGanttItem>
     GanttItemType Type { get; }     // t.ex. "Task", "Project"
     IEnumerable<IGanttItem>? Children { get; } // För projekt med tasks
     bool IsExpanded { get; set; }
-    // Beroenden
-    List<IGanttItem> Predecessors { get; set; } // Items som måste vara klara innan detta kan starta
-    List<IGanttItem> Successors { get; set; }   // Items som startar efter detta är klart
     IGanttItem Clone();
-
 }

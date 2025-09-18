@@ -1,4 +1,5 @@
 ﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
+using Planity.FrontendBlazorWASM.Shared.Models;
 
 namespace Planity.FrontendBlazorWASM.Shared.Models;
 
@@ -13,15 +14,12 @@ public class Resource : IGanttItem
     public GanttItemType Type => GanttItemType.Resource;
     public IEnumerable<IGanttItem>? Children => null;
     public bool IsExpanded { get; set; } = false;
-    public List<IGanttItem> Predecessors { get; set; } = [];
-    public List<IGanttItem> Successors { get; set; } = [];
-
     // Koppling till WorkCalendar
     public WorkCalendar WorkCalendar { get; set; } = new WorkCalendar();
 
     public IGanttItem Clone()
     {
-        return new Resource
+        var clone = new Resource
         {
             Id = this.Id,
             OrganizationId = this.OrganizationId,
@@ -29,10 +27,9 @@ public class Resource : IGanttItem
             Workers = this.Workers,
             Efficiency = this.Efficiency,
             IsExpanded = this.IsExpanded,
-            Predecessors = this.Predecessors?.Select(p => p.Clone()).ToList() ?? new List<IGanttItem>(),
-            Successors = this.Successors?.Select(s => s.Clone()).ToList() ?? new List<IGanttItem>(),
-            WorkCalendar = this.WorkCalendar // OBS: Om WorkCalendar ska klonas djupare, implementera Clone även där
+            WorkCalendar = this.WorkCalendar
         };
+        return clone;
     }
 
     public bool Equals(IGanttItem? other)

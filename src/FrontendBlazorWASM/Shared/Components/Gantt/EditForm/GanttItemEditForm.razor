@@ -9,11 +9,11 @@
         <MudTextField @bind-Value="Item.Name" Label="Namn" Variant="Variant.Outlined" Margin="Margin.Dense" />
         <MudTextField @bind-Value="Item.Start" Label="Startdatum" Variant="Variant.Outlined" InputType="InputType.Date" Margin="Margin.Dense" />
 
-        @if (Item.Predecessors != null && Item.Predecessors.Count > 0)
+        @if (Predecessors.Count > 0)
         {
             <MudText Typo="Typo.subtitle2">Föregångare</MudText>
             <ul class="gantt-list">
-                @foreach (var pred in Item.Predecessors)
+                @foreach (var pred in Predecessors)
                 {
                     <li class="gantt-list-item">
                         <span>@pred.Name</span>
@@ -22,11 +22,11 @@
                 }
             </ul>
         }
-        @if (Item.Successors != null && Item.Successors.Count > 0)
+        @if (Successors.Count > 0)
         {
             <MudText Typo="Typo.subtitle2">Efterföljare</MudText>
             <ul class="gantt-list">
-                @foreach (var succ in Item.Successors)
+                @foreach (var succ in Successors)
                 {
                     <li class="gantt-list-item">
                         <span>@succ.Name</span>
@@ -57,6 +57,9 @@
 @code {
     [CascadingParameter] public GanttView GanttView { get; set; } = null!;
     [Parameter] public IGanttItem? Item { get; set; }
+
+    List<IGanttItem> Predecessors => Item == null ? new() : GanttView.Links.Where(l => l.To == Item).Select(l => l.From).ToList();
+    List<IGanttItem> Successors => Item == null ? new() : GanttView.Links.Where(l => l.From == Item).Select(l => l.To).ToList();
 
     Task SelectItemAsync(IGanttItem item)
     {

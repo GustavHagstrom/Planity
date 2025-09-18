@@ -1,4 +1,5 @@
 ﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
+using Planity.FrontendBlazorWASM.Shared.Models;
 
 namespace Planity.FrontendBlazorWASM.Shared.Models;
 
@@ -21,22 +22,19 @@ public class Project : IGanttItem
     public IEnumerable<IGanttItem>? Children => Array.Empty<IGanttItem>().Concat(Tasks).Concat(Milestones);
     public bool IsExpanded { get; set; } = false;
     GanttItemType IGanttItem.Type => GanttItemType.Project;
-    public List<IGanttItem> Predecessors { get; set; } = [];
-    public List<IGanttItem> Successors { get; set; } = [];
 
     public IGanttItem Clone()
     {
-        return new Project
+        var clone = new Project
         {
             Id = this.Id,
             Name = this.Name,
             Description = this.Description,
             Tasks = this.Tasks?.Select(t => (ProjectTask)t.Clone()).ToList() ?? new List<ProjectTask>(),
             Milestones = this.Milestones?.Select(m => (Milestone)m.Clone()).ToList() ?? new List<Milestone>(),
-            IsExpanded = this.IsExpanded,
-            Predecessors = this.Predecessors?.Select(p => p.Clone()).ToList() ?? new List<IGanttItem>(),
-            Successors = this.Successors?.Select(s => s.Clone()).ToList() ?? new List<IGanttItem>()
+            IsExpanded = this.IsExpanded
         };
+        return clone;
     }
 
     public bool Equals(IGanttItem? other)

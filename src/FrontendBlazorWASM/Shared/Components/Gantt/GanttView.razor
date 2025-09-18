@@ -1,7 +1,7 @@
 @inject IStringLocalizer<GanttView> Localizer
 @inject IResourceService ResourceService
 @using Planity.FrontendBlazorWASM.Shared.Abstractions
-@using MudBlazor
+@using Planity.FrontendBlazorWASM.Shared.Models
 
 @if(Items is not null)
 {
@@ -35,8 +35,9 @@
     [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
     [Parameter] public double Zoom { get; set; } = 1.0;
     [Parameter] public string Title { get; set; } = "Gantt Chart";
+    [Parameter] public List<GanttItemLink> Links { get; set; } = new();
 
-
+    List<GanttItemLink> _sourceLinks = new();
     List<IGanttItem> _sourceItems = new();
     private GanttDragMode _dragMode = GanttDragMode.None;
 
@@ -45,10 +46,8 @@
         Start = StartTime;
         End = EndTime;
         Resources = await ResourceService.GetResourcesAsync() ?? new List<Resource>();
-        foreach (var item in Items ?? [])
-        {
-            _sourceItems.Add(item.Clone());
-        }
+        _sourceItems = Items?.Select(i => i.Clone()).ToList() ?? [];
+        _sourceLinks = Links.Select(l => l.Clone()).ToList();
         SelectedItem = Items?.FirstOrDefault();
     }
     async Task OnDateRangeChanged(DateRange range)

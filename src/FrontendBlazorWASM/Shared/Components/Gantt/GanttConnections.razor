@@ -1,5 +1,6 @@
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
+@using Planity.FrontendBlazorWASM.Shared.Models
 @inject IDateCalculator GanttDateCalculator
 @inject IResourceService ResourceService
 
@@ -28,26 +29,22 @@
         var itemIndex = itemsWithLevel.Select((tuple, idx) => new { tuple.item, idx }).ToDictionary(x => x.item, x => x.idx);
         var resources = (await ResourceService.GetResourcesAsync()).ToList();
 
-        for (int index = 0; index < itemsWithLevel.Count; index++)
-        {
-            var (item, level) = itemsWithLevel[index];
-            if (item.Predecessors == null) continue;
-            var itemEnd = GanttDateCalculator.CalculateEnd(item, resources);
-            foreach (var predecessor in item.Predecessors)
-            {
-                if (!itemIndex.TryGetValue(predecessor, out var predIndex)) continue;
-                var predEnd = GanttDateCalculator.CalculateEnd(predecessor, resources);
-                var (predX, predY) = GetHandlePosition(predecessor, predIndex, predEnd, true);
-                var (itemX, itemY) = GetHandlePosition(item, index, itemEnd, false);
-                var points = $"{predX},{predY} {itemX},{predY} {itemX},{itemY}";
-                bool isBroken = predEnd.HasValue && item.Start.HasValue && predEnd.Value > item.Start.Value;
-                connections.Add(new Connection(points, isBroken));
-            }
+        // Ny logik: iterera över View._sourceLinks
+        foreach (var link in View.Links) {
+            if (!itemIndex.TryGetValue(link.From, out var fromIndex)) continue;
+            if (!itemIndex.TryGetValue(link.To, out var toIndex)) continue;
+            var fromEnd = GanttDateCalculator.CalculateEnd(link.From, resources);
+            var toEnd = GanttDateCalculator.CalculateEnd(link.To, resources);
+            var (fromX, fromY) = GetHandlePosition(link.From, fromIndex, fromEnd, true);
+            var (toX, toY) = GetHandlePosition(link.To, toIndex, toEnd, false);
+            var points = $"{fromX},{fromY} {toX},{fromY} {toX},{toY}";
+            bool isBroken = fromEnd.HasValue && link.To.Start.HasValue && fromEnd.Value > link.To.Start.Value;
+            connections.Add(new Connection(points, isBroken));
         }
         return connections;
     }
 
-    // isEndHandle: true för predecessor, false för item
+    // isEndHandle: true för from, false för to
     private (string x, string y) GetHandlePosition(IGanttItem item, int index, DateTime? endDate, bool isEndHandle)
     {
         if (item.Type == GanttItemType.Milestone && item.Start != null)

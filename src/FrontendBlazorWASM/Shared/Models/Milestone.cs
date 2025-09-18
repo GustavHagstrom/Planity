@@ -14,22 +14,19 @@ public class Milestone : IGanttItem
     public GanttItemType Type => GanttItemType.Milestone;
     public IEnumerable<IGanttItem>? Children => null;
     public bool IsExpanded { get => false; set { } }
-    public List<IGanttItem> Predecessors { get; set; } = [];
-    public List<IGanttItem> Successors { get; set; } = [];
 
     public IGanttItem Clone()
     {
-        return new Milestone
+        var clone = new Milestone
         {
             Id = this.Id,
             OrganizationId = this.OrganizationId,
             Name = this.Name,
             Description = this.Description,
             ProjectId = this.ProjectId,
-            Start = this.Start,
-            Predecessors = this.Predecessors?.Select(p => p.Clone()).ToList() ?? new List<IGanttItem>(),
-            Successors = this.Successors?.Select(s => s.Clone()).ToList() ?? new List<IGanttItem>()
+            Start = this.Start
         };
+        return clone;
     }
 
     public bool Equals(IGanttItem? other)

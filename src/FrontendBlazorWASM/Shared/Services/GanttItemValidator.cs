@@ -20,38 +20,34 @@ public class GanttItemValidator
     /// <summary>
     /// Validates dependencies for a GanttItem and returns warnings if dates are incorrect.
     /// </summary>
-    public List<string> ValidateDependencies(IGanttItem item, List<Resource> resources)
+    public List<string> ValidateDependencies(IGanttItem item, List<Resource> resources, List<GanttItemLink> links)
     {
         var warnings = new List<string>();
         var itemResource = item is ProjectTask pt ? _resourceProvider(pt.ResourceId) : null;
         var itemEnd = _dateCalculator.CalculateEnd(item, resources);
 
-        // Kontrollera Predecessors
-        if (item.Predecessors != null)
+        // Kontrollera Predecessors via länkar
+        var predecessors = links.Where(l => l.To == item).Select(l => l.From);
+        foreach (var predecessor in predecessors)
         {
-            foreach (var predecessor in item.Predecessors)
+            var predResource = predecessor is ProjectTask ptp ? _resourceProvider(ptp.ResourceId) : null;
+            var predEnd = _dateCalculator.CalculateEnd(predecessor, resources);
+            if (predEnd.HasValue && item.Start.HasValue && item.Start < predEnd)
             {
-                var predResource = predecessor is ProjectTask ptp ? _resourceProvider(ptp.ResourceId) : null;
-                var predEnd = _dateCalculator.CalculateEnd(predecessor, resources);
-                if (predEnd.HasValue && item.Start.HasValue && item.Start < predEnd)
-                {
-                    warnings.Add(_localizer["Warning_PredecessorEndBeforeStart", item.Name, predecessor.Name]);
-                }
+                warnings.Add(_localizer["Warning_PredecessorEndBeforeStart", item.Name, predecessor.Name]);
             }
         }
 
-        // Kontrollera Successors
-        if (item.Successors != null)
+        // Kontrollera Successors via länkar
+        var successors = links.Where(l => l.From == item).Select(l => l.To);
+        foreach (var successor in successors)
         {
-            foreach (var successor in item.Successors)
+            var succResource = successor is ProjectTask pts ? _resourceProvider(pts.ResourceId) : null;
+            var succStart = successor.Start;
+            var itemEndVal = itemEnd;
+            if (itemEndVal.HasValue && succStart.HasValue && itemEndVal > succStart)
             {
-                var succResource = successor is ProjectTask pts ? _resourceProvider(pts.ResourceId) : null;
-                var succStart = successor.Start;
-                var itemEndVal = itemEnd;
-                if (itemEndVal.HasValue && succStart.HasValue && itemEndVal > succStart)
-                {
-                    warnings.Add(_localizer["Warning_SuccessorStartBeforeEnd", item.Name, successor.Name]);
-                }
+                warnings.Add(_localizer["Warning_SuccessorStartBeforeEnd", item.Name, successor.Name]);
             }
         }
 

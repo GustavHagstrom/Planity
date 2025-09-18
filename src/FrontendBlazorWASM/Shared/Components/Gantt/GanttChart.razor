@@ -76,23 +76,27 @@
         if (targetItem == ActiveItem)
             return;
 
-        // Koppla ActiveItem som predecessor eller successor
+        // Koppla ActiveItem som predecessor eller successor via länk
         if (targetType == GanttHandleType.Start || targetType == GanttHandleType.Milestone)
         {
-            // Lägg till ActiveItem som predecessor till targetItem om den inte redan finns
-            if (targetItem is { Predecessors: List<IGanttItem> preds })
+            // Skapa länk: ActiveItem (From) -> targetItem (To) om den inte redan finns
+            if (!View.Links.Any(l => l.From == ActiveItem && l.To == targetItem))
             {
-                if (!preds.Contains(ActiveItem))
-                    preds.Add(ActiveItem);
+                View.Links.Add(new Planity.FrontendBlazorWASM.Shared.Models.GanttItemLink {
+                    From = ActiveItem,
+                    To = targetItem
+                });
             }
         }
         else if (targetType == GanttHandleType.End)
         {
-            // Lägg till ActiveItem som successor till targetItem om den inte redan finns
-            if (targetItem is { Successors: List<IGanttItem> succs })
+            // Skapa länk: targetItem (From) -> ActiveItem (To) om den inte redan finns
+            if (!View.Links.Any(l => l.From == targetItem && l.To == ActiveItem))
             {
-                if (!succs.Contains(ActiveItem))
-                    succs.Add(ActiveItem);
+                View.Links.Add(new Planity.FrontendBlazorWASM.Shared.Models.GanttItemLink {
+                    From = targetItem,
+                    To = ActiveItem
+                });
             }
         }
         ResetActiveState();

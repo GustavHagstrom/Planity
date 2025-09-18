@@ -1,4 +1,5 @@
 ﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
+using Planity.FrontendBlazorWASM.Shared.Models;
 
 namespace Planity.FrontendBlazorWASM.Shared.Models;
 
@@ -14,12 +15,10 @@ public class ProjectTask : IGanttItem
     public GanttItemType Type => GanttItemType.Task;
     public IEnumerable<IGanttItem>? Children => [];
     public bool IsExpanded { get; set; } = false;
-    public List<IGanttItem> Predecessors { get; set; } = [];
-    public List<IGanttItem> Successors { get; set; } = [];
 
     public IGanttItem Clone()
     {
-        return new ProjectTask
+        var clone = new ProjectTask
         {
             Id = this.Id,
             OrganizationId = this.OrganizationId,
@@ -28,10 +27,9 @@ public class ProjectTask : IGanttItem
             Start = this.Start,
             WorkHours = this.WorkHours,
             ResourceId = this.ResourceId,
-            IsExpanded = this.IsExpanded,
-            Predecessors = this.Predecessors?.Select(p => p.Clone()).ToList() ?? new List<IGanttItem>(),
-            Successors = this.Successors?.Select(s => s.Clone()).ToList() ?? new List<IGanttItem>()
+            IsExpanded = this.IsExpanded
         };
+        return clone;
     }
 
     public bool Equals(IGanttItem? other)
