@@ -12,7 +12,7 @@ public static class ServiceRegistration
         services.AddScoped<IProjectService, MockProjectService>();
         services.AddScoped<IResourceService, MockResourceService>();
         services.AddScoped<IDateCalculator, DateCalculator>();
-
+        services.AddScoped<IRenderCalculator, RenderCalculator>();
         return services;
     }
 }

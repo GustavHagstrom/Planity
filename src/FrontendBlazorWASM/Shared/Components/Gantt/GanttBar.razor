@@ -1,47 +1,65 @@
 @using System.Globalization
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 @inject IDateCalculator DateCalculator
+@inject IRenderCalculator RenderCalculator
 
 <g class="gantt-bar">
     @if(Item.Type == GanttItemType.Milestone && Item.Start != null)
     {
-        var values = GetMilestoneValues();
-        @if (DragMode == GanttDragMode.EditDate)
+        var milestone = RenderCalculator.CalculateMilestoneCoordinates(Item, ViewStart, PixelsPerDay, RowHeight, Index);
+        if (milestone != null)
         {
-            <polygon points="@values.Points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" stroke="black" stroke-width="1" filter="url(#glow)"
-                @onpointerdown="BarPointerDownInternal"
-                style="cursor:move" />
-        }
-        else
-        {
-            <polygon points="@values.Points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" stroke="black" stroke-width="1" />
-        }
-        @if (DragMode == GanttDragMode.Link)
-        {
-            <circle cx="@values.CenterXStr" cy="@values.CenterYStr" r="@HandleRadius" class="gantt-link-handle"
-                    @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Milestone, e))"
-                    @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Milestone, e))" />
+            var coords = milestone.Value;
+            @if (DragMode == GanttDragMode.EditDate)
+            {
+                <polygon points="@coords.Points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" stroke="black" stroke-width="1" filter="url(#glow)"
+                    @onpointerdown="BarPointerDownInternal"
+                    style="cursor:move" />
+            }
+            else
+            {
+                <polygon points="@coords.Points" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" stroke="black" stroke-width="1" />
+            }
+            @if (DragMode == GanttDragMode.Link)
+            {
+                <circle cx="@coords.CenterX.ToString(CultureInfo.InvariantCulture)" cy="@coords.CenterY.ToString(CultureInfo.InvariantCulture)" r="@HandleRadius" class="gantt-link-handle"
+                        @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Milestone, e))"
+                        @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Milestone, e))" />
+            }
         }
     }
     else if(Item.Start != null && EndDate != null)
     {
-        var values = GetBarValues();
-        @if (DragMode == GanttDragMode.EditDate && Item.Type == GanttItemType.Task)
+        var bar = RenderCalculator.CalculateBarCoordinates(Item, View.Resources, ViewStart, EndDate.Value, PixelsPerDay, RowHeight);
+
+        if (bar != null)
         {
-            <rect x="@values.StartXStr" y="@values.YStr" width="@values.WidthStr" height="@values.HeightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:move" rx="0" ry="0" stroke="black" stroke-width="1" filter="url(#glow)" @onpointerdown="BarPointerDownInternal" />
-        }
-        else
-        {
-            <rect x="@values.StartXStr" y="@values.YStr" width="@values.WidthStr" height="@values.HeightStr" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:default" rx="1" ry="1" stroke="black" stroke-width="1" />
-        }
-        @if (DragMode == GanttDragMode.Link)
-        {
-            <circle cx="@values.CxStrStart" cy="@values.CyStr" r="@HandleRadius" class="gantt-link-handle"
-                    @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Start, e))"
-                    @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Start, e))" />
-            <circle cx="@values.CxStrEnd" cy="@values.CyStr" r="@HandleRadius" class="gantt-link-handle"
-                    @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.End, e))"
-                    @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.End, e))" />
+            var coords = bar.Value;
+       @*      var startXStr = bar.Value.X.ToInvariantString();
+            var endXStr = bar.Value.Width.ToInvariantString();
+            var yStr = bar.Value.Y.ToInvariantString();
+            var widthStr = (bar.Value.Width - bar.Value.X).ToInvariantString();
+            var heightStr = bar.Value.Height.ToInvariantString();
+            var cxStrStart = (bar.Value.X + HandleRadius).ToInvariantString();
+            var cxStrEnd = (bar.Value.Width - HandleRadius).ToInvariantString();
+            var cyStr = (bar.Value.Y + bar.Value.Height / 2).ToInvariantString(); *@
+            @if (DragMode == GanttDragMode.EditDate && Item.Type == GanttItemType.Task)
+            {
+                <rect x="@coords.X" y="@coords.Y" width="@coords.Width" height="@coords.Height" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:move" rx="0" ry="0" stroke="black" stroke-width="1" filter="url(#glow)" @onpointerdown="BarPointerDownInternal" />
+            }
+            else
+            {
+                <rect x="@coords.X" y="@coords.Y" width="@coords.Width" height="@coords.Height" fill="@(HasBrokenDependency ? "red" : FillColor)" opacity="@Opacity" style="cursor:default" rx="1" ry="1" stroke="black" stroke-width="1" />
+            }
+            @if (DragMode == GanttDragMode.Link)
+            {
+                <circle cx="@cxStrStart" cy="@cyStr" r="@HandleRadius" class="gantt-link-handle"
+                        @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.Start, e))"
+                        @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.Start, e))" />
+                <circle cx="@cxStrEnd" cy="@cyStr" r="@HandleRadius" class="gantt-link-handle"
+                        @onpointerdown="(e) => OnHandlePointerDown.InvokeAsync((Item, GanttHandleType.End, e))"
+                        @onpointerup="(e) => OnHandlePointerUp.InvokeAsync((Item, GanttHandleType.End, e))" />
+            }
         }
     }
 </g>
@@ -65,63 +83,6 @@
     [Parameter] public EventCallback<(IGanttItem, PointerEventArgs, string)> OnBarPointerDown { get; set; }
     [Parameter] public DateTime? EndDate { get; set; }
 
-    private (string CenterXStr, string CenterYStr, string Points) GetMilestoneValues()
-    {
-        var centerX = ((Item.Start!.Value - ViewStart).TotalDays * PixelsPerDay);
-        var centerY = (Index * RowHeight) + (RowHeight / 2);
-        var halfSize = RowHeight / 2 * 0.7;
-        var centerXStr = centerX.ToString(CultureInfo.InvariantCulture);
-        var centerYStr = centerY.ToString(CultureInfo.InvariantCulture);
-        var topY = (centerY - halfSize).ToString(CultureInfo.InvariantCulture);
-        var rightX = (centerX + halfSize).ToString(CultureInfo.InvariantCulture);
-        var bottomY = (centerY + halfSize).ToString(CultureInfo.InvariantCulture);
-        var leftX = (centerX - halfSize).ToString(CultureInfo.InvariantCulture);
-        var points = $"{centerXStr},{topY} {rightX},{centerYStr} {centerXStr},{bottomY} {leftX},{centerYStr}";
-        return (centerXStr, centerYStr, points);
-    }
-
-    private static double GetPercentOfWorkDayPassed(List<(TimeSpan Start, TimeSpan End)> workPeriods, TimeSpan currentTime)
-    {
-        double totalWorkHours = 0;
-        double passedWorkHours = 0;
-
-        foreach (var (start, end) in workPeriods)
-        {
-            var periodLength = (end - start).TotalHours;
-            totalWorkHours += periodLength;
-
-            if (currentTime >= end)
-            {
-                passedWorkHours += periodLength;
-            }
-            else if (currentTime > start)
-            {
-                passedWorkHours += (currentTime - start).TotalHours;
-            }
-        }
-
-        if (totalWorkHours == 0) return 0;
-        return passedWorkHours / totalWorkHours;
-    }
-
-    private (string StartXStr, string EndXStr, string YStr, string WidthStr, string HeightStr, string CxStrStart, string CxStrEnd, string CyStr) GetBarValues()
-    {
-        var startX = (DateCalculator.CalculateStart(Item, View.Resources) - ViewStart)!.Value.TotalDays * PixelsPerDay;
-        var endX = ((EndDate!.Value - ViewStart).TotalDays * PixelsPerDay); 
-        var width = endX - startX;
-        var y = (Index * RowHeight + 4);
-        var height = RowHeight - 8;
-        var startXStr = startX.ToString(CultureInfo.InvariantCulture);
-        var endXStr = endX.ToString(CultureInfo.InvariantCulture);
-        var yStr = y.ToString(CultureInfo.InvariantCulture);
-        var cxStrStart = (startX + HandleRadius).ToString(CultureInfo.InvariantCulture);
-        var cxStrEnd = (endX - HandleRadius).ToString(CultureInfo.InvariantCulture);
-        var cyStr = (y + height / 2).ToString(CultureInfo.InvariantCulture);
-        var widthStr = width.ToString(CultureInfo.InvariantCulture);
-        var heightStr = height.ToString(CultureInfo.InvariantCulture);
-        return (startXStr, endXStr, yStr, widthStr, heightStr, cxStrStart, cxStrEnd, cyStr);
-    }
-
     private Task BarPointerDownInternal(PointerEventArgs e)
     {
         return OnBarPointerDown.InvokeAsync((Item, e, Item.Type == GanttItemType.Milestone ? "milestone" : "bar"));
@@ -134,7 +95,6 @@
             if (View?.Links == null || !Item.Start.HasValue)
                 return false;
 
-            // Hitta alla länkar där Item är To (dvs. har predecessors)
             var predecessors = View.Links.Where(l => l.To == Item).Select(l => l.From);
             foreach (var predecessor in predecessors)
             {
@@ -147,8 +107,6 @@
                 {
                     predecessorEnd = milestone.Start;
                 }
-                // Lägg till fler typer om det behövs
-
                 if (predecessorEnd.HasValue && Item.Start.Value < predecessorEnd.Value)
                     return true;
             }
