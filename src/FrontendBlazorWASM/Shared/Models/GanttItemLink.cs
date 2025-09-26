@@ -6,7 +6,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Models;
 
 public class GanttItemLink
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public IGanttItem From { get; set; } = null!;
     public IGanttItem To { get; set; } = null!;
     public string? Comment { get; set; }

@@ -3,25 +3,36 @@
 @using Planity.FrontendBlazorWASM.Shared.Models
 @inject IDateCalculator GanttDateCalculator
 @inject IResourceService ResourceService
+@inject IRenderCalculator RenderCalculator
 
-@foreach (var conn in connections)
+@foreach (var link in linksToRender)
 {
-    <GanttConnection Points="@conn.Points" StrokeColor="@(conn.IsBroken ? "red" : "#3a6ea5")" StrokeWidth="2" MarkerEnd="url(#arrowhead)" />
+    var a = RenderCalculator.CalculateConnection(link.From, link.To, View.Resources, View.Start, View.PixelsPerDay, View.RowHeight);
 }
+@* @foreach (var conn in connections)
+{
+    var a = RenderCalculator.CalculateConnection()
+    <GanttConnection Points="@conn.Points" StrokeColor="@(conn.IsBroken ? "red" : "#3a6ea5")" StrokeWidth="2" MarkerEnd="url(#arrowhead)" />
+} *@
 
 @code {
-    [Parameter] public IEnumerable<IGanttItem> Items { get; set; } = Enumerable.Empty<IGanttItem>();
+
     [Parameter] public GanttView View { get; set; } = null!;
 
+    List<GanttItemLink> linksToRender = new();
     private record Connection(string Points, bool IsBroken);
 
     private List<Connection> connections = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        connections = await GetConnectionsAsync();
+        @* connections = await GetConnectionsAsync(); *@
+        SetLinksToRender();
     }
-
+    void SetLinksToRender()
+    {
+        linksToRender = View.Links.Where(l => View.Items!.Any(i => i.Id == l.From.Id) && View.Items!.Any(i => i.Id == l.To.Id)).ToList();
+    }
     private async Task<List<Connection>> GetConnectionsAsync()
     {
         var connections = new List<Connection>();

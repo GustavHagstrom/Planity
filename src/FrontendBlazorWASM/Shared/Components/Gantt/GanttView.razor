@@ -25,8 +25,8 @@
 
 @code {
 
-    [Parameter] public DateTime StartTime { get; set; }
-    [Parameter] public DateTime EndTime { get; set; }
+    [Parameter] public DateTime StartParam { get; set; }
+    [Parameter] public DateTime EndParam { get; set; }
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
     [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
@@ -43,8 +43,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Start = StartTime;
-        End = EndTime;
+        Start = StartParam;
+        End = EndParam;
         Resources = await ResourceService.GetResourcesAsync() ?? new List<Resource>();
         _sourceItems = Items?.Select(i => i.Clone()).ToList() ?? [];
         _sourceLinks = Links.Select(l => l.Clone()).ToList();

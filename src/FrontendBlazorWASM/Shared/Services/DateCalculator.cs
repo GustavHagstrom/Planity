@@ -149,35 +149,5 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
             }
         }
         return null;
-        //if (item.Start is null) return null;
-        //var resource = resources.FirstOrDefault(r => r.Id == item.ResourceId);
-        //if (resource is null || resource.WorkCalendar is null) return item.Start;
-        //var calendar = resource.WorkCalendar;
-        //DateTime searchDate = item.Start.Value;
-        //while (true)
-        //{
-        //    if (calendar.WorkPeriodsByDayOfWeek.TryGetValue(searchDate.DayOfWeek, out var periods) && periods.Count > 0 && !calendar.Holidays.Contains(searchDate.Date))
-        //    {
-        //        var firstPeriodStart = periods[0].Start;
-        //        if (searchDate.TimeOfDay < firstPeriodStart)
-        //        {
-        //            return searchDate.Date.Add(firstPeriodStart);
-        //        }
-        //        else if (searchDate.TimeOfDay >= periods.Last().End)
-        //        {
-        //            searchDate = searchDate.Date.AddDays(1);
-        //        }
-        //        else
-        //        {
-        //            // Om tiden är inom en period, använd tiden som den är
-        //            return searchDate;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // Ingen arbetstid denna dag, gå till nästa dag
-        //        searchDate = searchDate.Date.AddDays(1);
-        //    }
-        //}
     }
 }

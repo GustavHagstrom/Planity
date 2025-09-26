@@ -21,17 +21,10 @@
             <polygon points="0 0, 10 3.5, 0 7" fill="gold" />
         </marker>
     </defs>
-    @foreach (var ((item, level), index) in GanttItemUtils.ItemsWithExpandLevel(View.Items).Select((tuple, index) => (tuple, index)))
+    @foreach (var (item, index) in GanttItemUtils.ItemsWithExpand(View.Items).Select((tuple, index) => (tuple, index)))
     {
-        var isSelected = View.SelectedItem == item;
-        var fillColor = item.Type == GanttItemType.Project || item.Type == GanttItemType.Resource ? "plum" : "lightblue";
-        var opacity = 1.0;
-        var handleRadius = 5;
-        var endDate = GanttDateCalculator.CalculateEnd(item, View.Resources);
-        <GanttBar Item="@item" Index="@index" Level="@level" ViewStart="@View.Start" PixelsPerDay="@View.PixelsPerDay" RowHeight="@View.RowHeight"
-                  OnHandlePointerDown="@HandlePointerDownProxy" OnHandlePointerUp="@HandlePointerUpProxy"
-                  IsSelected="@isSelected" FillColor="@fillColor" Opacity="@opacity" HandleRadius="@handleRadius" DragMode="@DragMode"
-                  OnBarPointerDown="@((args) => HandleBarPointerDown(args))" EndDate="@endDate" />
+        <GanttBar Item="@item" Index="@index" OnHandlePointerDown="@HandlePointerDownProxy" OnHandlePointerUp="@HandlePointerUpProxy" DragMode="@DragMode"
+                  OnBarPointerDown="@((args) => HandleBarPointerDown(args))"/>
     }
     <GanttConnections Items="@View.Items" View="@View" />
     <GanttDragOverlay IsDragging="@IsActive" DragSourceItem="@ActiveItem" DragSourceType="@DragSourceType" PointerX="@PointerX" PointerY="@PointerY" View="@View" />
@@ -137,7 +130,7 @@
         return Task.CompletedTask;
     }
 
-    private void HandleBarPointerDown((IGanttItem item, PointerEventArgs e, string type) args)
+    private void HandleBarPointerDown((IGanttItem item, PointerEventArgs e) args)
     {
         if (DragMode != GanttDragMode.EditDate) return;
         ActiveItem = args.item;

@@ -4,72 +4,64 @@ using Planity.FrontendBlazorWASM.Shared.Models;
 
 namespace Planity.FrontendBlazorWASM.Shared.Services
 {
-    public struct BarCoordinates
+    public struct Bar
     {
-        public string X { get; set; }
-        
-        public string Y { get; set; }
+        public Point Start { get; set; }
         public string Width { get; set; }
         public string Height { get; set; }
+        public Point StartHandle { get; set; }
+        public Point EndHandle { get; set; }
     }
-
-    public struct ConnectionCoordinates
+    public struct MileStone
     {
-        public string StartX { get; set; }
-        public string StartY { get; set; }
-        public string EndX { get; set; }
-        public string EndY { get; set; }
+        public Point Center { get; set; }
+        public string ShapePoints { get; set; }
     }
-
-    public struct DragHandleCoordinates
+    public struct Connection
+    {
+        public Point Start { get; set; }
+        public Point End { get; set; }
+    }
+    public struct Point
     {
         public string X { get; set; }
         public string Y { get; set; }
     }
-    public struct MileStoneCoordinates
-    {
-        public string CenterX { get; set; }
-        public string CenterY { get; set; }
-        public string Points { get; set; }
-    }
+    
     public interface IRenderCalculator
     {
-        BarCoordinates? CalculateBarCoordinates(
+        Bar? CalculateBar(
             IGanttItem item,
-            IEnumerable<object> resources,
-            DateTime viewStart,
-            DateTime viewEnd,
-            double pixelsPerDay,
-            double rowHeight,
-            int index);
-
-        MileStoneCoordinates? CalculateMilestoneCoordinates(
-            IGanttItem item,
+            List<Resource> resources,
             DateTime viewStart,
             double pixelsPerDay,
             double rowHeight,
             int index);
 
-        ConnectionCoordinates? CalculateConnectionCoordinates(
+        MileStone? CalculateMilestone(
+            IGanttItem item,
+            DateTime viewStart,
+            double pixelsPerDay,
+            double rowHeight,
+            int index);
+
+        Connection? CalculateConnection(
             IGanttItem fromItem,
             IGanttItem toItem,
-            IEnumerable<object> resources,
+            List<Resource> resources,
             DateTime viewStart,
-            DateTime viewEnd,
             double pixelsPerDay,
             double rowHeight,
             int fromIndex,
             int toIndex);
 
-        DragHandleCoordinates? CalculateDragHandleCoordinates(
-            IGanttItem item,
-            IEnumerable<object> resources,
+        Point? CalculateBarDragHandlePoint(
             DateTime viewStart,
-            DateTime viewEnd,
+            DateTime date,
             double pixelsPerDay,
             double rowHeight,
             int index,
-            bool isStartHandle);
+            bool isStart);
     }
 
     public class RenderCalculator : IRenderCalculator
@@ -80,36 +72,42 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
         {
             _dateCalculator = dateCalculator;
         }
-
-        public BarCoordinates? CalculateBarCoordinates(
+        public Bar? CalculateBar(
             IGanttItem item,
-            IEnumerable<object> resources,
+            List<Resource> resources,
             DateTime viewStart,
-            DateTime viewEnd,
             double pixelsPerDay,
             double rowHeight,
             int index)
         {
-            var resourceList = resources.OfType<Resource>().ToList();
-            var start = _dateCalculator.CalculateStart(item, resourceList);
-            var end = _dateCalculator.CalculateEnd(item, resourceList);
+            var start = _dateCalculator.CalculateStart(item, resources);
+            var end = _dateCalculator.CalculateEnd(item, resources);
             if (!start.HasValue || !end.HasValue) return null;
-            var renderStart = start.Value < viewStart ? viewStart : start.Value;
-            var renderEnd = end.Value > viewEnd ? viewEnd : end.Value;
-            var startX = (renderStart - viewStart).TotalDays * pixelsPerDay;
-            var endX = (renderEnd - viewStart).TotalDays * pixelsPerDay;
+
+            var startHandle = CalculateBarDragHandlePoint(viewStart, start.Value, pixelsPerDay, rowHeight, index, true);
+            var endHandle = CalculateBarDragHandlePoint(viewStart, end.Value, pixelsPerDay, rowHeight, index, false);
+            if (!startHandle.HasValue || !endHandle.HasValue) return null;
+
+            var startX = (start.Value - viewStart).TotalDays * pixelsPerDay;
+            var endX = (end.Value - viewStart).TotalDays * pixelsPerDay;
+            
             var y = (index * rowHeight + 4);
             var height = rowHeight - 8;
-            return new BarCoordinates
+            return new Bar
             {
-                X = startX.ToInvariantString(),
+                Start = new Point
+                {
+                    X = startX.ToInvariantString(),
+                    Y = y.ToInvariantString()
+                },
                 Width = (endX - startX).ToInvariantString(),
-                Y = y.ToInvariantString(),
-                Height = height.ToInvariantString()
+                Height = height.ToInvariantString(),
+                StartHandle = startHandle.Value,
+                EndHandle = endHandle.Value
             };
         }
 
-        public MileStoneCoordinates? CalculateMilestoneCoordinates(
+        public MileStone? CalculateMilestone(
             IGanttItem item,
             DateTime viewStart,
             double pixelsPerDay,
@@ -124,69 +122,56 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
             var rightX = centerX + halfSize;
             var bottomY = centerY + halfSize;
             var leftX = centerX - halfSize;
-            return new MileStoneCoordinates
+            return new MileStone
             {
-                CenterX = centerX.ToInvariantString(),
-                CenterY = centerY.ToInvariantString(),
-                Points = $"{centerX.ToInvariantString()},{topY.ToInvariantString()} {rightX.ToInvariantString()},{centerY.ToInvariantString()} {centerX.ToInvariantString()},{bottomY.ToInvariantString()} {leftX.ToInvariantString()},{centerY.ToInvariantString()}"
+                Center = new Point
+                {
+                    X = centerX.ToInvariantString(),
+                    Y = centerY.ToInvariantString()
+                },
+                ShapePoints = $"{centerX.ToInvariantString()},{topY.ToInvariantString()} {rightX.ToInvariantString()},{centerY.ToInvariantString()} {centerX.ToInvariantString()},{bottomY.ToInvariantString()} {leftX.ToInvariantString()},{centerY.ToInvariantString()}"
             };
         }
 
-        public ConnectionCoordinates? CalculateConnectionCoordinates(
+        public Connection? CalculateConnection(
             IGanttItem fromItem,
             IGanttItem toItem,
-            IEnumerable<object> resources,
+            List<Resource> resources,
             DateTime viewStart,
-            DateTime viewEnd,
             double pixelsPerDay,
             double rowHeight,
             int fromIndex,
             int toIndex)
         {
-            var start = CalculateItemPoint(fromItem, resources, viewStart, viewEnd, pixelsPerDay, rowHeight, fromIndex, false);
-            var end = CalculateItemPoint(toItem, resources, viewStart, viewEnd, pixelsPerDay, rowHeight, toIndex, true);
+            var startDate = _dateCalculator.CalculateEnd(fromItem, resources);
+            var endDate = _dateCalculator.CalculateStart(toItem, resources);
+            if (!startDate.HasValue || !endDate.HasValue) return null;
+
+            var start = CalculateBarDragHandlePoint(viewStart, startDate.Value, pixelsPerDay, rowHeight, fromIndex, false);
+            var end = CalculateBarDragHandlePoint(viewStart, endDate.Value, pixelsPerDay, rowHeight, toIndex, true);
             if (!start.HasValue || !end.HasValue) return null;
-            return new ConnectionCoordinates
+
+            return new Connection
             {
-                StartX = start.Value.X,
-                StartY = start.Value.Y,
-                EndX = end.Value.X,
-                EndY = end.Value.Y
+                Start = start.Value,
+                End = end.Value,
             };
         }
 
-        public DragHandleCoordinates? CalculateDragHandleCoordinates(
-            IGanttItem item,
-            IEnumerable<object> resources,
+        public Point? CalculateBarDragHandlePoint(
             DateTime viewStart,
-            DateTime viewEnd,
-            double pixelsPerDay,
-            double rowHeight,
-            int index,
-            bool isStartHandle)
-        {
-            return CalculateItemPoint(item, resources, viewStart, viewEnd, pixelsPerDay, rowHeight, index, isStartHandle);
-        }
-
-        private DragHandleCoordinates? CalculateItemPoint(
-            IGanttItem item,
-            IEnumerable<object> resources,
-            DateTime viewStart,
-            DateTime viewEnd,
+            DateTime date,
             double pixelsPerDay,
             double rowHeight,
             int index,
             bool isStart)
         {
-            var resourceList = resources.OfType<Resource>().ToList();
-            DateTime? date = isStart ? _dateCalculator.CalculateStart(item, resourceList) : _dateCalculator.CalculateEnd(item, resourceList);
-            if (!date.HasValue) return null;
-            var renderDate = isStart
-                ? (date.Value < viewStart ? viewStart : date.Value)
-                : (date.Value > viewEnd ? viewEnd : date.Value);
-            var x = (renderDate - viewStart).TotalDays * pixelsPerDay;
+            var offset = isStart ? 8 : -8;
+            var x = (date - viewStart).TotalDays * pixelsPerDay + offset;
             var y = (index * rowHeight) + (rowHeight / 2);
-            return new DragHandleCoordinates { X = x, Y = y };
+            return new Point { X = x.ToInvariantString(), Y = y.ToInvariantString() };
         }
+
+        
     }
 }

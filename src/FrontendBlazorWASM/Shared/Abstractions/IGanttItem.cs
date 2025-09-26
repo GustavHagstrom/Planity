@@ -5,6 +5,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Abstractions;
 
 public interface IGanttItem : IEquatable<IGanttItem>
 {
+    string Id { get; set; }
     string Name { get; set;  }
     DateTime? Start { get; set; }
     GanttItemType Type { get; }     // t.ex. "Task", "Project"
