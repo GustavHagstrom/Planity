@@ -1,6 +1,7 @@
 using MudBlazor.Extensions;
 using Planity.FrontendBlazorWASM.Shared.Abstractions;
 using Planity.FrontendBlazorWASM.Shared.Models;
+using System.Globalization;
 
 namespace Planity.FrontendBlazorWASM.Shared.Services
 {
@@ -67,7 +68,10 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
     public class RenderCalculator : IRenderCalculator
     {
         private readonly IDateCalculator _dateCalculator;
+        private const double HandleOffset = 8;
+        private const double MilestoneSizeFactor = 0.7;
 
+        double MilestoneHalfSize(double rowHeight) => (rowHeight / 2) * MilestoneSizeFactor;
         public RenderCalculator(IDateCalculator dateCalculator)
         {
             _dateCalculator = dateCalculator;
@@ -117,7 +121,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
             if (!item.Start.HasValue) return null;
             var centerX = ((item.Start.Value - viewStart).TotalDays * pixelsPerDay);
             var centerY = (index * rowHeight) + (rowHeight / 2);
-            var halfSize = rowHeight / 2 * 0.7;
+            var halfSize = MilestoneHalfSize(rowHeight);
             var topY = (centerY - halfSize);
             var rightX = centerX + halfSize;
             var bottomY = centerY + halfSize;
@@ -147,8 +151,32 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
             var endDate = _dateCalculator.CalculateStart(toItem, resources);
             if (!startDate.HasValue || !endDate.HasValue) return null;
 
-            var start = CalculateBarDragHandlePoint(viewStart, startDate.Value, pixelsPerDay, rowHeight, fromIndex, false);
-            var end = CalculateBarDragHandlePoint(viewStart, endDate.Value, pixelsPerDay, rowHeight, toIndex, true);
+            Point? start;
+            Point? end;
+
+            if (fromItem.Type == GanttItemType.Milestone)
+            {
+
+                start = CalculateMilestone(fromItem, viewStart, pixelsPerDay, rowHeight, fromIndex)?.Center;
+                start = FixConnectionOffset(start, MilestoneHalfSize(rowHeight));                    
+            }
+            else
+            {
+                start = CalculateBarDragHandlePoint(viewStart, startDate.Value, pixelsPerDay, rowHeight, fromIndex, false);
+                start = FixConnectionOffset(start, HandleOffset);
+            }
+            if (toItem.Type == GanttItemType.Milestone)
+            {
+
+                end = CalculateMilestone(toItem, viewStart, pixelsPerDay, rowHeight, toIndex)?.Center;
+                end = FixConnectionOffset(end, -MilestoneHalfSize(rowHeight));
+            }
+            else
+            {
+                end = CalculateBarDragHandlePoint(viewStart, endDate.Value, pixelsPerDay, rowHeight, toIndex, true);
+                end = FixConnectionOffset(end, -HandleOffset);
+            }
+
             if (!start.HasValue || !end.HasValue) return null;
 
             return new Connection
@@ -157,7 +185,17 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
                 End = end.Value,
             };
         }
+        private Point? FixConnectionOffset(Point? point, double offset)
+        {
+            if(!point.HasValue) return point;
+            point = new Point
+            {
+                X = (double.Parse(point.Value.X, CultureInfo.InvariantCulture) + offset).ToInvariantString(),
+                Y = point.Value.Y
+            };
+            return point;
 
+        }
         public Point? CalculateBarDragHandlePoint(
             DateTime viewStart,
             DateTime date,
@@ -166,7 +204,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
             int index,
             bool isStart)
         {
-            var offset = isStart ? 8 : -8;
+            var offset = isStart ? HandleOffset : HandleOffset * -1;
             var x = (date - viewStart).TotalDays * pixelsPerDay + offset;
             var y = (index * rowHeight) + (rowHeight / 2);
             return new Point { X = x.ToInvariantString(), Y = y.ToInvariantString() };

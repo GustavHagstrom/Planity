@@ -7,7 +7,13 @@
 
 @foreach (var link in linksToRender)
 {
-    var a = RenderCalculator.CalculateConnection(link.From, link.To, View.Resources, View.Start, View.PixelsPerDay, View.RowHeight);
+    GetIndexOfItem(link.From, out var fromIndex);
+    GetIndexOfItem(link.To, out var toIndex);
+    var connection = RenderCalculator.CalculateConnection(link.From, link.To, View.Resources, View.Start, View.PixelsPerDay, View.RowHeight, fromIndex, toIndex);
+    if(connection.HasValue)
+    {
+        <GanttConnection Connection="connection.Value" />
+    }
 }
 @* @foreach (var conn in connections)
 {
@@ -24,59 +30,80 @@
 
     private List<Connection> connections = new();
 
-    protected override async Task OnParametersSetAsync()
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     connections = await GetConnectionsAsync();
+
+    // }
+    protected override void OnParametersSet()
     {
-        @* connections = await GetConnectionsAsync(); *@
         SetLinksToRender();
     }
     void SetLinksToRender()
     {
-        linksToRender = View.Links.Where(l => View.Items!.Any(i => i.Id == l.From.Id) && View.Items!.Any(i => i.Id == l.To.Id)).ToList();
+        linksToRender = View.Links;
+        // linksToRender = View.Links.Where(l => View.Items!.Any(i => i.Id == l.From.Id) && View.Items!.Any(i => i.Id == l.To.Id)).ToList();
     }
-    private async Task<List<Connection>> GetConnectionsAsync()
+    void GetIndexOfItem(IGanttItem item, out int index)
     {
-        var connections = new List<Connection>();
-        var itemsWithLevel = GanttItemUtils.ItemsWithExpandLevel(Items).ToList();
-        var itemIndex = itemsWithLevel.Select((tuple, idx) => new { tuple.item, idx }).ToDictionary(x => x.item, x => x.idx);
-        var resources = (await ResourceService.GetResourcesAsync()).ToList();
+        index = -1;
+        var items = GanttItemUtils.ItemsWithExpand(View.Items!);
 
-        // Ny logik: iterera över View._sourceLinks
-        foreach (var link in View.Links) {
-            if (!itemIndex.TryGetValue(link.From, out var fromIndex)) continue;
-            if (!itemIndex.TryGetValue(link.To, out var toIndex)) continue;
-            var fromEnd = GanttDateCalculator.CalculateEnd(link.From, resources);
-            var toEnd = GanttDateCalculator.CalculateEnd(link.To, resources);
-            var (fromX, fromY) = GetHandlePosition(link.From, fromIndex, fromEnd, true);
-            var (toX, toY) = GetHandlePosition(link.To, toIndex, toEnd, false);
-            var points = $"{fromX},{fromY} {toX},{fromY} {toX},{toY}";
-            bool isBroken = fromEnd.HasValue && link.To.Start.HasValue && fromEnd.Value > link.To.Start.Value;
-            connections.Add(new Connection(points, isBroken));
+        int i = 0;
+        foreach (var current in items)
+        {
+            if (current.Id == item.Id)
+            {
+                index = i;
+                return;
+            }
+            i++;
         }
-        return connections;
     }
+    // private async Task<List<Connection>> GetConnectionsAsync()
+    // {
+    //     var connections = new List<Connection>();
+    //     var itemsWithLevel = GanttItemUtils.ItemsWithExpandLevel(Items).ToList();
+    //     var itemIndex = itemsWithLevel.Select((tuple, idx) => new { tuple.item, idx }).ToDictionary(x => x.item, x => x.idx);
+    //     var resources = (await ResourceService.GetResourcesAsync()).ToList();
+
+    //     // Ny logik: iterera över View._sourceLinks
+    //     foreach (var link in View.Links) {
+    //         if (!itemIndex.TryGetValue(link.From, out var fromIndex)) continue;
+    //         if (!itemIndex.TryGetValue(link.To, out var toIndex)) continue;
+    //         var fromEnd = GanttDateCalculator.CalculateEnd(link.From, resources);
+    //         var toEnd = GanttDateCalculator.CalculateEnd(link.To, resources);
+    //         var (fromX, fromY) = GetHandlePosition(link.From, fromIndex, fromEnd, true);
+    //         var (toX, toY) = GetHandlePosition(link.To, toIndex, toEnd, false);
+    //         var points = $"{fromX},{fromY} {toX},{fromY} {toX},{toY}";
+    //         bool isBroken = fromEnd.HasValue && link.To.Start.HasValue && fromEnd.Value > link.To.Start.Value;
+    //         connections.Add(new Connection(points, isBroken));
+    //     }
+    //     return connections;
+    // }
 
     // isEndHandle: true för from, false för to
-    private (string x, string y) GetHandlePosition(IGanttItem item, int index, DateTime? endDate, bool isEndHandle)
-    {
-        if (item.Type == GanttItemType.Milestone && item.Start != null)
-        {
-            var centerX = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
-            var centerY = (index * View.RowHeight) + (View.RowHeight / 2);
-            return (centerX.ToString(CultureInfo.InvariantCulture), centerY.ToString(CultureInfo.InvariantCulture));
-        }
-        else if (item.Start != null && endDate != null)
-        {
-            var x = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
-            var width = ((endDate.Value - item.Start.Value).TotalDays * View.PixelsPerDay);
-            var handleRadius = 5;
-            var y = (index * View.RowHeight) + (View.RowHeight / 2);
-            if (isEndHandle)
-                return ((x + width - handleRadius).ToString(CultureInfo.InvariantCulture), y.ToString(CultureInfo.InvariantCulture));
-            else
-                return ((x + handleRadius).ToString(CultureInfo.InvariantCulture), y.ToString(CultureInfo.InvariantCulture));
-        }
-        return ("0", "0");
-    }
+    // private (string x, string y) GetHandlePosition(IGanttItem item, int index, DateTime? endDate, bool isEndHandle)
+    // {
+    //     if (item.Type == GanttItemType.Milestone && item.Start != null)
+    //     {
+    //         var centerX = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
+    //         var centerY = (index * View.RowHeight) + (View.RowHeight / 2);
+    //         return (centerX.ToString(CultureInfo.InvariantCulture), centerY.ToString(CultureInfo.InvariantCulture));
+    //     }
+    //     else if (item.Start != null && endDate != null)
+    //     {
+    //         var x = ((item.Start.Value - View.Start).TotalDays * View.PixelsPerDay);
+    //         var width = ((endDate.Value - item.Start.Value).TotalDays * View.PixelsPerDay);
+    //         var handleRadius = 5;
+    //         var y = (index * View.RowHeight) + (View.RowHeight / 2);
+    //         if (isEndHandle)
+    //             return ((x + width - handleRadius).ToString(CultureInfo.InvariantCulture), y.ToString(CultureInfo.InvariantCulture));
+    //         else
+    //             return ((x + handleRadius).ToString(CultureInfo.InvariantCulture), y.ToString(CultureInfo.InvariantCulture));
+    //     }
+    //     return ("0", "0");
+    // }
 }
 
 

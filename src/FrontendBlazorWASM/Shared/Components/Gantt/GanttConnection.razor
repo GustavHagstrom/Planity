@@ -3,8 +3,10 @@
 <polyline points="@Points" stroke="@StrokeColor" stroke-width="@StrokeWidth" marker-end="@MarkerEnd" style="pointer-events:none;fill:none;" />
 
 @code {
-    [Parameter] public string Points { get; set; } = string.Empty;
-    [Parameter] public string StrokeColor { get; set; } = "#3a6ea5";
-    [Parameter] public double StrokeWidth { get; set; } = 2;
-    [Parameter] public string MarkerEnd { get; set; } = "url(#arrowhead)";
+    [Parameter] public Connection Connection { get; set; }
+
+    string Points => $"{Connection.Start.X},{Connection.Start.Y} {Connection.End.X},{Connection.Start.Y} {Connection.End.X},{Connection.End.Y}";
+    string StrokeColor { get; set; } = "#3a6ea5";
+    double StrokeWidth { get; set; } = 2;
+    string MarkerEnd { get; set; } = "url(#arrowhead)";
 }

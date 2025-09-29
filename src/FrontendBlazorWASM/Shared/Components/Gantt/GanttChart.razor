@@ -26,7 +26,7 @@
         <GanttBar Item="@item" Index="@index" OnHandlePointerDown="@HandlePointerDownProxy" OnHandlePointerUp="@HandlePointerUpProxy" DragMode="@DragMode"
                   OnBarPointerDown="@((args) => HandleBarPointerDown(args))"/>
     }
-    <GanttConnections Items="@View.Items" View="@View" />
+    <GanttConnections View="@View" />
     <GanttDragOverlay IsDragging="@IsActive" DragSourceItem="@ActiveItem" DragSourceType="@DragSourceType" PointerX="@PointerX" PointerY="@PointerY" View="@View" />
 </svg>
 

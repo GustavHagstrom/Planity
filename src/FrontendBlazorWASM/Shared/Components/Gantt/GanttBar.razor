@@ -77,7 +77,7 @@
     {
         get
         {
-            if (View?.Links == null || !Item.Start.HasValue)
+            if (View.Links.Count == 0 || !Item.Start.HasValue)
                 return false;
 
             var predecessors = View.Links.Where(l => l.To == Item).Select(l => l.From);
