@@ -17,7 +17,7 @@
         <div style="width: @View.LeftWidthPx; position: relative;">
             @foreach (var item in View.Items ?? Enumerable.Empty<IGanttItem>())
             {
-                <GanttLeftPanelRow Item="item" Level="0" RowHeightPx="@View.RowHeightPx" SelectedItem="View.SelectedItem" OnRowClick="EventCallback.Factory.Create<IGanttItem>(this, OnRowClick)" OnExpandCollapse="View.TriggerStateHasChanged" />
+                <GanttLeftPanelRow Item="item" Level="0" RowHeightPx="@View.RowHeightPx" SelectedItem="View.SelectedItem" OnRowClick="OnRowClick" OnExpandCollapse="View.TriggerStateHasChanged" />
             }
         </div>
     </div>
@@ -36,11 +36,11 @@
         }
     }
 
-    private async Task OnRowClick(IGanttItem item)
+    void OnRowClick(IGanttItem item)
     {
         if (View.SelectedItem != item)
         {
-            await View.SelectItemAsync(item);
+            View.SelectItem(item);
         }
     }
 }

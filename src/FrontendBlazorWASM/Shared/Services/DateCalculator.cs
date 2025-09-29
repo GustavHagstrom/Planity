@@ -11,7 +11,7 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
         var resources = await resourceService.GetOrganizationResources();
         return CalculateEnd(item, resources);
     }
-    public DateTime? CalculateEnd(IGanttItem item, List<Resource> resources)
+    public DateTime? CalculateEnd(IGanttItem item, IReadOnlyList<Resource> resources)
     {
         if (item.Start is null) return null;
 
@@ -101,7 +101,7 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
         var resources = await resourceService.GetOrganizationResources();
         return CalculateStart(item, resources);
     }
-    public DateTime? CalculateStart(IGanttItem  item, List<Resource> resources)
+    public DateTime? CalculateStart(IGanttItem  item, IReadOnlyList<Resource> resources)
     {
         if (item.Start is null) return null;
         if (item is Milestone milestone) return milestone.Start;

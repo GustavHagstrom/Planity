@@ -55,19 +55,14 @@
 </MudPaper>
 
 @code {
-    [CascadingParameter] public GanttView GanttView { get; set; } = null!;
+    [CascadingParameter] public GanttView View { get; set; } = null!;
     [Parameter] public IGanttItem? Item { get; set; }
 
-    List<IGanttItem> Predecessors => Item == null ? new() : GanttView.Links.Where(l => l.To == Item).Select(l => l.From).ToList();
-    List<IGanttItem> Successors => Item == null ? new() : GanttView.Links.Where(l => l.From == Item).Select(l => l.To).ToList();
-
-    Task SelectItemAsync(IGanttItem item)
-    {
-        return GanttView.SelectItemAsync(item);
-    }
+    List<IGanttItem> Predecessors => Item == null ? new() : View.Links.Where(l => l.To == Item).Select(l => l.From).ToList();
+    List<IGanttItem> Successors => Item == null ? new() : View.Links.Where(l => l.From == Item).Select(l => l.To).ToList();
 
     void EditItem(IGanttItem item)
     {
-        SelectItemAsync(item);
+        View.SelectItem(item);
     }
 }

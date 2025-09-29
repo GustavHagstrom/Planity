@@ -6,7 +6,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Services;
 public interface IDateCalculator
 {
     Task<DateTime?> CalculateEndAsync(IGanttItem item);
-    DateTime? CalculateEnd(IGanttItem item, List<Resource> resources);
+    DateTime? CalculateEnd(IGanttItem item, IReadOnlyList<Resource> resources);
     bool IsWorkDay(WorkCalendar calendar, DateTime date);
-    DateTime? CalculateStart(IGanttItem task, List<Resource> resources);
+    DateTime? CalculateStart(IGanttItem task, IReadOnlyList<Resource> resources);
 }

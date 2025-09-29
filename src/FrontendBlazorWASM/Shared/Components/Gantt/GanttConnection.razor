@@ -5,8 +5,9 @@
 @code {
     [Parameter] public Connection Connection { get; set; }
 
-    string Points => $"{Connection.Start.X},{Connection.Start.Y} {Connection.End.X},{Connection.Start.Y} {Connection.End.X},{Connection.End.Y}";
-    string StrokeColor { get; set; } = "#3a6ea5";
-    double StrokeWidth { get; set; } = 2;
-    string MarkerEnd { get; set; } = "url(#arrowhead)";
+    string Points => $"{Connection.Start.X},{Connection.Start.Y} {Connection.Start.X},{Connection.End.Y} {Connection.End.X},{Connection.End.Y}";
+    bool IsBroken => double.Parse(Connection.Start.X, CultureInfo.InvariantCulture) > double.Parse(Connection.End.X, CultureInfo.InvariantCulture);
+    string StrokeColor => IsBroken ? "red" : "#3a6ea5";
+    double StrokeWidth => 2;
+    string MarkerEnd => "url(#arrowhead)";
 }

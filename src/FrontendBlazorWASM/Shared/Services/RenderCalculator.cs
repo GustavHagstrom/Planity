@@ -33,7 +33,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
     {
         Bar? CalculateBar(
             IGanttItem item,
-            List<Resource> resources,
+            IReadOnlyList<Resource> resources,
             DateTime viewStart,
             double pixelsPerDay,
             double rowHeight,
@@ -49,7 +49,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
         Connection? CalculateConnection(
             IGanttItem fromItem,
             IGanttItem toItem,
-            List<Resource> resources,
+            IReadOnlyList<Resource> resources,
             DateTime viewStart,
             double pixelsPerDay,
             double rowHeight,
@@ -78,7 +78,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
         }
         public Bar? CalculateBar(
             IGanttItem item,
-            List<Resource> resources,
+            IReadOnlyList<Resource> resources,
             DateTime viewStart,
             double pixelsPerDay,
             double rowHeight,
@@ -140,7 +140,7 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
         public Connection? CalculateConnection(
             IGanttItem fromItem,
             IGanttItem toItem,
-            List<Resource> resources,
+            IReadOnlyList<Resource> resources,
             DateTime viewStart,
             double pixelsPerDay,
             double rowHeight,

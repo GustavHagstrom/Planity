@@ -25,32 +25,81 @@
 
 @code {
 
-    [Parameter] public DateTime StartParam { get; set; }
-    [Parameter] public DateTime EndParam { get; set; }
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
+    [Parameter] public DateTime StartParam { get; set; } = DateTime.Today.AddMonths(-1);
+    [Parameter] public DateTime EndParam { get; set; } = DateTime.Today.AddMonths(3);
     [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
-    [Parameter] public IEnumerable<IGanttItem>? Items { get; set; }
-    [Parameter] public IGanttItem? SelectedItem { get; set; }
-    [Parameter] public EventCallback<IGanttItem?> SelectedItemChanged { get; set; }
-    [Parameter] public double Zoom { get; set; } = 1.0;
     [Parameter] public string Title { get; set; } = "Gantt Chart";
-    [Parameter] public List<GanttItemLink> Links { get; set; } = new();
+    [Parameter, EditorRequired] public IEnumerable<IGanttItem> ItemsParam { get; set; } = [];
+    [Parameter, EditorRequired] public IEnumerable<GanttItemLink> LinksParam { get; set; } = [];
 
-    List<GanttItemLink> _sourceLinks = new();
-    List<IGanttItem> _sourceItems = new();
+    public IReadOnlyList<IGanttItem> Items => _editItems;
+    public IReadOnlyList<GanttItemLink> Links => _editLinks;
+    public IReadOnlyDictionary<string, IGanttItem> GanttItemById => _itemById;
+    public IReadOnlySet<LinkKey> LinkKeys => _LinkKeys;
+
+    public double Zoom { get; private set; } = 1.0;
+    public DateTime Start { get; private set; }
+    public DateTime End { get; private set; }
+    public IGanttItem? SelectedItem { get; private set; }
+    public double PixelsPerDay => Mode switch
+    {
+        GanttViewMode.Year => 5 * Zoom,
+        GanttViewMode.Month => 30 * Zoom,
+        GanttViewMode.Week => 108 * Zoom,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+    public string LeftWidthPx => $"220px";
+    public double RowHeight => 30;
+    public string RowHeightPx => $"{RowHeight}px";
+    public double HeaderHeight => 60;
+    public string HeaderHeightPx => $"{HeaderHeight}px";
+    public double SvgWidth => Mode switch
+    {
+        GanttViewMode.Year => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Month => PixelsPerDay * (End - Start).Days,
+        GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+    public string SvgWidthPx => $"{SvgWidth}px";
+    public int RowCount => GanttItemUtils.ItemsWithExpand(Items).Count();
+    public IReadOnlyList<Resource> Resources { get; private set; } = [];
+
+    List<GanttItemLink> _sourceLinks = [];
+    List<IGanttItem> _sourceItems = [];
+    List<GanttItemLink> _editLinks = [];
+    List<IGanttItem> _editItems = [];
+
+    public record struct LinkKey(string FromId, string ToId);
+
+    Dictionary<string, IGanttItem> _itemById = new();
+    HashSet<LinkKey> _LinkKeys = [];
     private GanttDragMode _dragMode = GanttDragMode.None;
+
 
     protected override async Task OnInitializedAsync()
     {
         Start = StartParam;
         End = EndParam;
-        Resources = await ResourceService.GetResourcesAsync() ?? new List<Resource>();
-        _sourceItems = Items?.Select(i => i.Clone()).ToList() ?? [];
-        _sourceLinks = Links.Select(l => l.Clone()).ToList();
-        SelectedItem = Items?.FirstOrDefault();
+        Resources = await ResourceService.GetResourcesAsync() ?? [];
+        CloneItemAndLinkLists();
+        BuildItemAndLinkDictionaries();
+        SelectedItem = _editItems.FirstOrDefault();
+
     }
-    async Task OnDateRangeChanged(DateRange range)
+    void CloneItemAndLinkLists()
+    {
+        _sourceItems = ItemsParam.Select(i => i.Clone()).ToList() ?? [];
+        _sourceLinks = Links.Select(l => l.Clone()).ToList();
+        _editItems = ItemsParam.Select(i => i.Clone()).ToList();
+        _editLinks = Links.Select(l => l.Clone()).ToList();
+    }
+    void BuildItemAndLinkDictionaries()
+    {
+        _itemById = _editItems.ToDictionary(i => i.Id, i => i);
+        _LinkKeys = _editLinks.Select(l => new LinkKey(l.From.Id, l.To.Id)).ToHashSet();
+
+    }
+    void OnDateRangeChanged(DateRange range)
     {
         bool changed = false;
         if (Start != range.Start)
@@ -65,7 +114,7 @@
         }
         if (changed)
         {
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
         }
     }
     private void OnDragModeChanged(GanttDragMode mode)
@@ -73,39 +122,31 @@
         _dragMode = mode;
         StateHasChanged();
     }
-
-    public double PixelsPerDay => Mode switch
-    {
-        GanttViewMode.Year => 5 * Zoom,
-        GanttViewMode.Month => 30 * Zoom,
-        GanttViewMode.Week => 108 * Zoom,
-        _ => throw new ArgumentOutOfRangeException()
-    };
-    public string LeftWidthPx => $"220px";
-    public double RowHeight { get; set; } = 30;
-    public string RowHeightPx => $"{RowHeight}px";
-    public double HeaderHeight => 60;
-    public string HeaderHeightPx => $"{HeaderHeight}px";
-    public double SvgWidth => Mode switch
-    {
-        GanttViewMode.Year => PixelsPerDay * (End - Start).Days,
-        GanttViewMode.Month => PixelsPerDay * (End - Start).Days,
-        GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
-        _ => throw new ArgumentOutOfRangeException()
-    };
-    public string SvgWidthPx => $"{SvgWidth}px";
-    public int RowCount => GanttItemUtils.ItemsWithExpand(Items).Count();
-    public List<Resource> Resources { get; set; } = new();
-
-    
-
-    public async Task SelectItemAsync(IGanttItem? item)
+    public void SelectItem(IGanttItem? item)
     {
         SelectedItem = item;
-        await SelectedItemChanged.InvokeAsync(item);
         StateHasChanged();
     }
-
+    public void AddLink(GanttItemLink link)
+    {
+        var linkKey = new LinkKey(link.From.Id, link.To.Id);
+        if (!_LinkKeys.Contains(linkKey))
+        {
+            _editLinks.Add(link);
+            _LinkKeys.Add(linkKey);
+            StateHasChanged();
+        }
+    }
+    public void RemoveLink(GanttItemLink link)
+    {
+        var linkKey = new LinkKey(link.From.Id, link.To.Id);
+        if (_LinkKeys.Contains(linkKey))
+        {
+            _editLinks.Remove(link);
+            _LinkKeys.Remove(linkKey);
+            StateHasChanged();
+        }
+    }
     public void TriggerStateHasChanged()
     {
         StateHasChanged();

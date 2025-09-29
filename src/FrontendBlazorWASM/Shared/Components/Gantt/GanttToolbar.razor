@@ -54,12 +54,7 @@
         };
         return $"{baseString} {modeString}";
     }
-    // protected override Task OnInitializedAsync()
-    // {
-    //     dateRange.Start = Start;
-    //     dateRange.End = End;
-    //     return base.OnInitializedAsync();
-    // }
+
     async Task OnDateRangeChanged(DateRange range)
     {
         if(Start != range.Start)

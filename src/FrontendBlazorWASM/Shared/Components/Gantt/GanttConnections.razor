@@ -41,7 +41,7 @@
     }
     void SetLinksToRender()
     {
-        linksToRender = View.Links;
+        linksToRender = View.Links.ToList();
         // linksToRender = View.Links.Where(l => View.Items!.Any(i => i.Id == l.From.Id) && View.Items!.Any(i => i.Id == l.To.Id)).ToList();
     }
     void GetIndexOfItem(IGanttItem item, out int index)

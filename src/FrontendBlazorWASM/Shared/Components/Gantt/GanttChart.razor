@@ -75,7 +75,7 @@
             // Skapa länk: ActiveItem (From) -> targetItem (To) om den inte redan finns
             if (!View.Links.Any(l => l.From == ActiveItem && l.To == targetItem))
             {
-                View.Links.Add(new Planity.FrontendBlazorWASM.Shared.Models.GanttItemLink {
+                View.AddLink(new GanttItemLink {
                     From = ActiveItem,
                     To = targetItem
                 });
@@ -86,7 +86,8 @@
             // Skapa länk: targetItem (From) -> ActiveItem (To) om den inte redan finns
             if (!View.Links.Any(l => l.From == targetItem && l.To == ActiveItem))
             {
-                View.Links.Add(new Planity.FrontendBlazorWASM.Shared.Models.GanttItemLink {
+                View.AddLink(new GanttItemLink
+                {
                     From = targetItem,
                     To = ActiveItem
                 });
