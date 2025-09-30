@@ -1,0 +1,20 @@
+﻿<MudMenu>
+    <ActivatorContent>
+        <ActiveText Href="@FeatureRoute" Match="NavLinkMatch.Prefix">@MenuTitle</ActiveText>
+    </ActivatorContent>
+    <ChildContent>
+        @foreach (var link in MenuLinks)
+        {
+            <ActiveText Href="@link.Route" Match="link.Match">
+                @link.Title
+            </ActiveText>
+        }
+    </ChildContent>
+</MudMenu>
+
+@code {
+    public record MenuLink(string Title, string Route, NavLinkMatch Match);
+    [Parameter] public string? MenuTitle { get; set; } 
+    [Parameter] public string? FeatureRoute { get; set; }
+    [Parameter] public List<MenuLink> MenuLinks { get; set; } = [];
+}
