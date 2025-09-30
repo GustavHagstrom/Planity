@@ -3,6 +3,12 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using System.Globalization;
+using Planity.FrontendBlazorWASM.Features.Dashboard;
+using Planity.FrontendBlazorWASM.Features.Milestones;
+using Planity.FrontendBlazorWASM.Features.Project;
+using Planity.FrontendBlazorWASM.Features.Resources;
+using Planity.FrontendBlazorWASM.Features.Settings;
+using Planity.FrontendBlazorWASM.Features.Tasks;
 
 // Set default culture (e.g., Swedish)
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("sv-SE");
@@ -28,7 +34,16 @@ builder.Services.AddAuthorizationCore(options =>
     //options.AddPolicy("User", policy => policy.RequireRole("User"));
 });
 builder.Services.AddMudServices();
-builder.Services.AddFeatureServices();
+builder.Services.AddSharedServices();
+builder.ConfigureFeatures(config =>
+{
+    config.AddFeature<DashboardFeature>();
+    config.AddFeature<MilestoneFeature>();
+    config.AddFeature<ProjectFeature>();
+    config.AddFeature<ResourceFeature>();
+    config.AddFeature<TaskFeature>();
+    config.AddFeature<SettingsFeature>();
+});
 
 var host = builder.Build();
 
