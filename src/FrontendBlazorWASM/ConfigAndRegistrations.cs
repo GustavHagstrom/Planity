@@ -2,26 +2,26 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Planity.FrontendBlazorWASM.Shared.Abstractions;
-using Planity.FrontendBlazorWASM.Shared.Constants;
 using Planity.FrontendBlazorWASM.Shared.Services;
 namespace Planity.FrontendBlazorWASM;
 
 public class FeatureBuilder(WebAssemblyHostBuilder builder)
 {
-    private ComponentRegistrationBuilder _componentRegistrationBuilder = new(builder);
+    public ComponentTypeCollection ComponentTypeCollection { get; set; } = new();
     public void AddFeature<T>() where T : IFeature, new()
     {
         var feature = new T();
         feature.RegisterServices(builder.Services);
+        feature.RegisterInjecableComponents(ComponentTypeCollection);
         // Configuration logic for the feature can be added here
     }
+    
 }
-public class ComponentRegistrationBuilder(WebAssemblyHostBuilder builder)
+public class ComponentTypeCollection
 {
-    public void AddAppbarNavigation<T>() where T : ComponentBase
-    {
-        builder.Services.AddKeyedTransient(typeof(T), ComponentKeyConstants.AppbarNavKey);
-    }
+    private HashSet<Type> _appBarNavigationComponents = new();
+    public void AddAppBarNavigationComponent<T>() where T : ComponentBase => _appBarNavigationComponents.Add(typeof(T));
+    public IEnumerable<Type> GetAppBarNavigationComponents() => _appBarNavigationComponents;
 }
 
 public static class ConfigAndRegistrations
@@ -41,5 +41,7 @@ public static class ConfigAndRegistrations
     {
         var featureBuilder = new FeatureBuilder(builder);
         config(featureBuilder);
+        builder.Services.AddSingleton(featureBuilder.ComponentTypeCollection);
+
     }
 }

@@ -5,5 +5,5 @@ namespace Planity.FrontendBlazorWASM.Shared.Abstractions;
 public interface IFeature
 {
     void RegisterServices(IServiceCollection services);
-    void RegisterAppbarNavComponents(ComponentRegistrationBuilder componentRegistrator);
+    void RegisterInjecableComponents(ComponentTypeCollection typeCollection);
 }

@@ -6,14 +6,16 @@ namespace Planity.FrontendBlazorWASM.Shared.Services
 {
     public class RenderFragmentService
     {
-        public RenderFragment Create<TComponent>(Dictionary<string, object>? parameters = null)
+        public RenderFragment Render<TComponent>(Dictionary<string, object>? parameters = null)
             where TComponent : ComponentBase
         {
-            return Create<TComponent>(typeof(TComponent), parameters);
+            return Render(typeof(TComponent), parameters);
         }
-        public RenderFragment Create<TComponent>(Type type, Dictionary<string, object>? parameters = null)
-            where TComponent : ComponentBase
+        public RenderFragment Render(Type type, Dictionary<string, object>? parameters = null)
         {
+            if (!typeof(ComponentBase).IsAssignableFrom(type))
+                throw new ArgumentException($"Type '{type.FullName}' must inherit from ComponentBase.", nameof(type));
+
             return builder =>
             {
                 var seq = 0;

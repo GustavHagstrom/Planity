@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject ComponentTypeCollection ComponentTypeCollection
+@inject RenderFragmentService RenderFragmentService
 
 <AuthorizeView>
 
@@ -24,18 +26,22 @@
                     <MudDivider Vertical="true" />
                 </div>
                 
+                @foreach (var componentType in ComponentTypeCollection.GetAppBarNavigationComponents())
+                {
+                    @RenderFragmentService.Render(componentType);
+                }
                 <MudMenu>
                     <ActivatorContent>
-                        <ActiveText Href="/projects" Match="NavLinkMatch.Prefix">Hejk</ActiveText>
+                        <NavigationText Href="/projects" Match="NavLinkMatch.Prefix">Hejk</NavigationText>
                     </ActivatorContent>
                     <ChildContent>
                         @foreach (var route in Routes.AllRoutes)
                         {
                             if (!route.Contains("SampleId"))
                             {
-                                <ActiveText Href="@route" Match="GetMatch(route)">
+                                <NavigationText Href="@route" Match="GetMatch(route)">
                                     @GetRouteName(route)
-                                </ActiveText>
+                                </NavigationText>
                                 @* <MudMenuItem Href="@route" Icon="@GetIcon(route)" Match="GetMatch(route)">@GetRouteName(route)</MudMenuItem> *@
                             }
                         }

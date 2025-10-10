@@ -1,0 +1,13 @@
+﻿@inject IStringLocalizer<AppbarNavigation> Localizer
+
+<FeatureNavigationMenu FeatureRoute="@Routes.ProjectsOverview" MenuTitle="@Localizer["Projekt"]" Match="NavLinkMatch.Prefix" MenuLinks="menuLinks"/>
+
+
+@code {
+    List<FeatureNavigationMenu.MenuLink> menuLinks = new()
+    {
+        new FeatureNavigationMenu.MenuLink("Nytt", Routes.ProjectsNew, NavLinkMatch.All),
+        new FeatureNavigationMenu.MenuLink("a2", "/a2", NavLinkMatch.All),
+        new FeatureNavigationMenu.MenuLink("2", "/2", NavLinkMatch.All),
+    };
+}

@@ -4,7 +4,7 @@ namespace Planity.FrontendBlazorWASM.Features.Tasks;
 
 public class TaskFeature : IFeature
 {
-    public void RegisterAppbarNavComponents(ComponentRegistrationBuilder componentRegistrator)
+    public void RegisterInjecableComponents(ComponentTypeCollection typeCollection)
     {
         
     }

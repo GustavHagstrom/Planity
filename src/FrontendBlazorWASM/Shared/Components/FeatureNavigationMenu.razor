@@ -1,13 +1,15 @@
 ﻿<MudMenu>
     <ActivatorContent>
-        <ActiveText Href="@FeatureRoute" Match="NavLinkMatch.Prefix">@MenuTitle</ActiveText>
+        <NavigationText Href="@FeatureRoute" Match="@Match">@MenuTitle</NavigationText>
     </ActivatorContent>
     <ChildContent>
         @foreach (var link in MenuLinks)
         {
-            <ActiveText Href="@link.Route" Match="link.Match">
-                @link.Title
-            </ActiveText>
+            <MudMenuItem Href="@link.Route">
+                <NavigationText Href="@link.Route" Match="link.Match">
+                    @link.Title
+                </NavigationText>
+            </MudMenuItem>
         }
     </ChildContent>
 </MudMenu>
@@ -17,4 +19,5 @@
     [Parameter] public string? MenuTitle { get; set; } 
     [Parameter] public string? FeatureRoute { get; set; }
     [Parameter] public List<MenuLink> MenuLinks { get; set; } = [];
+    [Parameter] public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
 }

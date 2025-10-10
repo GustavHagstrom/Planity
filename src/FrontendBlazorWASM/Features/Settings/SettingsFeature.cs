@@ -4,7 +4,7 @@ namespace Planity.FrontendBlazorWASM.Features.Settings;
 
 public class SettingsFeature : IFeature
 {
-    public void RegisterAppbarNavComponents(ComponentRegistrationBuilder componentRegistrator)
+    public void RegisterInjecableComponents(ComponentTypeCollection typeCollection)
     {
 
     }
