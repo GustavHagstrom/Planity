@@ -1,23 +1,82 @@
-﻿<MudMenu>
+﻿@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<MudMenu Dense="true" style="height: 100%;">
     <ActivatorContent>
-        <NavigationText Href="@FeatureRoute" Match="@Match">@MenuTitle</NavigationText>
+        <MudText Style="@MenuStyle(FeatureRoute, Match)" Class="mud-button">
+            @MenuTitle
+        </MudText>
     </ActivatorContent>
     <ChildContent>
         @foreach (var link in MenuLinks)
         {
-            <MudMenuItem Href="@link.Route">
-                <NavigationText Href="@link.Route" Match="link.Match">
-                    @link.Title
-                </NavigationText>
-            </MudMenuItem>
+            <MudMenuItem Href="@link.Route" Label="@link.Title" Style="@MenuItemStyle(link.Route, link.Match)" />
         }
     </ChildContent>
+    
 </MudMenu>
 
 @code {
-    public record MenuLink(string Title, string Route, NavLinkMatch Match);
-    [Parameter] public string? MenuTitle { get; set; } 
-    [Parameter] public string? FeatureRoute { get; set; }
+
+    public record MenuLink(string Title, string Route, string? Icon, NavLinkMatch Match);
+
+    [Parameter] public string MenuTitle { get; set; } = string.Empty;
+    [Parameter] public string FeatureRoute { get; set; } = string.Empty;
     [Parameter] public List<MenuLink> MenuLinks { get; set; } = [];
     [Parameter] public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += (s, e) => StateHasChanged();
+    }
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= (s, e) => StateHasChanged();        
+    }
+
+    string MenuStyle(string href, NavLinkMatch match)
+    {
+        string baseStyle = "align-content: center; padding-left: 16px; padding-right: 16px; font-weight: bold;";
+        return $"{baseStyle} {GetActiveStyle(href, match)}";
+    }
+    string MenuItemStyle(string href, NavLinkMatch match)
+    {
+        string baseStyle = "font-weight: bold;";
+        return $"{baseStyle} {GetActiveStyle(href, match)}";
+    }
+
+    string GetActiveStyle(string href, NavLinkMatch match)
+    {
+        if(IsActive(href, match))
+        {
+            return "color: var(--mud-palette-primary); background: var(--mud-palette-action-default-hover);";
+        }
+        return string.Empty;
+    }
+
+    bool IsActive(string href, NavLinkMatch match)
+    {
+        var currentUri = NavigationManager.Uri;
+        var baseUri = NavigationManager.BaseUri.TrimEnd('/');
+        var targetUri = NavigationManager.ToAbsoluteUri(href).ToString();
+
+        if (match == NavLinkMatch.All)
+        {
+            return currentUri == targetUri || currentUri == $"{baseUri}{href.TrimStart('/')}";
+        }
+        else if (match == NavLinkMatch.Prefix)
+        {
+            return currentUri.StartsWith(targetUri) || currentUri.StartsWith($"{baseUri}{href.TrimStart('/')}");
+        }
+        return false;
+    }
+//     .active {
+//     color: var(--mud-palette-primary);
+//     font-weight: bold;
+//     background: var(--mud-palette-action-default-hover);
+    
+// }
+     
 }
