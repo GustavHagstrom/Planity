@@ -1,20 +1,34 @@
 ﻿@implements IDisposable
 @inject NavigationManager NavigationManager
 
-<MudMenu Dense="true" style="height: 100%;">
-    <ActivatorContent>
-        <MudText Style="@MenuStyle(FeatureRoute, Match)" Class="mud-button">
+
+@if(MenuLinks.Count != 0)
+{
+    <MudMenu Dense="true">
+        <ActivatorContent>
+            <MudText Style="@MenuStyle(FeatureRoute, Match)" Class="mud-button" Typo="Typo.body2">
+                @MenuTitle
+            </MudText>
+        </ActivatorContent>
+        <ChildContent>
+            @foreach (var link in MenuLinks)
+            {
+                <MudMenuItem Href="@link.Route" Label="@link.Title" Style="@MenuItemStyle(link.Route, link.Match)" />
+            }
+        </ChildContent>
+
+    </MudMenu>
+}
+else
+{
+    <a href="@FeatureRoute">
+        <MudText Typo="Typo.body2" Style="@($"{MenuStyle(FeatureRoute, Match)}")" Class="mud-button">
             @MenuTitle
         </MudText>
-    </ActivatorContent>
-    <ChildContent>
-        @foreach (var link in MenuLinks)
-        {
-            <MudMenuItem Href="@link.Route" Label="@link.Title" Style="@MenuItemStyle(link.Route, link.Match)" />
-        }
-    </ChildContent>
+    </a>
     
-</MudMenu>
+}
+
 
 @code {
 
@@ -38,12 +52,12 @@
 
     string MenuStyle(string href, NavLinkMatch match)
     {
-        string baseStyle = "align-content: center; padding-left: 16px; padding-right: 16px; font-weight: bold;";
+        string baseStyle = "align-content: center; padding-left: 12px; padding-right: 12px;";
         return $"{baseStyle} {GetActiveStyle(href, match)}";
     }
     string MenuItemStyle(string href, NavLinkMatch match)
     {
-        string baseStyle = "font-weight: bold;";
+        string baseStyle = "";
         return $"{baseStyle} {GetActiveStyle(href, match)}";
     }
 
@@ -71,12 +85,5 @@
             return currentUri.StartsWith(targetUri) || currentUri.StartsWith($"{baseUri}{href.TrimStart('/')}");
         }
         return false;
-    }
-//     .active {
-//     color: var(--mud-palette-primary);
-//     font-weight: bold;
-//     background: var(--mud-palette-action-default-hover);
-    
-// }
-     
+    }     
 }

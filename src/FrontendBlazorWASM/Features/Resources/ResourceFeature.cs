@@ -4,9 +4,9 @@ namespace Planity.FrontendBlazorWASM.Features.Resources;
 
 public class ResourceFeature : IFeature
 {
-    public void RegisterInjecableComponents(ComponentTypeCollection typeCollection)
+    public void RegisterInjecableComponents(ComponentTypeCollection collection)
     {
-
+        collection.AddAppBarNavigationComponent<AppbarNavigation>();
     }
 
     public void RegisterServices(IServiceCollection services)

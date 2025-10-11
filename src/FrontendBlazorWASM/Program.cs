@@ -38,10 +38,10 @@ builder.Services.AddSharedServices();
 builder.ConfigureFeatures(config =>
 {
     config.AddFeature<DashboardFeature>();
-    config.AddFeature<MilestoneFeature>();
     config.AddFeature<ProjectFeature>();
     config.AddFeature<ResourceFeature>();
     config.AddFeature<TaskFeature>();
+    config.AddFeature<MilestoneFeature>();    
     config.AddFeature<SettingsFeature>();
 });
 

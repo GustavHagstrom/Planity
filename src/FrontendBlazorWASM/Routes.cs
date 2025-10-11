@@ -12,7 +12,7 @@ public static class Routes
     public const string Unauthorized = "/unauthorized";
 
     // Resource routes
-    public const string Resources = "/resources";
+    public const string ResourcesOverview = "/resources";
     public static string ResourceDetails(string id) => $"/resources/{id}";
     public const string ResourceNew = "/resources/new";
 
@@ -34,7 +34,7 @@ public static class Routes
         ProjectsNew,
         ProjectDetails("SampleId"),
         Unauthorized,
-        Resources,
+        ResourcesOverview,
         ResourceDetails("SampleId"),
         ResourceNew,
         TasksOverview,

@@ -19,33 +19,23 @@
             </style>
 
 
-            <MudToolBar Dense="true" Gutters="false" Class="px-1 mud-elevation-4 app-bar" Style="">
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" OnClick="ToggleDrawer" />
+            <MudToolBar Dense="true" Gutters="false" Class="px-4 mud-elevation-4 app-bar" Style="">
                 <a href="@Routes.Dashboard"><MudText Typo="Typo.h4" Style="color: var(--mud-palette-primary)"><b>Planity</b></MudText></a>
                 <div class="py-2 px-3" style="height: 100%;">
                     <MudDivider Vertical="true" />
                 </div>
                 
-                @foreach (var componentType in ComponentTypeCollection.GetAppBarNavigationComponents())
-                {
-                    @RenderFragmentService.Render(componentType);
-                }
+                <div class="d-flex gap-1">
+                    @foreach (var componentType in ComponentTypeCollection.GetAppBarNavigationComponents())
+                    {
+                        @RenderFragmentService.Render(componentType)
+                    }
+                </div>
+                
 
                 <MudSpacer />
                 <LoginDisplay />
             </MudToolBar>
-
-            <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Temporary" Elevation="1" Anchor="Anchor.Left"  >
-                <MudNavMenu Style="flex-direction: row;">
-                    @foreach (var route in Routes.AllRoutes)
-                    {
-                        if (!route.Contains("SampleId"))
-                        {
-                            <MudNavLink Href="@route" Icon="@GetIcon(route)" Match="GetMatch(route)">@GetRouteName(route)</MudNavLink>
-                        }
-                    }
-                </MudNavMenu>
-            </MudDrawer>
 
             <div style="padding-top: 48px;">
                 @Body
@@ -61,62 +51,3 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@code {
-    private string GetRouteName(string route)
-    {
-        return route switch
-        {
-            "/" => "Dashboard",
-            "/projects" => "Projektöversikt",
-            "projects/new" => "Nytt projekt",
-            "/settings" => "Inställningar",
-            "/unauthorized" => "Ej behörig",
-            "/resources" => "Resursöversikt",
-            "/resources/new" => "Ny resurs",
-            _ when route.StartsWith("/resources/") => "Resursdetaljer",
-            "/tasks" => "Uppgiftsöversikt",
-            "/tasks/new" => "Ny uppgift",
-            _ when route.StartsWith("/tasks/") => "Uppgiftsdetaljer",
-            "/milestones" => "Milestoneöversikt",
-            "/milestones/new" => "Ny milestone",
-            _ when route.StartsWith("/milestones/") => "Milestonedetaljer",
-            _ when route.StartsWith("/projects/") => "Projektdetaljer",
-            _ => route
-        };
-    }
-    private string GetIcon(string route)
-    {
-        return route switch
-        {
-            "/" => Icons.Material.Filled.Dashboard,
-            "/projects" => Icons.Material.Filled.List,
-            "projects/new" => Icons.Material.Filled.AddBox,
-            "/settings" => Icons.Material.Filled.Settings,
-            "/unauthorized" => Icons.Material.Filled.Block,
-            "/resources" => Icons.Material.Filled.People,
-            "/resources/new" => Icons.Material.Filled.PersonAdd,
-            _ when route.StartsWith("/resources/") => Icons.Material.Filled.Person,
-            "/tasks" => Icons.Material.Filled.Checklist,
-            "/tasks/new" => Icons.Material.Filled.AddTask,
-            _ when route.StartsWith("/tasks/") => Icons.Material.Filled.Task,
-            "/milestones" => Icons.Material.Filled.Flag,
-            "/milestones/new" => Icons.Material.Filled.Add,
-            _ when route.StartsWith("/milestones/") => Icons.Material.Filled.FlagCircle,
-            _ when route.StartsWith("/projects/") => Icons.Material.Filled.Info,
-            _ => Icons.Material.Filled.Link
-        };
-    }
-    private NavLinkMatch GetMatch(string route)
-    {
-        return route == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix;
-    }
-}
-
-@code{
-        bool _drawerOpen = false;
-    void ToggleDrawer()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-
-}

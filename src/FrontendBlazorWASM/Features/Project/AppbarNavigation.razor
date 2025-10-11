@@ -4,10 +4,14 @@
 
 
 @code {
-    List<FeatureNavigationMenu.MenuLink> menuLinks = new()
+    List<FeatureNavigationMenu.MenuLink> menuLinks = new();
+
+    protected override void OnInitialized()
     {
-        new FeatureNavigationMenu.MenuLink("Nytt", Routes.ProjectsNew, Icons.Material.Sharp.Add, NavLinkMatch.All),
-        new FeatureNavigationMenu.MenuLink("a2", "/a2", null, NavLinkMatch.All),
-        new FeatureNavigationMenu.MenuLink("2", "/2", null, NavLinkMatch.All),
-    };
+        menuLinks = new()
+        {
+            new FeatureNavigationMenu.MenuLink(Localizer["Översikt"], Routes.ProjectsOverview, null, NavLinkMatch.All),
+            new FeatureNavigationMenu.MenuLink(Localizer["Nytt"], Routes.ProjectsNew, Icons.Material.Sharp.Add, NavLinkMatch.All),
+        };
+    }
 }

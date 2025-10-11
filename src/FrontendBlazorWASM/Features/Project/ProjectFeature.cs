@@ -4,9 +4,9 @@ namespace Planity.FrontendBlazorWASM.Features.Project;
 
 public class ProjectFeature : IFeature
 {
-    public void RegisterInjecableComponents(ComponentTypeCollection typeCollection)
+    public void RegisterInjecableComponents(ComponentTypeCollection collection)
     {
-        typeCollection.AddAppBarNavigationComponent<AppbarNavigation>();
+        collection.AddAppBarNavigationComponent<AppbarNavigation>();
     }
     public void RegisterServices(IServiceCollection services)
     {
