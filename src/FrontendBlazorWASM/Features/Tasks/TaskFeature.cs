@@ -1,12 +1,15 @@
-﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
+﻿using Microsoft.Extensions.Localization;
+using Planity.FrontendBlazorWASM.Features.Resources;
+using Planity.FrontendBlazorWASM.Shared.Abstractions;
 
 namespace Planity.FrontendBlazorWASM.Features.Tasks;
 
-public class TaskFeature : IFeature
+public class TaskFeature(IStringLocalizer<TaskFeature> Localizer) : IFeature
 {
-    public void RegisterInjecableComponents(ComponentTypeCollection collection)
+    public void RegisterRenderObjects(RenderCollection collection)
     {
         collection.AddAppBarNavigationComponent<AppbarNavigation>();
+        collection.AddCreateNewLink(new MenuLink(Localizer["Uppgift"], Routes.TaskNew));
     }
 
     public void RegisterServices(IServiceCollection services)

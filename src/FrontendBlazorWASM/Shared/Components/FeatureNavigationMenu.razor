@@ -32,10 +32,10 @@ else
 
 @code {
 
-    public record MenuLink(string Title, string Route, string? Icon, NavLinkMatch Match);
+    
 
     [Parameter] public string MenuTitle { get; set; } = string.Empty;
-    [Parameter] public string FeatureRoute { get; set; } = string.Empty;
+    [Parameter] public string? FeatureRoute { get; set; }
     [Parameter] public List<MenuLink> MenuLinks { get; set; } = [];
     [Parameter] public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
 
@@ -50,18 +50,18 @@ else
         NavigationManager.LocationChanged -= (s, e) => StateHasChanged();        
     }
 
-    string MenuStyle(string href, NavLinkMatch match)
+    string MenuStyle(string? href, NavLinkMatch? match)
     {
         string baseStyle = "align-content: center; padding-left: 12px; padding-right: 12px;";
         return $"{baseStyle} {GetActiveStyle(href, match)}";
     }
-    string MenuItemStyle(string href, NavLinkMatch match)
+    string MenuItemStyle(string? href, NavLinkMatch? match)
     {
         string baseStyle = "";
         return $"{baseStyle} {GetActiveStyle(href, match)}";
     }
 
-    string GetActiveStyle(string href, NavLinkMatch match)
+    string GetActiveStyle(string? href, NavLinkMatch? match)
     {
         if(IsActive(href, match))
         {
@@ -70,17 +70,17 @@ else
         return string.Empty;
     }
 
-    bool IsActive(string href, NavLinkMatch match)
+    bool IsActive(string? href, NavLinkMatch? match)
     {
         var currentUri = NavigationManager.Uri;
         var baseUri = NavigationManager.BaseUri.TrimEnd('/');
         var targetUri = NavigationManager.ToAbsoluteUri(href).ToString();
 
-        if (match == NavLinkMatch.All)
+        if (match == NavLinkMatch.All && href is not null)
         {
             return currentUri == targetUri || currentUri == $"{baseUri}{href.TrimStart('/')}";
         }
-        else if (match == NavLinkMatch.Prefix)
+        else if (match == NavLinkMatch.Prefix && href is not null)
         {
             return currentUri.StartsWith(targetUri) || currentUri.StartsWith($"{baseUri}{href.TrimStart('/')}");
         }

@@ -6,11 +6,11 @@
 
 
 <OverviewPageLayout Title="@localizer["Resursöversikt"]">
-    <Actions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ResourceNew))" StartIcon="@Icons.Material.Filled.Add">
+    <LeftActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ResourceNew))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
             @localizer["Ny resurs"]
         </MudButton>
-    </Actions>
+    </LeftActions>
     <Filters>
 
     </Filters>

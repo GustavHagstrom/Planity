@@ -1,17 +1,17 @@
 ﻿@inject IStringLocalizer<AppbarNavigation> Localizer
 
-<FeatureNavigationMenu FeatureRoute="@Routes.ResourcesOverview" MenuTitle="@Localizer["Resurser"]" Match="NavLinkMatch.Prefix" MenuLinks="menuLinks" />
+<FeatureNavigationMenu FeatureRoute="@Routes.ResourcesOverview" MenuTitle="@Localizer["Resurser"]" Match="NavLinkMatch.Prefix"/>
 
 
 @code {
-    List<FeatureNavigationMenu.MenuLink> menuLinks = new();
+    List<MenuLink> menuLinks = new();
 
     protected override void OnInitialized()
     {
         menuLinks = new()
         {
-            new FeatureNavigationMenu.MenuLink(Localizer["Översikt"], Routes.ResourcesOverview, null, NavLinkMatch.All),
-            new FeatureNavigationMenu.MenuLink(Localizer["Nytt"], Routes.ResourceNew, Icons.Material.Sharp.Add, NavLinkMatch.All),
+            new MenuLink(Localizer["Översikt"], Routes.ResourcesOverview, null, NavLinkMatch.All),
+
         };
     }
 }

@@ -1,12 +1,14 @@
-﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
+﻿using Microsoft.Extensions.Localization;
+using Planity.FrontendBlazorWASM.Shared.Abstractions;
 
 namespace Planity.FrontendBlazorWASM.Features.Resources;
 
-public class ResourceFeature : IFeature
+public class ResourceFeature(IStringLocalizer<ResourceFeature> Localizer) : IFeature
 {
-    public void RegisterInjecableComponents(ComponentTypeCollection collection)
+    public void RegisterRenderObjects(RenderCollection collection)
     {
         collection.AddAppBarNavigationComponent<AppbarNavigation>();
+        collection.AddCreateNewLink(new MenuLink(Localizer["Resurs"], Routes.ResourceNew));
     }
 
     public void RegisterServices(IServiceCollection services)

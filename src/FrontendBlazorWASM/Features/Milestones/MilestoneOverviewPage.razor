@@ -5,11 +5,11 @@
 
 
 <OverviewPageLayout Title="@localizer["Milstensöversikt"]">
-    <Actions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestoneNew))" StartIcon="@Icons.Material.Filled.Add">
+    <LeftActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestoneNew))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
             @localizer["Ny milestone"]
         </MudButton>
-    </Actions>
+    </LeftActions>
     <Filters>
 
     </Filters>

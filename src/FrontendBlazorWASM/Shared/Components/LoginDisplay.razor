@@ -6,10 +6,10 @@
         <div class="pr-3">
             Hello, @context.User.Identity?.Name!
         </div>
-        <MudButton Variant="Variant.Filled" @onclick="LogOutAsync" Color="Color.Secondary" >Log out</MudButton>
+        <MudButton Variant="Variant.Filled" @onclick="LogOutAsync" Color="Color.Secondary" Size="Size.Small">Log out</MudButton>
     </Authorized>
     <NotAuthorized>
-        <MudButton Variant="Variant.Filled" @onclick="LoginAsync" Style="color: var(--mud-palette-primary-text)">Log in</MudButton>
+        <MudButton Variant="Variant.Filled" @onclick="LoginAsync" Style="color: var(--mud-palette-primary-text)" Size="Size.Small">Log in</MudButton>
     </NotAuthorized>
 </AuthorizeView>
 

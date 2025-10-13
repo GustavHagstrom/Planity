@@ -6,11 +6,11 @@
 @inject IDateCalculator GanttDateCalculator
 
 <OverviewPageLayout Title="@localizer["Uppgiftsöversikt"]">
-    <Actions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TaskNew))" StartIcon="@Icons.Material.Filled.Add">
+    <LeftActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TaskNew))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
             @localizer["Ny uppgift"]
         </MudButton>
-    </Actions>
+    </LeftActions>
     <Filters>
 
     </Filters>

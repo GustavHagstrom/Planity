@@ -6,12 +6,15 @@
 @inject IProjectService ProjectService
 
 <OverviewPageLayout Title="@localizer["Projektöversikt"]">
-    <Actions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))">
-            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" Size="Size.Small"/>
-            <span>@localizer["Skapa nytt projekt"]</span>
+    <LeftActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add">
+            <span>@localizer["Nytt projekt"]</span>
+            <MudText>test</MudText>
         </MudButton>
-    </Actions>
+    </LeftActions>
+    <MiddleActions>
+
+    </MiddleActions>
     <Filters>
 
     </Filters>

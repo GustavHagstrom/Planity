@@ -1,0 +1,17 @@
+﻿.left {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.center {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.right {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}

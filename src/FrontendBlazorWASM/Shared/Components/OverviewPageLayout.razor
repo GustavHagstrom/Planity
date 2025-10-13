@@ -1,6 +1,20 @@
+<MudToolBar Dense="true" Gutters="false" Style="justify-content: space-between" Class="px-4 mud-elevation-1">
+    <div class="left">
+        @* <MudText Typo="Typo.h6" Align="Align.Center"><b>@Title</b></MudText> *@
+        @* <MudDivider Vertical="true" /> *@
+        @LeftActions
+    </div>
+    <div class="center">
+        @MiddleActions
+    </div>
+    <div class="right">
+        @RightActions
+    </div>
+</MudToolBar>
 <div class="pa-4">
     <MudStack Spacing="2">
-        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+
+        @* <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
             <MudText Typo="Typo.h4">@Title</MudText>
             @if (Actions != null)
             {
@@ -8,7 +22,7 @@
                     @Actions
                 </MudStack>
             }
-        </MudStack>
+        </MudStack> *@
         @if (Filters != null)
         {
             <MudPaper Class="pa-2" Elevation="0">
@@ -24,7 +38,9 @@
 
 @code {
     [Parameter] public string Title { get; set; } = string.Empty;
-    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public RenderFragment? LeftActions { get; set; }
+    [Parameter] public RenderFragment? MiddleActions { get; set; }
+    [Parameter] public RenderFragment? RightActions { get; set; }
     [Parameter] public RenderFragment? Filters { get; set; }
     [Parameter] public RenderFragment? MainContent { get; set; }
 }
