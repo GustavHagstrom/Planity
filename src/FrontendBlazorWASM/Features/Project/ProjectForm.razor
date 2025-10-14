@@ -1,5 +1,6 @@
-<MudTextField T="string" @bind-Value="project.Name" Label="Namn" For="() => project.Name" Required="true" />
-<MudTextField T="string" @bind-Value="project.Description" Label="Beskrivning" For="() => project.Description" />
+@inject IStringLocalizer<ProjectForm> Localizer
+<MudTextField T="string" @bind-Value="project.Name" Label="@Localizer["Projektnamn"]" For="() => project.Name" Required="true" />
+<MudTextField T="string" @bind-Value="project.Description" Label="@Localizer["Beskrivning"]" For="() => project.Description" />
 
 @code {
     [Parameter] public Project? ProjectModel { get; set; }

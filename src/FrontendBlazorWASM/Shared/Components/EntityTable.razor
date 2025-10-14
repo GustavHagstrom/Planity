@@ -21,9 +21,10 @@
         @if(EditLinkFunction is not null)
         {
             <MudTd>
-                <a href="@EditLinkFunction(context)">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary"/>
-                </a>
+
+                @* <a href="@EditLinkFunction(context)"> *@
+                    <MudIconButton Href="@EditLinkFunction(context)" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" />
+                @* </a> *@
             </MudTd>
         }
     </RowTemplate>

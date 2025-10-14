@@ -7,26 +7,29 @@
 <OverviewPageLayout Title="@localizer["Milstensöversikt"]">
     <LeftActions>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestoneNew))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
-            @localizer["Ny milestone"]
+            @localizer["Ny milsten"]
         </MudButton>
     </LeftActions>
-    <Filters>
 
-    </Filters>
-    <MainContent>
-        <EntityTable Items="@Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
+    <ChildContent>
+        <EntityTable Items="@Milestones">
             <HeaderContent>
-                <MudTh>Namn</MudTh>
-                <MudTh>Datum</MudTh>
-                <MudTh>Projekt</MudTh>
+                <MudTh>@localizer["Namn"]</MudTh>
+                <MudTh>@localizer["Datum"]</MudTh>
+                <MudTh>@localizer["Projekt"]</MudTh>
+                <MudTh>@localizer["Handlingar"]</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
                 <MudTd>@context.Start.ToString()</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
+                <MudTd>
+                    <MudIconButton Href="@Routes.MilestoneDetails(context.Id)" Size="Size.Small" Icon="@Icons.Material.Sharp.Edit" Color="Color.Primary"/>
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Sharp.Delete" Color="Color.Error" />
+                </MudTd>
             </RowTemplate>
         </EntityTable>
-    </MainContent>
+    </ChildContent>
 </OverviewPageLayout>
 
 

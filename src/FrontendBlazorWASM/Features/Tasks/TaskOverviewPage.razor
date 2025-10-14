@@ -11,10 +11,8 @@
             @localizer["Ny uppgift"]
         </MudButton>
     </LeftActions>
-    <Filters>
 
-    </Filters>
-    <MainContent>
+    <ChildContent>
         <EntityTable Items="@Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
             <HeaderContent>
                 <MudTh>Namn</MudTh>
@@ -29,7 +27,7 @@
                 <MudTd>@GetProjectName(context)</MudTd>
             </RowTemplate>
         </EntityTable>
-    </MainContent>
+    </ChildContent>
 </OverviewPageLayout>
 
 

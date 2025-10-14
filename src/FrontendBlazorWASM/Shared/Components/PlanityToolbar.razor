@@ -1,0 +1,26 @@
+﻿<MudToolBar Dense="true" Gutters="false" Style="justify-content: space-between" Class="px-4 mud-elevation-1">
+    <div class="section left">
+        @if (Title is not null)
+        {
+            <MudText Typo="Typo.h6"><b>@Title</b></MudText>
+            @* <MudDivider Vertical="true" Class="mx-2" /> *@
+            <div class="py-2" style="height: 100%;">
+                <MudDivider Vertical="true" />
+            </div>
+        }
+        @LeftActions
+    </div>
+    <div class="section center">
+        @MiddleActions
+    </div>
+    <div class="section right">
+        @RightActions
+    </div>
+</MudToolBar>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public RenderFragment? LeftActions { get; set; }
+    [Parameter] public RenderFragment? MiddleActions { get; set; }
+    [Parameter] public RenderFragment? RightActions { get; set; }
+}

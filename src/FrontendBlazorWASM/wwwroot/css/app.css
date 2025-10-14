@@ -1,3 +1,13 @@
+* {
+    caret-color: transparent;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+    caret-color: auto !important;
+}
+
 .denser-input .mud-input > input.mud-input-root-outlined.mud-input-root-margin-dense {
     padding-top: 6px;
     padding-bottom: 6px;
@@ -109,3 +119,4 @@ code {
     scrollbar-color: #3a6ea5 transparent !important;
     scrollbar-width: thin;
 }*/
+

@@ -11,10 +11,8 @@
             @localizer["Ny resurs"]
         </MudButton>
     </LeftActions>
-    <Filters>
 
-    </Filters>
-    <MainContent>
+    <ChildContent>
         <EntityTable Items="@resources" EditLinkFunction="x => Routes.ResourceDetails(x.Id)">
             <HeaderContent>
                 <MudTh>@localizer["Namn"]</MudTh>
@@ -23,7 +21,7 @@
                 <MudTd>@context.Name</MudTd>
             </RowTemplate>
         </EntityTable>
-    </MainContent>
+    </ChildContent>
 </OverviewPageLayout>
 
 

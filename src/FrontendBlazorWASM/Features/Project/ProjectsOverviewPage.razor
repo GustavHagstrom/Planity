@@ -7,18 +7,15 @@
 
 <OverviewPageLayout Title="@localizer["Projektöversikt"]">
     <LeftActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" >
             <span>@localizer["Nytt projekt"]</span>
-            <MudText>test</MudText>
         </MudButton>
     </LeftActions>
     <MiddleActions>
 
     </MiddleActions>
-    <Filters>
 
-    </Filters>
-    <MainContent>
+    <ChildContent>
         <EntityTable Items="@Projects" EditLinkFunction="x => Routes.ProjectDetails(x.Id)">
             <HeaderContent>
                 <MudTh>Namn</MudTh>
@@ -31,7 +28,7 @@
                 <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
             </RowTemplate>
         </EntityTable>
-    </MainContent>
+    </ChildContent>
 </OverviewPageLayout>
 
 

@@ -1,28 +1,25 @@
 @inject IStringLocalizer<EntityFormsPageLayout> localizer
 
-<div class="pa-4">
-    <MudStack Spacing="2">
-        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-            <MudText Typo="Typo.h4">@Title</MudText>
-            <MudStack Spacing="1">
-                @if (Actions != null)
-                {
-                    @Actions
-                }
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnSaveClicked" Disabled="IsSaving">
-                    @if (IsSaving)
-                    {
-                        <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Sharp.Save" Class="mr-2" Size="Size.Small" />
-                    }
-                    <span>@localizer["Spara"]</span>
-                </MudButton>
-            </MudStack>
-        </MudStack>
-        <MudDivider />
+<OverviewPageLayout Title="@Title"> 
+    <LeftActions>
+        @if (Actions != null)
+        {
+            @Actions
+        }
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnSaveClicked" Disabled="IsSaving" Size="Size.Small">
+            @if (IsSaving)
+            {
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Sharp.Save" Class="mr-2" Size="Size.Small" />
+            }
+            <span>@localizer["Spara"]</span>
+        </MudButton>
+    </LeftActions>
+        
+    <ChildContent>
         <div>
             @if (IsLoading)
             {
@@ -33,8 +30,8 @@
                 @MainContent
             }
         </div>
-    </MudStack>
-</div>
+    </ChildContent>
+</OverviewPageLayout>
 
 @code {
     [Parameter] public string Title { get; set; } = string.Empty;
