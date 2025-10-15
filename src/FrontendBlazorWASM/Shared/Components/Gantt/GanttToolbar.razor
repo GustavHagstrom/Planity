@@ -1,32 +1,22 @@
 @inject IStringLocalizer<GanttToolbar> Localizer
 
-
-<MudToolBar Dense="true" Style="justify-content: space-between">
-    <div class="left">
-        <MudText Typo="Typo.h6" Align="Align.Center"><b>@Title</b></MudText>
-
+<PlanityToolbar Title="@Title">
+    <LeftActions>
         <MudSelect InputClass="denser-input" Value="DragMode" ValueChanged="DragModeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" T="GanttDragMode" MultiSelection="false" Class="denser-input" RelativeWidth="DropdownWidth.Relative" Style="width: 170px;" ToStringFunc="ToStringFunc">
             <MudSelectItem Value="GanttDragMode.None" />
-            <MudSelectItem Value="GanttDragMode.EditDate"/>
-            <MudSelectItem Value="GanttDragMode.Link"/>
+            <MudSelectItem Value="GanttDragMode.EditDate" />
+            <MudSelectItem Value="GanttDragMode.Link" />
         </MudSelect>
-        
+
         <div class="date-picker">
             <MudDateRangePicker DateRange="dateRange" DateRangeChanged="DateRangeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Class="denser-input" RelativeWidth="DropdownWidth.Adaptive" />
         </div>
-        
-        
-    </div>
-    <div class="center">
-
-    </div>
-    <div class="right">
-        <MudSwitch T="bool" @bind-Value="autoSave" Label="@Localizer["Autospar:"]" Color="Color.Primary" LabelPlacement="Placement.Left"/>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="autoSave" Size="Size.Medium"/>
-    </div>
-    
-
-</MudToolBar>
+    </LeftActions>
+    <RightActions>
+        <MudSwitch T="bool" @bind-Value="autoSave" Label="@Localizer["Autospar:"]" Color="Color.Primary" LabelPlacement="Placement.Left" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" Disabled="autoSave" Size="Size.Medium" />
+    </RightActions>  
+</PlanityToolbar>
 
 @code {
     [Parameter] public GanttDragMode DragMode { get; set; }

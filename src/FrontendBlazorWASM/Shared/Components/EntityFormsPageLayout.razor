@@ -2,10 +2,6 @@
 
 <OverviewPageLayout Title="@Title"> 
     <LeftActions>
-        @if (Actions != null)
-        {
-            @Actions
-        }
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnSaveClicked" Disabled="IsSaving" Size="Size.Small">
             @if (IsSaving)
             {
@@ -17,6 +13,10 @@
             }
             <span>@localizer["Spara"]</span>
         </MudButton>
+        @if (Actions != null)
+        {
+            @Actions
+        }
     </LeftActions>
         
     <ChildContent>

@@ -5,7 +5,7 @@
 @inject IDateCalculator GanttDateCalculator
 @inject IProjectService ProjectService
 
-<OverviewPageLayout Title="@localizer["Projektöversikt"]">
+<OverviewPageLayout Title="@localizer["Projektöversikt"]" Class="d-flex">
     <LeftActions>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" >
             <span>@localizer["Nytt projekt"]</span>
@@ -16,18 +16,23 @@
     </MiddleActions>
 
     <ChildContent>
-        <EntityTable Items="@Projects" EditLinkFunction="x => Routes.ProjectDetails(x.Id)">
-            <HeaderContent>
-                <MudTh>Namn</MudTh>
-                <MudTh>Start</MudTh>
-                <MudTh>Slut</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>@context.Name</MudTd>
-                <MudTd>@context.Start?.ToShortDateString()</MudTd>
-                <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
-            </RowTemplate>
-        </EntityTable>
+            <EntityTable Items="@Projects">
+                <HeaderContent>
+                    <MudTh>Namn</MudTh>
+                    <MudTh>Start</MudTh>
+                    <MudTh>Slut</MudTh>
+                    <MudTh>Handlingar</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd>@context.Start?.ToShortDateString()</MudTd>
+                    <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
+                    <MudTd>
+                        <MudIconButton Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Sharp.Edit" Href="@Routes.ProjectDetails(context.Id)"/>
+                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Sharp.Delete" Color="Color.Error" />
+                    </MudTd>
+                </RowTemplate>
+            </EntityTable>
     </ChildContent>
 </OverviewPageLayout>
 

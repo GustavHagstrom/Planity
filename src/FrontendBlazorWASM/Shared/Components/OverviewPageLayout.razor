@@ -1,5 +1,7 @@
+@inherits StyleComponent
+
 <PlanityToolbar LeftActions="@LeftActions" MiddleActions="@MiddleActions" RightActions="@RightActions" Title="@Title"/>
-<div class="pa-4">
+<div class="@_class" style="@Style">
     @ChildContent
 </div>
 
@@ -9,4 +11,6 @@
     [Parameter] public RenderFragment? MiddleActions { get; set; }
     [Parameter] public RenderFragment? RightActions { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    string _class => $"pa-4 {Class}";
 }
