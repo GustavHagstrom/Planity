@@ -1,0 +1,17 @@
+﻿@inject IStringLocalizer<PlanitySearchField> localizer
+
+<MudTextField T="string" 
+              Value="Value" 
+              ValueChanged="ValueChanged" 
+              Margin="Margin.Dense" 
+              Placeholder="@localizer["Sök"]" 
+              AdornmentIcon="@Icons.Material.Sharp.Search"
+              Adornment="Adornment.Start"
+              Variant="Variant.Outlined"
+              Clearable="true"
+              DebounceInterval="500"/>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+}

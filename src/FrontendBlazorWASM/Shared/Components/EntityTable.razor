@@ -5,7 +5,7 @@
     <MudText Typo="Typo.h6">@Title</MudText>
 }
 
-<MudTable T="TItem" Items="@Items" Hover="true" Dense="true" >
+<MudTable T="TItem" Items="@Items" Hover="true" Dense="true" Virtualize="true" Striped="true" Filter="Filter">
     <HeaderContent>
             @HeaderContent
             @if(EditLinkFunction is not null)
@@ -33,4 +33,5 @@
     [Parameter] public RenderFragment? HeaderContent { get; set; }
     [Parameter] public RenderFragment<TItem>? RowTemplate { get; set; }
     [Parameter] public Func<TItem, string>? EditLinkFunction { get; set; }
+    [Parameter] public Func<TItem, bool>? Filter { get; set; }
 }

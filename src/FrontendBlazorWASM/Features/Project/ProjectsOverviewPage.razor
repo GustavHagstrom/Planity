@@ -14,25 +14,33 @@
     <MiddleActions>
 
     </MiddleActions>
+    <RightActions>
+        <PlanitySearchField @bind-Value="FilterString" />
+    </RightActions>
 
     <ChildContent>
-            <EntityTable Items="@Projects">
+        <MudContainer>
+            <EntityTable Items="@Projects" Filter="FilterFunction">
                 <HeaderContent>
                     <MudTh>Namn</MudTh>
+                    <MudTh>Beskrivning</MudTh>
                     <MudTh>Start</MudTh>
                     <MudTh>Slut</MudTh>
                     <MudTh>Handlingar</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Name</MudTd>
+                    <MudTd>@context.Description</MudTd>
                     <MudTd>@context.Start?.ToShortDateString()</MudTd>
                     <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
                     <MudTd>
-                        <MudIconButton Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Sharp.Edit" Href="@Routes.ProjectDetails(context.Id)"/>
+                        <MudIconButton Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Sharp.Edit" Href="@Routes.ProjectDetails(context.Id)" />
                         <MudIconButton Size="Size.Small" Icon="@Icons.Material.Sharp.Delete" Color="Color.Error" />
                     </MudTd>
                 </RowTemplate>
             </EntityTable>
+        </MudContainer>
+            
     </ChildContent>
 </OverviewPageLayout>
 
@@ -41,10 +49,22 @@
     private List<Project> Projects = new();
     private List<Resource> Resources = new();
 
+    string FilterString = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         Projects = await ProjectService.GetProjectsAsync();
         Resources = await ResourceService.GetOrganizationResources();
+    }
+
+    bool FilterFunction(Project project)
+    {
+        if (string.IsNullOrWhiteSpace(FilterString))
+            return true;
+        if (project.Name.Contains(FilterString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (project.Description != null && project.Description.Contains(FilterString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
     }
 }

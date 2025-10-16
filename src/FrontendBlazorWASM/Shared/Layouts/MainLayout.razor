@@ -20,7 +20,7 @@
             </style>
 
 
-            <MudToolBar Dense="true" Gutters="false" Class="px-4 mud-elevation-4 app-bar" Style="">
+            <MudToolBar Dense="true" Gutters="false" Class="px-4 mud-elevation-4 app-bar" Style="z-index: 10000; background-color: var(--mud-palette-drawer-background)">
                 <a href="@Routes.Dashboard"><MudText Typo="Typo.h4" Style="color: var(--mud-palette-primary)"><b>Planity</b></MudText></a>
                 <div class="py-2 px-3" style="height: 100%;">
                     <MudDivider Vertical="true" />
@@ -43,7 +43,7 @@
                 <LoginDisplay />
             </MudToolBar>
 
-            <div style="padding-top: 48px;">
+            <div style="padding-top: 48px; height: 100%;">
                 @Body
             </div>
         </MudLayout>
