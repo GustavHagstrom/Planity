@@ -1,0 +1,19 @@
+﻿<MudTextField T="string" 
+              Value="Value" 
+              ValueChanged="ValueChanged" 
+              Margin="Margin.Dense" 
+              Placeholder="@Placeholder"
+              AdornmentIcon="@AdornmentIcon"
+              Adornment="@Adornment"
+              Variant="Variant.Outlined"
+              Clearable="true"
+              DebounceInterval="300"/>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public Adornment Adornment { get; set; } = Adornment.Start;
+    [Parameter] public string? AdornmentIcon { get; set; }
+
+}

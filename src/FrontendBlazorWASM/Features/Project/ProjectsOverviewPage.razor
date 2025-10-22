@@ -22,11 +22,35 @@
         <MudContainer>
             <EntityTable Items="@Projects" Filter="FilterFunction">
                 <HeaderContent>
-                    <MudTh>Namn</MudTh>
-                    <MudTh>Beskrivning</MudTh>
-                    <MudTh>Start</MudTh>
-                    <MudTh>Slut</MudTh>
-                    <MudTh>Handlingar</MudTh>
+                    <MudTh>
+                        <MudStack Spacing="0">
+                            <b>Namn</b>
+                            <PlanityFilterField @bind-Value="@NameFilter"/>
+                        </MudStack>
+                    </MudTh>
+                    <MudTh>
+                        <b>Beskrivning</b>
+                        <PlanityFilterField @bind-Value="@DescriptionFilter"/>
+                        @* <MudField Variant="Variant.Outlined" Margin="Margin.Dense" Style="visibility: hidden;" /> *@
+                    </MudTh>
+                    <MudTh>
+                        <MudStack Spacing="0">
+                            <b>Start</b>
+                            <MudDatePicker @bind-Date="@FromDateFilter" Placeholder="Från" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" />
+                        </MudStack>
+                    </MudTh>
+                    <MudTh>
+                        <MudStack Spacing="0">
+                            <b>Slut</b>
+                            <MudDatePicker @bind-Date="@ToDateFilter" Placeholder="Till" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" />
+                        </MudStack>
+                    </MudTh>
+                    <MudTh>
+                        <MudStack Spacing="0">
+                            <b>Handlingar</b>
+                            <MudField Variant="Variant.Outlined" Margin="Margin.Dense" Style="visibility: hidden;" />
+                        </MudStack>
+                    </MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Name</MudTd>
@@ -49,6 +73,10 @@
     private List<Project> Projects = new();
     private List<Resource> Resources = new();
 
+    string NameFilter = string.Empty;
+    string DescriptionFilter = string.Empty;
+    DateTime? FromDateFilter;
+    DateTime? ToDateFilter;
     string FilterString = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -59,12 +87,23 @@
 
     bool FilterFunction(Project project)
     {
-        if (string.IsNullOrWhiteSpace(FilterString))
-            return true;
-        if (project.Name.Contains(FilterString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (project.Description != null && project.Description.Contains(FilterString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
+        bool nameMatches = false;
+        bool descriptionMatches = false;
+        bool fromMatches = false;
+        bool toMatches = false;
+        bool filterMatches = false;
+
+        if (string.IsNullOrWhiteSpace(NameFilter) || project.Name.Contains(NameFilter)) nameMatches = true;
+        if (string.IsNullOrWhiteSpace(DescriptionFilter) || project.Description.Contains(DescriptionFilter)) descriptionMatches = true;
+
+        // throw new NotImplementedException("Filtering null-dates seems to crash the app.");
+        if (FromDateFilter is null || project.Start >= FromDateFilter) fromMatches = true;
+        if (ToDateFilter is null || GanttDateCalculator.CalculateEnd(project, Resources) <= ToDateFilter) toMatches = true;
+
+        if (string.IsNullOrWhiteSpace(FilterString)) filterMatches = true;
+        if (project.Name.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
+        if (project.Description != null && project.Description.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
+        
+        return nameMatches && descriptionMatches && fromMatches && toMatches && filterMatches;
     }
 }

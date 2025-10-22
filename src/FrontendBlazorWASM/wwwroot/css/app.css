@@ -2,6 +2,17 @@
     caret-color: transparent;
 }
 
+*:focus-visible {
+    outline: none;
+}
+
+input {
+    border: 1px solid var(--mud-palette-lines-inputs);
+    border-radius: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
 input,
 textarea,
 [contenteditable="true"] {
