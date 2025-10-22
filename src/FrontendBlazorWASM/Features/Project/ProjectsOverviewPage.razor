@@ -94,15 +94,23 @@
         bool filterMatches = false;
 
         if (string.IsNullOrWhiteSpace(NameFilter) || project.Name.Contains(NameFilter)) nameMatches = true;
+        else return false;
         if (string.IsNullOrWhiteSpace(DescriptionFilter) || project.Description.Contains(DescriptionFilter)) descriptionMatches = true;
+        else return false;
 
         // throw new NotImplementedException("Filtering null-dates seems to crash the app.");
-        if (FromDateFilter is null || project.Start >= FromDateFilter) fromMatches = true;
-        if (ToDateFilter is null || GanttDateCalculator.CalculateEnd(project, Resources) <= ToDateFilter) toMatches = true;
+        
 
         if (string.IsNullOrWhiteSpace(FilterString)) filterMatches = true;
         if (project.Name.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
         if (project.Description != null && project.Description.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
+
+        if (FromDateFilter is null || project.Start >= FromDateFilter) fromMatches = true;
+        else return false;
+
+        //Do this last for optimiaztion reasons.
+        if (ToDateFilter is null || GanttDateCalculator.CalculateEnd(project, Resources) <= ToDateFilter) toMatches = true;
+        else return false;
         
         return nameMatches && descriptionMatches && fromMatches && toMatches && filterMatches;
     }
