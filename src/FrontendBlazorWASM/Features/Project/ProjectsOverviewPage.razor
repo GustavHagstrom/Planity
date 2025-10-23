@@ -4,11 +4,15 @@
 @inject IResourceService ResourceService
 @inject IDateCalculator GanttDateCalculator
 @inject IProjectService ProjectService
+@inject GanttViewStateContainer GanttViewState
 
 <OverviewPageLayout Title="@localizer["Projektöversikt"]" Class="d-flex">
     <LeftActions>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" >
             <span>@localizer["Nytt projekt"]</span>
+        </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ViewSelectionInGantt" Size="Size.Small" StartIcon="@Icons.Material.Filled.ViewTimeline">
+            <span>@localizer["Visa urval i Gantt"]</span>
         </MudButton>
     </LeftActions>
     <MiddleActions>
@@ -23,31 +27,32 @@
             <EntityTable Items="@Projects" Filter="FilterFunction">
                 <HeaderContent>
                     <MudTh>
-                        <MudStack Spacing="0">
-                            <b>Namn</b>
-                            <PlanityFilterField @bind-Value="@NameFilter"/>
+                        <MudStack Spacing="0" Style="max-width: 200px;">
+                            <MudText><b>Namn</b></MudText>
+                            <PlanityFilterField @bind-Value="@NameFilter" />
                         </MudStack>
                     </MudTh>
                     <MudTh>
-                        <b>Beskrivning</b>
-                        <PlanityFilterField @bind-Value="@DescriptionFilter"/>
-                        @* <MudField Variant="Variant.Outlined" Margin="Margin.Dense" Style="visibility: hidden;" /> *@
+                        <MudStack Spacing="0" Style="max-width: 200px;">
+                            <MudText><b>Beskrivning</b></MudText>
+                            <PlanityFilterField @bind-Value="@DescriptionFilter" />
+                        </MudStack>
                     </MudTh>
                     <MudTh>
-                        <MudStack Spacing="0">
-                            <b>Start</b>
-                            <MudDatePicker @bind-Date="@FromDateFilter" Placeholder="Från" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" />
+                        <MudStack Spacing="0" Style="max-width: 200px;">
+                            <MudText><b>Start</b></MudText>
+                            <MudDatePicker @bind-Date="@FromDateFilter" Placeholder="Från" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" Editable="true"/>
+                        </MudStack>
+                    </MudTh>
+                    <MudTh>
+                        <MudStack Spacing="0" Style="max-width: 200px;">
+                            <MudText><b>Slut</b></MudText>
+                            <MudDatePicker @bind-Date="@ToDateFilter" Placeholder="Till" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" Editable="true"/>
                         </MudStack>
                     </MudTh>
                     <MudTh>
                         <MudStack Spacing="0">
-                            <b>Slut</b>
-                            <MudDatePicker @bind-Date="@ToDateFilter" Placeholder="Till" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" />
-                        </MudStack>
-                    </MudTh>
-                    <MudTh>
-                        <MudStack Spacing="0">
-                            <b>Handlingar</b>
+                            <MudText><b>Handlingar</b></MudText>
                             <MudField Variant="Variant.Outlined" Margin="Margin.Dense" Style="visibility: hidden;" />
                         </MudStack>
                     </MudTh>
@@ -93,13 +98,13 @@
         bool toMatches = false;
         bool filterMatches = false;
 
-        if (string.IsNullOrWhiteSpace(NameFilter) || project.Name.Contains(NameFilter)) nameMatches = true;
+        if (string.IsNullOrWhiteSpace(NameFilter) || project.Name.Contains(NameFilter, StringComparison.OrdinalIgnoreCase)) nameMatches = true;
         else return false;
-        if (string.IsNullOrWhiteSpace(DescriptionFilter) || project.Description.Contains(DescriptionFilter)) descriptionMatches = true;
+        if (string.IsNullOrWhiteSpace(DescriptionFilter) || project.Description.Contains(DescriptionFilter, StringComparison.OrdinalIgnoreCase)) descriptionMatches = true;
         else return false;
 
         // throw new NotImplementedException("Filtering null-dates seems to crash the app.");
-        
+
 
         if (string.IsNullOrWhiteSpace(FilterString)) filterMatches = true;
         if (project.Name.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
@@ -109,9 +114,14 @@
         else return false;
 
         //Do this last for optimiaztion reasons.
-        if (ToDateFilter is null || GanttDateCalculator.CalculateEnd(project, Resources) <= ToDateFilter) toMatches = true;
+        if (ToDateFilter is null ||  GanttDateCalculator.CalculateEnd(project, Resources)?.Date <= ToDateFilter?.Date) toMatches = true;
         else return false;
-        
+
         return nameMatches && descriptionMatches && fromMatches && toMatches && filterMatches;
+    }
+    void ViewSelectionInGantt()
+    {
+        GanttViewState.SetItems(Projects.Where(p => FilterFunction(p)));
+        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectGantt);
     }
 }

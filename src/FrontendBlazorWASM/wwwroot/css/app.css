@@ -2,7 +2,11 @@
     caret-color: transparent;
 }
 
-*:focus-visible {
+
+body {
+    background-color: var(--mud-palette-background-gray) !important;
+}
+    *:focus-visible {
     outline: none;
 }
 
