@@ -27,7 +27,7 @@
         <MudContainer>
             <EntityTable Items="@Projects" Filter="FilterFunction">
                 <HeaderContent>
-                    <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Namn"]" SortBy="new Func<EndDateProject, object>(x => x.Name)" @bind-FilterString="NameFilter" />
+                    <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Namn"]" SortBy="new Func<EndDateProject, object>(x => x.Name)" @bind-FilterString="NameFilter"/>
                     <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Beskrivning"]" SortBy="new Func<EndDateProject, object>(x => x.Description)" @bind-FilterString="DescriptionFilter" />
                     <TableHeaderDateFilter T="EndDateProject" Title="@localizer["Start"]" SortBy="new Func<EndDateProject, object?>(x => x.Start)" @bind-FilterDate="@FromDateFilter" PlaceHolder="@localizer["Från"]" />
                     <TableHeaderDateFilter T="EndDateProject" Title="@localizer["Slut"]" SortBy="new Func<EndDateProject, object?>(x => x.End)" @bind-FilterDate="@ToDateFilter" PlaceHolder="@localizer["Till"]" />

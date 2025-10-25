@@ -7,7 +7,7 @@
                 <MudText><b>@Title</b></MudText>
             </MudTableSortLabel>
         </div>
-        <PlanityFilterField @bind-Value="@FilterString" />
+        <PlanityFilterField Value="@FilterString" ValueChanged="OnFilterChanged" />
     </MudStack>
 </MudTh>
 
@@ -16,4 +16,9 @@
     [Parameter] public EventCallback<string> FilterStringChanged { get; set; }
     [Parameter] public string? Title { get; set; }
     [Parameter] public Func<T, object>? SortBy { get; set; }
+
+    Task OnFilterChanged(string value)
+    {
+        return FilterStringChanged.InvokeAsync(value);
+    }
 }

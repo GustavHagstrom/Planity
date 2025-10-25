@@ -7,7 +7,7 @@
                 <MudText><b>@Title</b></MudText>
             </MudTableSortLabel>
         </div>
-        <MudDatePicker @bind-Date="@FilterDate" Placeholder="@PlaceHolder" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Date" Clearable="true" Editable="true" />
+        <MudDatePicker Date="@FilterDate" DateChanged="OnFilterChanged" Placeholder="@PlaceHolder" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Date" Clearable="true" Editable="true" />
     </MudStack>
 </MudTh>
 
@@ -17,4 +17,9 @@
     [Parameter] public string? Title { get; set; }
     [Parameter] public string? PlaceHolder { get; set; }
     [Parameter] public Func<T, object>? SortBy { get; set; }
+
+    Task OnFilterChanged(DateTime? value)
+    {
+        return FilterDateChanged.InvokeAsync(value);
+    }
 }
