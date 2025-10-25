@@ -1,8 +1,17 @@
 ﻿@page "/projects/gantt"
-@inject GanttViewStateContainer GanttViewState
+@layout FullHeightLayout
+@inject SelectedProjectsState State
+@inject IProjectService ProjectService
+@inject IResourceService ResourceService
 
-<GanttView ItemsParam="GanttViewState.Items" LinksParam="null"/>
+
+<GanttView ItemsParam="Projects"  LinksParam="null"/>
 
 @code {
+    List<Project> Projects = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Projects = await ProjectService.GetProjectsAsync(State.ProjectIds);
+    }
 }

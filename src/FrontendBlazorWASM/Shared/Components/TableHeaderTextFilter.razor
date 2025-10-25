@@ -1,0 +1,19 @@
+﻿@typeparam T
+
+<MudTh>
+    <MudStack Spacing="0" Style="max-width: 200px;">
+        <div class="d-flex">
+            <MudTableSortLabel SortBy="@SortBy">
+                <MudText><b>@Title</b></MudText>
+            </MudTableSortLabel>
+        </div>
+        <PlanityFilterField @bind-Value="@FilterString" />
+    </MudStack>
+</MudTh>
+
+@code {
+    [Parameter] public string FilterString { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> FilterStringChanged { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public Func<T, object>? SortBy { get; set; }
+}

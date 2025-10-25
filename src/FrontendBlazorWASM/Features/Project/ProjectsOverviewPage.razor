@@ -4,7 +4,8 @@
 @inject IResourceService ResourceService
 @inject IDateCalculator GanttDateCalculator
 @inject IProjectService ProjectService
-@inject GanttViewStateContainer GanttViewState
+@inject ProjectFactory ProjectFactory
+@inject SelectedProjectsState ProjectsState
 
 <OverviewPageLayout Title="@localizer["Projektöversikt"]" Class="d-flex">
     <LeftActions>
@@ -26,42 +27,24 @@
         <MudContainer>
             <EntityTable Items="@Projects" Filter="FilterFunction">
                 <HeaderContent>
-                    <MudTh>
-                        <MudStack Spacing="0" Style="max-width: 200px;">
-                            <MudText><b>Namn</b></MudText>
-                            <PlanityFilterField @bind-Value="@NameFilter" />
-                        </MudStack>
-                    </MudTh>
-                    <MudTh>
-                        <MudStack Spacing="0" Style="max-width: 200px;">
-                            <MudText><b>Beskrivning</b></MudText>
-                            <PlanityFilterField @bind-Value="@DescriptionFilter" />
-                        </MudStack>
-                    </MudTh>
-                    <MudTh>
-                        <MudStack Spacing="0" Style="max-width: 200px;">
-                            <MudText><b>Start</b></MudText>
-                            <MudDatePicker @bind-Date="@FromDateFilter" Placeholder="Från" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" Editable="true"/>
-                        </MudStack>
-                    </MudTh>
-                    <MudTh>
-                        <MudStack Spacing="0" Style="max-width: 200px;">
-                            <MudText><b>Slut</b></MudText>
-                            <MudDatePicker @bind-Date="@ToDateFilter" Placeholder="Till" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Month" Clearable="true" Editable="true"/>
-                        </MudStack>
-                    </MudTh>
+                    <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Namn"]" SortBy="new Func<EndDateProject, object>(x => x.Name)" @bind-FilterString="NameFilter" />
+                    <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Beskrivning"]" SortBy="new Func<EndDateProject, object>(x => x.Description)" @bind-FilterString="DescriptionFilter" />
+                    <TableHeaderDateFilter T="EndDateProject" Title="@localizer["Start"]" SortBy="new Func<EndDateProject, object?>(x => x.Start)" @bind-FilterDate="@FromDateFilter" PlaceHolder="@localizer["Från"]" />
+                    <TableHeaderDateFilter T="EndDateProject" Title="@localizer["Slut"]" SortBy="new Func<EndDateProject, object?>(x => x.End)" @bind-FilterDate="@ToDateFilter" PlaceHolder="@localizer["Till"]" />
+
                     <MudTh>
                         <MudStack Spacing="0">
                             <MudText><b>Handlingar</b></MudText>
                             <MudField Variant="Variant.Outlined" Margin="Margin.Dense" Style="visibility: hidden;" />
                         </MudStack>
                     </MudTh>
+
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Name</MudTd>
                     <MudTd>@context.Description</MudTd>
                     <MudTd>@context.Start?.ToShortDateString()</MudTd>
-                    <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
+                    <MudTd>@context.End?.ToShortDateString()</MudTd>
                     <MudTd>
                         <MudIconButton Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Sharp.Edit" Href="@Routes.ProjectDetails(context.Id)" />
                         <MudIconButton Size="Size.Small" Icon="@Icons.Material.Sharp.Delete" Color="Color.Error" />
@@ -75,8 +58,7 @@
 
 
 @code {
-    private List<Project> Projects = new();
-    private List<Resource> Resources = new();
+    private List<EndDateProject> Projects = new();
 
     string NameFilter = string.Empty;
     string DescriptionFilter = string.Empty;
@@ -86,11 +68,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Projects = await ProjectService.GetProjectsAsync();
-        Resources = await ResourceService.GetOrganizationResources();
+        var projects = await ProjectService.GetProjectsAsync();
+        var resources = await ResourceService.GetOrganizationResources();
+
+        Projects = projects?.Select(p => ProjectFactory.CreateEndDateProject(p, resources)).ToList() ?? new List<EndDateProject>();
     }
 
-    bool FilterFunction(Project project)
+    bool FilterFunction(EndDateProject project)
     {
         bool nameMatches = false;
         bool descriptionMatches = false;
@@ -102,26 +86,20 @@
         else return false;
         if (string.IsNullOrWhiteSpace(DescriptionFilter) || project.Description.Contains(DescriptionFilter, StringComparison.OrdinalIgnoreCase)) descriptionMatches = true;
         else return false;
-
-        // throw new NotImplementedException("Filtering null-dates seems to crash the app.");
-
+        if (FromDateFilter is null || project.Start >= FromDateFilter) fromMatches = true;
+        else return false;
+        if (ToDateFilter is null || project.End <= ToDateFilter?.Date) toMatches = true;
+        else return false;
 
         if (string.IsNullOrWhiteSpace(FilterString)) filterMatches = true;
         if (project.Name.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
         if (project.Description != null && project.Description.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
 
-        if (FromDateFilter is null || project.Start >= FromDateFilter) fromMatches = true;
-        else return false;
-
-        //Do this last for optimiaztion reasons.
-        if (ToDateFilter is null ||  GanttDateCalculator.CalculateEnd(project, Resources)?.Date <= ToDateFilter?.Date) toMatches = true;
-        else return false;
-
         return nameMatches && descriptionMatches && fromMatches && toMatches && filterMatches;
     }
     void ViewSelectionInGantt()
     {
-        GanttViewState.SetItems(Projects.Where(p => FilterFunction(p)));
+        ProjectsState.ProjectIds = Projects.Where(p => FilterFunction(p)).Select(p => p.Id).ToList();
         NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectGantt);
     }
 }

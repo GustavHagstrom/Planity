@@ -5,12 +5,13 @@
 
 @if(Items is not null)
 {
+
     <CascadingValue Value="this">
         <div class="d-flex" style="height: 100%; flex-direction: column;">
             <GanttToolbar Title="@Title" DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" Start="Start" End="End" DateRangeChanged="OnDateRangeChanged" />
-            <div class="d-flex" style="flex-grow: 1; border: 1px solid black;">
+            <MudPaper Class="d-flex ma-4 border" Style="flex-grow: 1;">
                 <GanttItemEditForm Item="SelectedItem" />
-                <GanttLeftPanel/>
+                <GanttLeftPanel />
                 <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
                     <GanttHeader />
                     <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
@@ -18,9 +19,10 @@
                         <GanttChart DragMode="@_dragMode" />
                     </div>
                 </div>
-            </div>
+            </MudPaper>
         </div>
     </CascadingValue>
+
 }
 
 @code {

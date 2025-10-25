@@ -2,7 +2,7 @@
 @using Planity.FrontendBlazorWASM.Shared.Models
 @using MudBlazor
 
-<MudPaper Class="pa-4" Style="width: 400px;">
+<div class="pa-4 mud-elevation-1" style="width: 400px;">
     @if(Item is not null)
     {
         <MudText Typo="Typo.h6"><b>Redigera @Item.Type.ToString()</b></MudText>
@@ -52,7 +52,7 @@
                 break;
         }
     }
-</MudPaper>
+</div>
 
 @code {
     [CascadingParameter] public GanttView View { get; set; } = null!;

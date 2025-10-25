@@ -8,9 +8,9 @@ public static class MockedDataStore
 {
     public static Dictionary<string, Resource> Resources { get; } = new()
     {
-        ["1"] = new Resource { Id = "1", Name = "Produktionslina 1", OrganizationId = "Org1", Workers = 5, Efficiency = 1 },
-        ["2"] = new Resource { Id = "2", Name = "Bertil Berg", OrganizationId = "Org1", Workers = 1, Efficiency = 1 },
-        ["3"] = new Resource { Id = "3", Name = "Cecilia Carlsson", OrganizationId = "Org1", Workers = 1, Efficiency = 1.1 }
+        ["1"] = new Resource { Id = "1", Name = "Produktionslina 1", OrganizationId = "OrganizationID123", Workers = 5, Efficiency = 1 },
+        ["2"] = new Resource { Id = "2", Name = "Bertil Berg", OrganizationId = "OrganizationID123", Workers = 1, Efficiency = 1 },
+        ["3"] = new Resource { Id = "3", Name = "Cecilia Carlsson", OrganizationId = "OrganizationID123", Workers = 1, Efficiency = 1.1 }
     };
 
     public static Dictionary<string, WorkCalendar> WorkCalendars { get; } = new()

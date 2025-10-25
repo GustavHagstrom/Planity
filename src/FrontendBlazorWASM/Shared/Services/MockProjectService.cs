@@ -152,4 +152,10 @@ public class MockProjectService : IProjectService
         var allMilestones = MockedDataStore.Projects.SelectMany(p => p.Milestones).ToList();
         return Task.FromResult(allMilestones);
     }
+
+    public Task<List<Project>> GetProjectsAsync(List<string> projectIds)
+    {
+        var projects = MockedDataStore.Projects.Where(p => projectIds.Contains(p.Id)).ToList();
+        return Task.FromResult(projects);
+    }
 }

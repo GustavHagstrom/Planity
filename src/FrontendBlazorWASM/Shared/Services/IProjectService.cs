@@ -10,6 +10,7 @@ public interface IProjectService
     Task<Project> CreateProjectAsync(Project project);
     Task<Project> UpdateProjectAsync(Project project);
     Task DeleteProjectAsync(string projectId);
+    Task<List<Project>> GetProjectsAsync(List<string> projectIds);
 
     // Tasks
     Task<ProjectTask> AddTaskToProjectAsync(string projectId, ProjectTask task);
