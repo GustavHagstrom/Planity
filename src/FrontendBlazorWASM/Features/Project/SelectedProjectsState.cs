@@ -1,4 +1,4 @@
-﻿namespace Planity.FrontendBlazorWASM.Features.Project.Models;
+﻿namespace Planity.FrontendBlazorWASM.Features.Project;
 
 public class SelectedProjectsState
 {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Localization;
-using Planity.FrontendBlazorWASM.Features.Project.Models;
 using Planity.FrontendBlazorWASM.Features.Project.Services;
 using Planity.FrontendBlazorWASM.Shared.Abstractions;
 
@@ -16,5 +15,6 @@ public class ProjectFeature(IStringLocalizer<ProjectFeature> Localizer) : IFeatu
     {
         services.AddScoped<ProjectFactory>();
         services.AddScoped<SelectedProjectsState>();
+        services.AddScoped<ProjectNavigator>();
     }
 }

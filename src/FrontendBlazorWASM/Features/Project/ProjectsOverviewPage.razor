@@ -1,15 +1,14 @@
 ﻿@page "/projects"
-@inject NavigationManager NavigationManager
 @inject IStringLocalizer<ProjectsOverviewPage> localizer
 @inject IResourceService ResourceService
 @inject IDateCalculator GanttDateCalculator
 @inject IProjectService ProjectService
 @inject ProjectFactory ProjectFactory
-@inject SelectedProjectsState ProjectsState
+@inject ProjectNavigator ProjectNavigator
 
 <OverviewPageLayout Title="@localizer["Projektöversikt"]" Class="d-flex">
     <LeftActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectsNew))" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" >
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@Routes.ProjectsNew" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" >
             <span>@localizer["Nytt projekt"]</span>
         </MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ViewSelectionInGantt" Size="Size.Small" StartIcon="@Icons.Material.Filled.ViewTimeline">
@@ -24,7 +23,6 @@
     </RightActions>
 
     <ChildContent>
-        <MudContainer>
             <EntityTable Items="@Projects" Filter="FilterFunction">
                 <HeaderContent>
                     <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Namn"]" SortBy="new Func<EndDateProject, object>(x => x.Name)" @bind-FilterString="NameFilter"/>
@@ -51,8 +49,6 @@
                     </MudTd>
                 </RowTemplate>
             </EntityTable>
-        </MudContainer>
-            
     </ChildContent>
 </OverviewPageLayout>
 
@@ -99,7 +95,6 @@
     }
     void ViewSelectionInGantt()
     {
-        ProjectsState.ProjectIds = Projects.Where(p => FilterFunction(p)).Select(p => p.Id).ToList();
-        NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ProjectGantt);
+        ProjectNavigator.ShowInGantt(Projects.Where(p => FilterFunction(p)).Select(p => p.Id).ToList());
     }
 }

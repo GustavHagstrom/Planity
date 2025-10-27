@@ -1,9 +1,9 @@
 @inherits StyleComponent
-
+<PageTitle>@Title</PageTitle>
 <PlanityToolbar LeftActions="@LeftActions" MiddleActions="@MiddleActions" RightActions="@RightActions" Title="@Title"/>
-<div class="@_class" style="@Style">
+<MudContainer Class="@_class" Style="@Style">
     @ChildContent
-</div>
+</MudContainer>
 
 @code {
     [Parameter] public string? Title { get; set; }

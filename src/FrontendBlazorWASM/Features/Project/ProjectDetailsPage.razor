@@ -5,56 +5,62 @@
 @inject IStringLocalizer<ProjectDetailsPage> localizer
 @inject IJSRuntime JS
 @inject IDateCalculator GanttDateCalculator
+@inject ProjectNavigator ProjectNavigator
 
-<EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null || Resources is null" OnSave="Save">
+<EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null || Resources is null" OnSave="Save" >
+    <Actions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="ShowInGantt" Size="Size.Small" StartIcon="@Icons.Material.Filled.ViewTimeline">
+            <span>@localizer["Visa i Gantt"]</span>
+        </MudButton>
+    </Actions>
     <MainContent>
+        
+            <MudStack Spacing="2">
+                <ProjectForm ProjectModel="Project" />
 
-        <ProjectForm ProjectModel="Project" />
+                <EntityTable Title="@localizer["Uppgifter"]" Items="Project!.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
+                    <HeaderContent>
+                        <MudTh>@localizer["Namn"]</MudTh>
+                        <MudTh>@localizer["Startdatum"]</MudTh>
+                        <MudTh>@localizer["Slutdatum"]</MudTh>
+                        <MudTh>@localizer["Tilldelad resurs"]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            @context.Name
+                        </MudTd>
+                        <MudTd>
+                            @context.Start?.ToString("yyyy-MM-dd")
+                        </MudTd>
+                        <MudTd>
+                            @GanttDateCalculator.CalculateEnd(context, Resources!)
+                        </MudTd>
+                        <MudTd>
+                            @Resources?.FirstOrDefault(r => r.Id == context.ResourceId)?.Name
+                        </MudTd>
+                    </RowTemplate>
+                </EntityTable>
 
-        <MudDivider Class="my-4"></MudDivider>
-
-        <EntityTable Title="@localizer["Uppgifter"]" Items="Project!.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
-            <HeaderContent>
-                <MudTh>@localizer["Namn"]</MudTh>
-                <MudTh>@localizer["Startdatum"]</MudTh>
-                <MudTh>@localizer["Slutdatum"]</MudTh>
-                <MudTh>@localizer["Tilldelad resurs"]</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>
-                    @context.Name
-                </MudTd>
-                <MudTd>
-                    @context.Start?.ToString("yyyy-MM-dd")
-                </MudTd>
-                <MudTd>
-                    @GanttDateCalculator.CalculateEnd(context, Resources!)
-                </MudTd>
-                <MudTd>
-                    @Resources?.FirstOrDefault(r => r.Id == context.ResourceId)?.Name
-                </MudTd>
-            </RowTemplate>
-        </EntityTable>
-
-        <EntityTable Title="@localizer["Milstenar"]" Items="Project!.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
-            <HeaderContent>
-                <MudTh>@localizer["Namn"]</MudTh>
-                <MudTh>@localizer["Datum"]</MudTh>
-                <MudTh>@localizer["Beskrivning"]</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>
-                    @context.Name
-                </MudTd>
-                <MudTd>
-                    @context.Start?.ToString("yyyy-MM-dd")
-                </MudTd>
-                <MudTd>
-                    @context.Description
-                </MudTd>
-            </RowTemplate>
-        </EntityTable>
-
+                <EntityTable Title="@localizer["Milstenar"]" Items="Project!.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
+                    <HeaderContent>
+                        <MudTh>@localizer["Namn"]</MudTh>
+                        <MudTh>@localizer["Datum"]</MudTh>
+                        <MudTh>@localizer["Beskrivning"]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            @context.Name
+                        </MudTd>
+                        <MudTd>
+                            @context.Start?.ToString("yyyy-MM-dd")
+                        </MudTd>
+                        <MudTd>
+                            @context.Description
+                        </MudTd>
+                    </RowTemplate>
+                </EntityTable>
+            </MudStack>
+        
     </MainContent>
 </EntityFormsPageLayout>
 
@@ -82,5 +88,11 @@
             return;
         await ProjectService.UpdateProjectAsync(Project);
         await JS.InvokeVoidAsync("history.back");
+    }
+    void ShowInGantt()
+    {
+        if (Project == null)
+            return;
+        ProjectNavigator.ShowInGantt([Project.Id]);
     }
 }

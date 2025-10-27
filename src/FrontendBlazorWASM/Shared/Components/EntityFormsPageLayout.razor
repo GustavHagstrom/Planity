@@ -20,7 +20,7 @@
     </LeftActions>
         
     <ChildContent>
-        <div>
+        <MudPaper Class="pa-4">
             @if (IsLoading)
             {
                 <MudProgressCircular Indeterminate Color="Color.Primary" />
@@ -29,7 +29,7 @@
             {
                 @MainContent
             }
-        </div>
+        </MudPaper>
     </ChildContent>
 </OverviewPageLayout>
 
