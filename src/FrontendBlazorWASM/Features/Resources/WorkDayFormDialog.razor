@@ -2,11 +2,11 @@
 
 <MudDialog>
     <TitleContent>
-        @localizer["Arbetstidsdetaljer"]
+        @localizer["Arbetspass"]
     </TitleContent>
     <DialogContent>
         <MudStack Spacing="2">
-            <MudSelect T="DayOfWeek" Value="@Day" Label="Day" ToStringFunc="WeekDayToString" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudSelect T="DayOfWeek" @bind-Value="@Day" Label="Day" ToStringFunc="WeekDayToString" Variant="Variant.Outlined" Margin="Margin.Dense">
                 <MudSelectItem Value="DayOfWeek.Monday" />
                 <MudSelectItem Value="DayOfWeek.Tuesday" />
                 <MudSelectItem Value="DayOfWeek.Wednesday" />
@@ -22,7 +22,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Text" Color="Color.Primary">@localizer["Avbryt"]</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(Start == null || End == null)">@localizer["Spara"]</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(Period?.Start == null || Period?.End == null)" OnClick="Submit" StartIcon="@Icons.Material.Sharp.Save">@localizer["Spara"]</MudButton>
     </DialogActions>
    
 </MudDialog>
@@ -30,10 +30,23 @@
 
 @code {
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
-    [Parameter] public DayOfWeek Day { get; set; }
-    [Parameter] public TimeSpan? Start { get; set; }
-    [Parameter] public TimeSpan? End { get; set; }
-    [Parameter] public double BreakDuration { get; set; } = 1;
+    [Parameter] public WorkPeriod? Period { get; set; }
+    DayOfWeek Day;
+    TimeSpan? Start;
+    TimeSpan? End;
+    double BreakDuration = 1;
+
+    protected override void OnInitialized()
+    {
+        if(Period is not null)
+        {
+            Day = Period.Day;
+            Start = Period.Start;
+            End = Period.End;
+            BreakDuration = Period.BreakDuration;
+        }
+    }
+
 
     string WeekDayToString(DayOfWeek dayOfWeek)
     {
@@ -52,7 +65,16 @@
 
     void Submit()
     {
-        MudDialog.Close(DialogResult.Ok((Day, Start!, End!, BreakDuration)));
+        if (MudDialog is not null && Start is not null && End is not null)
+        {
+            MudDialog.Close(DialogResult.Ok(new WorkPeriod
+            {
+                Day = Day,
+                Start = Start.Value,
+                End = End.Value,
+                BreakDuration = BreakDuration
+            }));
+        }
     }
 
 }

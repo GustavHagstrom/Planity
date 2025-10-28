@@ -26,11 +26,16 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
             bool isFirstDay = true;
             while (remainingHours > 0)
             {
-                var periods = workCalendar.WorkPeriodsByDayOfWeek.TryGetValue(currentDate.DayOfWeek, out var p) ? p : new List<(TimeSpan, TimeSpan, double)>();
-                bool isHoliday = workCalendar.Holidays.Contains(currentDate.Date);
-                bool hasOvertime = workCalendar.OvertimeHours.TryGetValue(currentDate.Date, out var overtimeHours) && overtimeHours > 0;
-                int passCount = periods.Count;
-                bool hasOrdinaryWork = passCount > 0 && !isHoliday;
+                // Filtrera arbetspass för aktuell veckodag
+                var dayPeriods = workCalendar.WorkPeriods
+                    .Where(p => p.Day == currentDate.DayOfWeek)
+                    .OrderBy(p => p.Start)
+                    .ToList();
+
+                bool isHoliday = workCalendar.Holidays.Any(x => x.Date == DateOnly.FromDateTime(currentDate.Date));
+                bool hasOvertime = workCalendar.OvertimeHours.TryGetValue(DateOnly.FromDateTime(currentDate.Date), out var overtimeHours) && overtimeHours > 0;
+
+                bool hasOrdinaryWork = dayPeriods.Count > 0 && !isHoliday;
                 bool hasAnyWork = hasOrdinaryWork || hasOvertime;
                 if (!hasAnyWork)
                 {
@@ -38,36 +43,77 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
                     isFirstDay = false;
                     continue;
                 }
-                // Iterera över ordinarie perioder
-                foreach (var (periodStart, periodEnd, breakDuration) in periods)
+
+                // Iterera över ordinarie perioder för dagen
+                if (hasOrdinaryWork)
                 {
-                    var actualStart = isFirstDay && currentDate.TimeOfDay > periodStart ? currentDate.TimeOfDay : periodStart;
-                    if (actualStart >= periodEnd)
-                        continue;
-                    var availableHours = (periodEnd.Subtract(TimeSpan.FromHours(breakDuration)) - actualStart).TotalHours * workerEff;
-                    if (availableHours <= 0)
-                        continue;
-                    if (remainingHours <= availableHours)
+                    foreach (var period in dayPeriods)
                     {
-                        var hoursUsed = remainingHours / workerEff;
-                        return currentDate.Date.Add(actualStart).Add(TimeSpan.FromHours(hoursUsed));
+                        var actualStart = isFirstDay && currentDate.TimeOfDay > period.Start ? currentDate.TimeOfDay : period.Start;
+                        if (actualStart >= period.End)
+                            continue;
+
+                        // Rå längd i timmar för arbetbara delen av passet
+                        var rawHours = (period.End - actualStart).TotalHours;
+
+                        // Justera för rast endast om passet överlappar antagen lunchrast (12:00–12:00+BreakDuration)
+                        double lunchOverlapHours = 0;
+                        if (period.BreakDuration > 0)
+                        {
+                            var lunchStart = TimeSpan.FromHours(12);
+                            var lunchEnd = lunchStart + TimeSpan.FromHours(period.BreakDuration);
+
+                            // Beräkna överlapp mellan [actualStart, period.End] och [lunchStart, lunchEnd]
+                            var overlapStart = actualStart > lunchStart ? actualStart : lunchStart;
+                            var overlapEnd = period.End < lunchEnd ? period.End : lunchEnd;
+                            if (overlapEnd > overlapStart)
+                            {
+                                lunchOverlapHours = (overlapEnd - overlapStart).TotalHours;
+                            }
+                        }
+
+                        var availableHours = Math.Max(0, rawHours - lunchOverlapHours) * workerEff;
+                        if (availableHours <= 0)
+                            continue;
+
+                        if (remainingHours <= availableHours)
+                        {
+                            var hoursUsed = remainingHours / workerEff;
+                            return currentDate.Date.Add(actualStart).Add(TimeSpan.FromHours(hoursUsed));
+                        }
+                        remainingHours -= availableHours;
+                        if (remainingHours <= 0) return currentDate.Date.Add(period.End);
                     }
-                    remainingHours -= availableHours;
-                    if (remainingHours <= 0) return currentDate.Date.Add(periodEnd);
                 }
+
                 // Hantera övertid
                 if (hasOvertime)
                 {
-                    TimeSpan overtimeStart = passCount > 0 ? periods[^1].Item2 : TimeSpan.FromHours(0);
-                    var availableOvertime = overtimeHours * workerEff;
-                    if (remainingHours <= availableOvertime)
+                    // Övertid antas ske som ett sammanhängande pass efter dagens sista ordinarie period
+                    var lastOrdinaryEnd = dayPeriods.Count > 0 ? dayPeriods[^1].End : TimeSpan.FromHours(8);
+
+                    // Starttid för övertid: efter sista ordinarie sluttid om sådan finns, annars08:00.
+                    // Om första dagen och starttiden redan är senare, börja där.
+                    var overtimeStart = lastOrdinaryEnd;
+                    if (isFirstDay && currentDate.TimeOfDay > overtimeStart)
                     {
-                        var hoursUsed = remainingHours / workerEff;
-                        return currentDate.Date.Add(overtimeStart).Add(TimeSpan.FromHours(hoursUsed));
+                        overtimeStart = currentDate.TimeOfDay;
                     }
-                    remainingHours -= availableOvertime;
-                    if (remainingHours <= 0) return currentDate.Date.Add(overtimeStart).Add(TimeSpan.FromHours(overtimeHours));
+
+                    var availableOvertime = overtimeHours * workerEff; // effekt-justerade timmar
+                    if (availableOvertime > 0)
+                    {
+                        if (remainingHours <= availableOvertime)
+                        {
+                            var hoursUsed = remainingHours / workerEff;
+                            return currentDate.Date.Add(overtimeStart).Add(TimeSpan.FromHours(hoursUsed));
+                        }
+
+                        // Konsumera hela övertidspasset denna dag och fortsätt till nästa dag
+                        remainingHours -= availableOvertime;
+                    }
                 }
+
                 currentDate = currentDate.Date.AddDays(1);
                 isFirstDay = false;
             }
@@ -94,14 +140,15 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
     // Hjälpmetod för att räkna ut om det är arbetsdag
     public bool IsWorkDay(WorkCalendar calendar, DateTime date)
     {
-        return calendar.WorkPeriodsByDayOfWeek.TryGetValue(date.DayOfWeek, out var periods) && periods.Count > 0 && !calendar.Holidays.Contains(date.Date);
+        var dayPeriods = calendar.WorkPeriods.Where(p => p.Day == date.DayOfWeek).ToList();
+        return dayPeriods.Count > 0 && !calendar.Holidays.Any(x => x.Date == DateOnly.FromDateTime(date.Date));
     }
     public async Task<DateTime?> CalculateStartAsync(IGanttItem item)
     {
         var resources = await resourceService.GetOrganizationResources();
         return CalculateStart(item, resources);
     }
-    public DateTime? CalculateStart(IGanttItem  item, IReadOnlyList<Resource> resources)
+    public DateTime? CalculateStart(IGanttItem item, IReadOnlyList<Resource> resources)
     {
         if (item.Start is null) return null;
         if (item is Milestone milestone) return milestone.Start;
@@ -123,15 +170,20 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
             DateTime searchDate = task.Start!.Value;
             while (true)
             {
-                if (calendar.WorkPeriodsByDayOfWeek.TryGetValue(searchDate.DayOfWeek, out var periods) && periods.Count > 0 && !calendar.Holidays.Contains(searchDate.Date))
+                var dayPeriods = calendar.WorkPeriods
+                    .Where(p => p.Day == searchDate.DayOfWeek)
+                    .OrderBy(p => p.Start)
+                    .ToList();
+
+                if (dayPeriods.Count > 0 && !calendar.Holidays.Any(x => x.Date == DateOnly.FromDateTime(searchDate.Date)))
                 {
-                    periods = periods.OrderBy(p => p.Start).ToList();
-                    var firstPeriodStart = periods.First().Start;
+                    var firstPeriodStart = dayPeriods.First().Start;
+                    var lastPeriodEnd = dayPeriods.Last().End;
                     if (searchDate.TimeOfDay < firstPeriodStart)
                     {
                         return searchDate.Date.Add(firstPeriodStart);
                     }
-                    else if (searchDate.TimeOfDay >= periods.Last().End)
+                    else if (searchDate.TimeOfDay >= lastPeriodEnd)
                     {
                         searchDate = searchDate.Date.AddDays(1);
                     }

@@ -25,15 +25,18 @@ public static class MockedDataStore
         var calendar = new WorkCalendar
         {
             ResourceId = "1",
-            Holidays = new HashSet<DateTime> { new DateTime(DateTime.Now.Year, 4, 1) },
-            OvertimeHours = new Dictionary<DateTime, double> { { DateTime.Today, 2 } }
+            Holidays = [ new Holyday { Date = new DateOnly(DateTime.Now.Year, 4, 1), Name = "Första april" } ],
+            OvertimeHours = new Dictionary<DateOnly, double> { { DateOnly.FromDateTime(DateTime.Today), 2 } }
         };
         // Måndag–Torsdag: 08:00–12:00, 13:00–16:30 (raster 12:00–13:00), Fredag: 08:00–14:00
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday,    new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday,   new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Thursday,  new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Friday,    new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(14), 1) });
+        calendar.WorkPeriods =
+        [
+            new WorkPeriod { Day = DayOfWeek.Monday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Tuesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Wednesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Thursday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Friday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(14), BreakDuration = 1 }
+        ];
         // Lördag och söndag har redan tomma perioder
         return calendar;
     }
@@ -43,14 +46,17 @@ public static class MockedDataStore
         var calendar = new WorkCalendar
         {
             ResourceId = "2",
-            Holidays = new HashSet<DateTime> { new DateTime(DateTime.Now.Year, 12, 24) },
-            OvertimeHours = new Dictionary<DateTime, double> { { DateTime.Today.AddDays(1), 1.5 } }
+            Holidays = [new Holyday { Date = new DateOnly(DateTime.Now.Year, 12, 24), Name = "Julafton" } ],
+            OvertimeHours = new Dictionary<DateOnly, double> { { DateOnly.FromDateTime(DateTime.Today.AddDays(1)), 1.5 } }
         };
         // Måndag–Torsdag: 08:00–12:00, 13:00–15:00 (raster 12:00–13:00)
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday,    new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday,   new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Thursday,  new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
+        calendar.WorkPeriods =
+        [
+            new WorkPeriod { Day = DayOfWeek.Monday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Tuesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Wednesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Thursday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 }
+        ];
         // Fredag, lördag och söndag har tomma perioder
         return calendar;
     }
@@ -60,16 +66,16 @@ public static class MockedDataStore
         var calendar = new WorkCalendar
         {
             ResourceId = "3",
-            Holidays = new HashSet<DateTime>(),
-            OvertimeHours = new Dictionary<DateTime, double>()
         };
         // Måndag–Fredag: 08:00–12:00, 13:00–16:00 (raster 12:00–13:00)
-        var periods = new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16), 1) };
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday, periods);
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday, periods);
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, periods);
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Thursday, periods);
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Friday, periods);
+        calendar.WorkPeriods =
+        [
+            new WorkPeriod { Day = DayOfWeek.Monday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Tuesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Wednesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Thursday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 },
+            new WorkPeriod { Day = DayOfWeek.Friday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(12), BreakDuration = 1 }
+        ];
         // Lördag och söndag har tomma perioder
         return calendar;
     }

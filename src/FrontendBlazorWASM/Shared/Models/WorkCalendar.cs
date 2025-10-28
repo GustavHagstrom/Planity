@@ -6,25 +6,32 @@ public class WorkCalendar
     public string ResourceId { get; set; } = string.Empty;
 
     // Arbetspass per veckodag (t.ex. 08:00-12:00, 13:00-17:00)
-    private readonly Dictionary<DayOfWeek, List<(TimeSpan Start, TimeSpan End, double BreakDuration)>> _workPeriodsByDayOfWeek = new()
-    {
-        { DayOfWeek.Monday,    [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5), 1) ] }, // 08:00-16:30
-        { DayOfWeek.Tuesday,   [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5), 1) ] },
-        { DayOfWeek.Wednesday, [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5), 1) ] },
-        { DayOfWeek.Thursday,  [ (TimeSpan.FromHours(8), TimeSpan.FromHours(16.5), 1) ] },
-        { DayOfWeek.Friday,    [ (TimeSpan.FromHours(8), TimeSpan.FromHours(14), 1) ] },   // 08:00-14:00
-        { DayOfWeek.Saturday,  [] },
-        { DayOfWeek.Sunday,    [] }
-    };
-    public IReadOnlyDictionary<DayOfWeek, List<(TimeSpan Start, TimeSpan End, double BreakDuration)>> WorkPeriodsByDayOfWeek => _workPeriodsByDayOfWeek;
+    public HashSet<WorkPeriod> WorkPeriods = 
+    [
+        new WorkPeriod { Day = DayOfWeek.Monday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+        new WorkPeriod { Day = DayOfWeek.Tuesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+        new WorkPeriod { Day = DayOfWeek.Wednesday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+        new WorkPeriod { Day = DayOfWeek.Thursday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
+        new WorkPeriod { Day = DayOfWeek.Friday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(14), BreakDuration = 1 }
+    ];
+    //public IReadOnlyList<WorkPeriod> WorkPeriods => WorkPeriods;
 
-    public void SetWorkPeriodsByDayOfWeek(DayOfWeek day, List<(TimeSpan Start, TimeSpan End, double BreakDuration)> periods)
-    {
-        _workPeriodsByDayOfWeek[day] = periods;
-    }
+    //public void AddWorkPeriod(WorkPeriod workPeriod)
+    //{
+    //    WorkPeriods.Add(workPeriod);
+    //}
+    //public void AddWorkPeriods(IEnumerable<WorkPeriod> workPeriods)
+    //{
+    //    WorkPeriods.AddRange(workPeriods);
+    //}
+    //public void RemoveWorkPeriod(WorkPeriod workPeriod)
+    //{
+    //    WorkPeriods.Remove(workPeriod);
+    //}
+
 
     // Special-helgdagar (t.ex. påsk, midsommar)
-    public HashSet<DateTime> Holidays { get; set; } = new();
+    public HashSet<Holyday> Holidays { get; set; } = [];
     // Övertid per dag (datum -> antal extra timmar)
-    public Dictionary<DateTime, double> OvertimeHours { get; set; } = new();
+    public Dictionary<DateOnly, double> OvertimeHours { get; set; } = new();
 }

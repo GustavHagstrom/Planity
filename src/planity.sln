@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planity.FrontendBlazorWASM"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planity.DTOs", "DTOs\Planity.DTOs.csproj", "{33CC6B06-A3AE-4EC0-B257-21A4283D21CD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planity.FrontendBlazorWASM.Tests", "FrontendBlazorWASM.Tests\Planity.FrontendBlazorWASM.Tests.csproj", "{56123CD6-6A5A-F09A-6B9C-6F69D2F75FDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{33CC6B06-A3AE-4EC0-B257-21A4283D21CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33CC6B06-A3AE-4EC0-B257-21A4283D21CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33CC6B06-A3AE-4EC0-B257-21A4283D21CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56123CD6-6A5A-F09A-6B9C-6F69D2F75FDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56123CD6-6A5A-F09A-6B9C-6F69D2F75FDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56123CD6-6A5A-F09A-6B9C-6F69D2F75FDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56123CD6-6A5A-F09A-6B9C-6F69D2F75FDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

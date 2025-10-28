@@ -13,7 +13,7 @@
         <PlanityTextField T="int" Value="@Convert.ToInt32(resource.Efficiency * 100)" ValueChanged="SetEfficiency" Label="@localizer["Effektivitet"]" Required="true" Adornment="Adornment.Start" AdornmentText="%" />
     </MudItem>
     <MudItem xs="12" xxl="12">
-        <EntityTable Items="FlatWorkPeriods()" Title="@localizer["Arbetstider"]">
+        <EntityTable Items="resource.WorkCalendar.WorkPeriods" Title="@localizer["Arbetstider"]">
             <LeftActions>
                 <MudIconButton Icon="@Icons.Material.Sharp.Add" Variant="Variant.Filled" Color="Color.Primary" />
             </LeftActions>
@@ -75,18 +75,5 @@
             DayOfWeek.Sunday => localizer["Söndag"],
             _ => string.Empty,
         };
-    }
-    List<(DayOfWeek Day, TimeSpan Start, TimeSpan End, double BreakDuration)> FlatWorkPeriods()
-    {
-        var flatList = resource.WorkCalendar.WorkPeriodsByDayOfWeek
-            .SelectMany(kvp => kvp.Value.Select(v => (
-                kvp.Key,
-                v.Start,
-                v.End,
-                v.BreakDuration
-            )))
-            .ToList();
-        flatList = flatList.OrderBy(x => x.Key).ToList();
-        return flatList;
     }
 }

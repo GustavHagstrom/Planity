@@ -12,33 +12,49 @@ public class MockedWorkCalendarService : IWorkCalendarService
         return Task.FromResult(new WorkCalendar { ResourceId = resourceId });
     }
 
-    public Task SetWorkPeriodsByDayOfWeekAsync(string resourceId, DayOfWeek day, List<(TimeSpan Start, TimeSpan End, double BreakDuration)> periods)
+    public Task AddWorkPeriod(string resourceId, WorkPeriod period)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
         {
-            calendar.SetWorkPeriodsByDayOfWeek(day, periods);
+            calendar.WorkPeriods.Add(period);
+        }
+        return Task.CompletedTask;
+    }
+    public Task AddWorkPeriods(string resourceId, IEnumerable<WorkPeriod> periods)
+    {
+        if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
+        {
+            foreach (var period in periods)
+                calendar.WorkPeriods.Add(period);
         }
         return Task.CompletedTask;
     }
 
-    public Task AddHolidayAsync(string resourceId, DateTime holiday)
+    public Task AddHolidayAsync(string resourceId, Holyday holyday)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
-            calendar.Holidays.Add(holiday.Date);
+            calendar.Holidays.Add(holyday);
         return Task.CompletedTask;
     }
 
-    public Task RemoveHolidayAsync(string resourceId, DateTime holiday)
+    public Task RemoveHolidayAsync(string resourceId, Holyday holyday)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
-            calendar.Holidays.Remove(holiday.Date);
+            calendar.Holidays.Remove(holyday);
         return Task.CompletedTask;
     }
 
-    public Task SetOvertimeAsync(string resourceId, DateTime date, double overtimeHours)
+    public Task SetOvertimeAsync(string resourceId, DateOnly date, double overtimeHours)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
-            calendar.OvertimeHours[date.Date] = overtimeHours;
+            calendar.OvertimeHours[date] = overtimeHours;
+        return Task.CompletedTask;
+    }
+
+    public Task RemoveOvertimeAsync(string resourceId, DateOnly date)
+    {
+        if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
+            calendar.OvertimeHours.Remove(date);
         return Task.CompletedTask;
     }
 }
