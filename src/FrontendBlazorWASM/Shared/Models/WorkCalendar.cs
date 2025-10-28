@@ -14,22 +14,6 @@ public class WorkCalendar
         new WorkPeriod { Day = DayOfWeek.Thursday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16.5), BreakDuration = 1 },
         new WorkPeriod { Day = DayOfWeek.Friday, Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(14), BreakDuration = 1 }
     ];
-    //public IReadOnlyList<WorkPeriod> WorkPeriods => WorkPeriods;
-
-    //public void AddWorkPeriod(WorkPeriod workPeriod)
-    //{
-    //    WorkPeriods.Add(workPeriod);
-    //}
-    //public void AddWorkPeriods(IEnumerable<WorkPeriod> workPeriods)
-    //{
-    //    WorkPeriods.AddRange(workPeriods);
-    //}
-    //public void RemoveWorkPeriod(WorkPeriod workPeriod)
-    //{
-    //    WorkPeriods.Remove(workPeriod);
-    //}
-
-
     // Special-helgdagar (t.ex. påsk, midsommar)
     public HashSet<Holyday> Holidays { get; set; } = [];
     // Övertid per dag (datum -> antal extra timmar)

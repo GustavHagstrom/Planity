@@ -1,9 +1,6 @@
-﻿@inject IStringLocalizer<WorkDayFormDialog> localizer
+﻿@inject IStringLocalizer<WorkperiodFormDialog> localizer
 
 <MudDialog>
-    <TitleContent>
-        @localizer["Arbetspass"]
-    </TitleContent>
     <DialogContent>
         <MudStack Spacing="2">
             <MudSelect T="DayOfWeek" @bind-Value="@Day" Label="Day" ToStringFunc="WeekDayToString" Variant="Variant.Outlined" Margin="Margin.Dense">
@@ -17,12 +14,12 @@
             </MudSelect>
             <MudTimePicker Margin="Margin.Dense" @bind-Time="Start" Required="true" Label="@localizer["Start"]" />
             <MudTimePicker Margin="Margin.Dense" @bind-Time="End" Required="true" Label="@localizer["Slut"]" />
-            <PlanityTextField T="double" Label="@localizer["Rast"]" @bind-Value="BreakDuration" Adornment="Adornment.Start" AdornmentText="@localizer["Timmar"]" />
+            <PlanityTextField T="double" Label="@localizer["Rast"]" @bind-Value="BreakDuration" Adornment="Adornment.End" AdornmentText="@localizer["Timme"]" />
         </MudStack>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Text" Color="Color.Primary">@localizer["Avbryt"]</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(Period?.Start == null || Period?.End == null)" OnClick="Submit" StartIcon="@Icons.Material.Sharp.Save">@localizer["Spara"]</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(Start == null || End == null)" OnClick="Submit" StartIcon="@Icons.Material.Sharp.Save">@localizer["Spara"]</MudButton>
     </DialogActions>
    
 </MudDialog>
@@ -31,7 +28,7 @@
 @code {
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public WorkPeriod? Period { get; set; }
-    DayOfWeek Day;
+    DayOfWeek Day = DayOfWeek.Monday;
     TimeSpan? Start;
     TimeSpan? End;
     double BreakDuration = 1;
