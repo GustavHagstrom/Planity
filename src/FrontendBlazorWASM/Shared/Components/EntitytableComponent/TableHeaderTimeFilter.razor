@@ -1,0 +1,25 @@
+﻿@typeparam T
+
+<MudTh>
+    <MudStack Spacing="0" Style="max-width: 200px;">
+        <div class="d-flex">
+            <MudTableSortLabel SortBy="@SortBy">
+                <MudText><b>@Title</b></MudText>
+            </MudTableSortLabel>
+        </div>
+        <MudTimePicker Time="@Time" TimeChanged="OnTimeChanged" Placeholder="@PlaceHolder" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Hours" Clearable="true" Editable="true" />
+    </MudStack>
+</MudTh>
+
+@code {
+    [Parameter] public TimeSpan? Time { get; set; }
+    [Parameter] public EventCallback<TimeSpan?> TimeChanged { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? PlaceHolder { get; set; }
+    [Parameter] public Func<T, object>? SortBy { get; set; }
+
+    Task OnTimeChanged(TimeSpan? value)
+    {
+        return TimeChanged.InvokeAsync(value);
+    }
+}

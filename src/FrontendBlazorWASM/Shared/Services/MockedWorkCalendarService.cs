@@ -12,7 +12,7 @@ public class MockedWorkCalendarService : IWorkCalendarService
         return Task.FromResult(new WorkCalendar { ResourceId = resourceId });
     }
 
-    public Task SetWorkPeriodsByDayOfWeekAsync(string resourceId, DayOfWeek day, List<(TimeSpan Start, TimeSpan End)> periods)
+    public Task SetWorkPeriodsByDayOfWeekAsync(string resourceId, DayOfWeek day, List<(TimeSpan Start, TimeSpan End, double BreakDuration)> periods)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
         {

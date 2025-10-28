@@ -1,0 +1,58 @@
+﻿@inject IStringLocalizer<WorkDayFormDialog> localizer
+
+<MudDialog>
+    <TitleContent>
+        @localizer["Arbetstidsdetaljer"]
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudSelect T="DayOfWeek" Value="@Day" Label="Day" ToStringFunc="WeekDayToString" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <MudSelectItem Value="DayOfWeek.Monday" />
+                <MudSelectItem Value="DayOfWeek.Tuesday" />
+                <MudSelectItem Value="DayOfWeek.Wednesday" />
+                <MudSelectItem Value="DayOfWeek.Thursday" />
+                <MudSelectItem Value="DayOfWeek.Friday" />
+                <MudSelectItem Value="DayOfWeek.Saturday" />
+                <MudSelectItem Value="DayOfWeek.Sunday" />
+            </MudSelect>
+            <MudTimePicker Margin="Margin.Dense" @bind-Time="Start" Required="true" Label="@localizer["Start"]" />
+            <MudTimePicker Margin="Margin.Dense" @bind-Time="End" Required="true" Label="@localizer["Slut"]" />
+            <PlanityTextField T="double" Label="@localizer["Rast"]" @bind-Value="BreakDuration" Adornment="Adornment.Start" AdornmentText="@localizer["Timmar"]" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary">@localizer["Avbryt"]</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(Start == null || End == null)">@localizer["Spara"]</MudButton>
+    </DialogActions>
+   
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public DayOfWeek Day { get; set; }
+    [Parameter] public TimeSpan? Start { get; set; }
+    [Parameter] public TimeSpan? End { get; set; }
+    [Parameter] public double BreakDuration { get; set; } = 1;
+
+    string WeekDayToString(DayOfWeek dayOfWeek)
+    {
+        return dayOfWeek switch
+        {
+            DayOfWeek.Monday => localizer["Måndag"],
+            DayOfWeek.Tuesday => localizer["Tisdag"],
+            DayOfWeek.Wednesday => localizer["Onsdag"],
+            DayOfWeek.Thursday => localizer["Torsdag"],
+            DayOfWeek.Friday => localizer["Fredag"],
+            DayOfWeek.Saturday => localizer["Lördag"],
+            DayOfWeek.Sunday => localizer["Söndag"],
+            _ => string.Empty,
+        };
+    }
+
+    void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok((Day, Start!, End!, BreakDuration)));
+    }
+
+}

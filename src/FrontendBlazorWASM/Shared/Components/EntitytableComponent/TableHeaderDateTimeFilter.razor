@@ -1,0 +1,33 @@
+﻿@typeparam T
+
+<MudTh>
+    <MudStack Spacing="0" Style="max-width: 200px; ">
+        <div class="d-flex">
+            <MudTableSortLabel SortBy="@SortBy">
+                <MudText><b>@Title</b></MudText>
+            </MudTableSortLabel>
+        </div>
+        <MudDatePicker Date="@FilterDate" DateChanged="OnDateChanged" Placeholder="@DatePlaceHolder" Variant="Variant.Outlined" Margin="Margin.Dense" OpenTo="OpenTo.Date" Clearable="true" Editable="true" />
+        <MudTimePicker Time="@FilterDate?.TimeOfDay" TimeChanged="OnTimeChanged" Placeholder="@TimePlaceHolder" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="false" Editable="true" />
+    </MudStack>
+</MudTh>
+
+@code {
+    [Parameter] public DateTime? FilterDate { get; set; }
+    [Parameter] public EventCallback<DateTime?> FilterDateChanged { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? DatePlaceHolder { get; set; }
+    [Parameter] public string? TimePlaceHolder { get; set; }
+    [Parameter] public Func<T, object>? SortBy { get; set; }
+
+    Task OnDateChanged(DateTime? value)
+    {
+        FilterDate = value?.Date + (FilterDate?.TimeOfDay ?? TimeSpan.Zero);
+        return FilterDateChanged.InvokeAsync(value);
+    }
+    Task OnTimeChanged(TimeSpan? value)
+    {
+        FilterDate = FilterDate?.Date + value;
+        return FilterDateChanged.InvokeAsync(FilterDate);
+    }
+}

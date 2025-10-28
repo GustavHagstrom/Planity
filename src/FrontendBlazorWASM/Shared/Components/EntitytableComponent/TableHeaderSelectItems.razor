@@ -1,0 +1,28 @@
+﻿@typeparam T
+
+<MudTh>
+    <MudStack Spacing="0" Style="max-width: 200px;">
+        <div class="d-flex">
+            <MudTableSortLabel SortBy="@SortBy">
+                <MudText><b>@Title</b></MudText>
+            </MudTableSortLabel>
+        </div>
+
+        <div class="d-flex align-center">
+            <MudCheckBox Value="@Value" ValueChanged="ValueChanged" Dense="true" Size="Size.Medium" />
+            <MudField Variant="Variant.Outlined" Margin="Margin.Dense" Style="visibility: hidden;" />
+        </div>
+    </MudStack>
+</MudTh>
+
+@code {
+    [Parameter] public bool Value { get; set; } = false;
+    [Parameter] public EventCallback<bool> ValueChanged { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public Func<T, object>? SortBy { get; set; }
+
+    Task OnFilterChanged(bool value)
+    {
+        return ValueChanged.InvokeAsync(value);
+    }
+}

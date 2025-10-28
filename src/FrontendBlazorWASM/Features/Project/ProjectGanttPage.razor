@@ -13,5 +13,12 @@
     protected override async Task OnInitializedAsync()
     {
         Projects = await ProjectService.GetProjectsAsync(State.ProjectIds);
+        if(State.Expanded)
+        {
+            foreach(var project in Projects)
+            {
+                project.IsExpanded = true;
+            }
+        }
     }
 }

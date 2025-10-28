@@ -1,0 +1,30 @@
+﻿@using System.Linq.Expressions
+@typeparam T
+@inherits StyleComponent
+
+<MudTextField T="T" Value="Value"
+              ValueChanged="ValueChanged" 
+              For="For" 
+              Variant="Variant.Outlined" 
+              Margin="Margin.Dense" 
+              Required="Required" 
+              Adornment="@Adornment" 
+              AdornmentText="@AdornmentText" 
+              AdornmentIcon="@AdornmentIcon" 
+              AdornmentColor="@AdornmentColor" 
+              Class="@Class" 
+              Style="@Style"
+              Label="@Label"/>
+
+@code {
+    [Parameter] public T? Value { get; set; }
+    [Parameter] public EventCallback<T?> ValueChanged { get; set; }
+    [Parameter] public Expression<Func<T>>? For { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool Required { get; set; } = false;
+    [Parameter] public Adornment Adornment { get; set; } = Adornment.None;
+    [Parameter] public string? AdornmentText { get; set; }
+    [Parameter] public string? AdornmentIcon { get; set; }
+    [Parameter] public Color AdornmentColor { get; set; } = Color.Default;
+}
+

@@ -1,13 +1,47 @@
 @inject IStringLocalizer<ResourceForm> localizer
 
-
-<MudTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
-<MudTextField T="string" @bind-Value="resource.OrganizationId" Label="@localizer["Organisation"]" For="() => resource.OrganizationId" />
+<MudGrid Spacing="2">
+    <MudItem xs="12" sm="6" lg="3">
+        <PlanityTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" />
+    </MudItem>
+    <MudItem xs="0" sm="6" lg="9">
+    </MudItem>
+    <MudItem md="4">
+        <PlanityTextField T="int" @bind-Value="@resource.Workers" Label="@localizer["Antal arbetare"]" Required="true" />
+    </MudItem>
+    <MudItem md="4">
+        <PlanityTextField T="int" Value="@Convert.ToInt32(resource.Efficiency * 100)" ValueChanged="SetEfficiency" Label="@localizer["Effektivitet"]" Required="true" Adornment="Adornment.Start" AdornmentText="%" />
+    </MudItem>
+    <MudItem xs="12" xxl="12">
+        <EntityTable Items="FlatWorkPeriods()" Title="@localizer["Arbetstider"]">
+            <LeftActions>
+                <MudIconButton Icon="@Icons.Material.Sharp.Add" Variant="Variant.Filled" Color="Color.Primary" />
+            </LeftActions>
+            <HeaderContent>
+                <MudTh>@localizer["Veckodag"]</MudTh>
+                <MudTh>@localizer["Från"]</MudTh>
+                <MudTh>@localizer["Till"]</MudTh>
+                <MudTh>@localizer["Timmars rast"]</MudTh>
+                <MudTh>@localizer["Åtgärder"]</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@WeekDayToString(@context.Day)</MudTd>
+                <MudTd>@context.Start.ToString(@"hh\:mm")</MudTd>
+                <MudTd>@context.End.ToString(@"hh\:mm")</MudTd>
+                <MudTd>@context.BreakDuration</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+                </MudTd>
+            </RowTemplate>
+        </EntityTable>
+    </MudItem>
+</MudGrid>
 
 
 @code {
     [Parameter] public Resource? ResourceModel { get; set; }
-    
+
     private Resource resource = new();
 
     protected override void OnParametersSet()
@@ -21,5 +55,38 @@
                 OrganizationId = ResourceModel.OrganizationId,
             };
         }
+    }
+
+    void SetEfficiency(int value)
+    {
+        resource.Efficiency = value / 100.0;
+    }
+
+    string WeekDayToString(DayOfWeek dayOfWeek)
+    {
+        return dayOfWeek switch
+        {
+            DayOfWeek.Monday => localizer["Måndag"],
+            DayOfWeek.Tuesday => localizer["Tisdag"],
+            DayOfWeek.Wednesday => localizer["Onsdag"],
+            DayOfWeek.Thursday => localizer["Torsdag"],
+            DayOfWeek.Friday => localizer["Fredag"],
+            DayOfWeek.Saturday => localizer["Lördag"],
+            DayOfWeek.Sunday => localizer["Söndag"],
+            _ => string.Empty,
+        };
+    }
+    List<(DayOfWeek Day, TimeSpan Start, TimeSpan End, double BreakDuration)> FlatWorkPeriods()
+    {
+        var flatList = resource.WorkCalendar.WorkPeriodsByDayOfWeek
+            .SelectMany(kvp => kvp.Value.Select(v => (
+                kvp.Key,
+                v.Start,
+                v.End,
+                v.BreakDuration
+            )))
+            .ToList();
+        flatList = flatList.OrderBy(x => x.Key).ToList();
+        return flatList;
     }
 }

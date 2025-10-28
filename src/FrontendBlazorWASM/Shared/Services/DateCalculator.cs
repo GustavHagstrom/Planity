@@ -26,7 +26,7 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
             bool isFirstDay = true;
             while (remainingHours > 0)
             {
-                var periods = workCalendar.WorkPeriodsByDayOfWeek.TryGetValue(currentDate.DayOfWeek, out var p) ? p : new List<(TimeSpan, TimeSpan)>();
+                var periods = workCalendar.WorkPeriodsByDayOfWeek.TryGetValue(currentDate.DayOfWeek, out var p) ? p : new List<(TimeSpan, TimeSpan, double)>();
                 bool isHoliday = workCalendar.Holidays.Contains(currentDate.Date);
                 bool hasOvertime = workCalendar.OvertimeHours.TryGetValue(currentDate.Date, out var overtimeHours) && overtimeHours > 0;
                 int passCount = periods.Count;
@@ -39,12 +39,12 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
                     continue;
                 }
                 // Iterera över ordinarie perioder
-                foreach (var (periodStart, periodEnd) in periods)
+                foreach (var (periodStart, periodEnd, breakDuration) in periods)
                 {
                     var actualStart = isFirstDay && currentDate.TimeOfDay > periodStart ? currentDate.TimeOfDay : periodStart;
                     if (actualStart >= periodEnd)
                         continue;
-                    var availableHours = (periodEnd - actualStart).TotalHours * workerEff;
+                    var availableHours = (periodEnd.Subtract(TimeSpan.FromHours(breakDuration)) - actualStart).TotalHours * workerEff;
                     if (availableHours <= 0)
                         continue;
                     if (remainingHours <= availableHours)

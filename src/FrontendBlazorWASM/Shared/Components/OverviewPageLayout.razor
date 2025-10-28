@@ -1,7 +1,7 @@
 @inherits StyleComponent
 <PageTitle>@Title</PageTitle>
 <PlanityToolbar LeftActions="@LeftActions" MiddleActions="@MiddleActions" RightActions="@RightActions" Title="@Title"/>
-<MudContainer Class="@_class" Style="@Style">
+<MudContainer Class="@_class" Style="@Style" MaxWidth="MaxWidth.ExtraExtraLarge">
     @ChildContent
 </MudContainer>
 
@@ -12,5 +12,5 @@
     [Parameter] public RenderFragment? RightActions { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    string _class => $"pa-4 {Class}";
+    string _class => $"pa-4 justify-center d-flex {Class}";
 }

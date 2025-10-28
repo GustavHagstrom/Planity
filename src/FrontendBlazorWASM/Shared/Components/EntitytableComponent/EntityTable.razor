@@ -1,0 +1,69 @@
+@typeparam TItem
+
+<MudStack>
+    @if(Title is not null)
+    {
+        <div class="d-flex justify-space-between">
+            <MudStack Row="true" Spacing="2" Class="align-end">
+                <MudText Typo="Typo.h6">@Title</MudText>
+                @if(LeftActions is not null)
+                {
+                    <MudDivider Vertical="true" Class="mx-2" />
+                    @LeftActions
+                }
+            </MudStack>
+            <MudStack Row="true" Spacing="2">
+                @RightActions
+            </MudStack>
+        </div>
+        
+    }
+
+    <style>
+        .entity-table th {
+            vertical-align: top;
+        }
+    </style>
+
+    <MudTable T="TItem" 
+              Items="@Items" 
+              Hover="true" 
+              Dense="true" 
+              Virtualize="true" 
+              Striped="true" 
+              Filter="Filter" 
+              FixedHeader="true"
+              Class="entity-table">
+
+        <HeaderContent>
+                @HeaderContent
+                @if(EditLinkFunction is not null)
+                {
+                    <MudTh/>
+                }
+        </HeaderContent>
+        <RowTemplate>
+            @if (RowTemplate is not null)
+            {
+                @RowTemplate(context)
+            }
+            @if(EditLinkFunction is not null)
+            {
+                <MudTd>
+                    <MudIconButton Href="@EditLinkFunction(context)" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" />
+                </MudTd>
+            }
+        </RowTemplate>
+
+    </MudTable>
+</MudStack>
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public IEnumerable<TItem>? Items { get; set; }
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment<TItem>? RowTemplate { get; set; }
+    [Parameter] public RenderFragment? LeftActions { get; set; }
+    [Parameter] public RenderFragment? RightActions { get; set; }
+    [Parameter] public Func<TItem, string>? EditLinkFunction { get; set; }
+    [Parameter] public Func<TItem, bool>? Filter { get; set; }
+}

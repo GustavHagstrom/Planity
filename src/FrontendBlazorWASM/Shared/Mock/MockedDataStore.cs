@@ -29,11 +29,11 @@ public static class MockedDataStore
             OvertimeHours = new Dictionary<DateTime, double> { { DateTime.Today, 2 } }
         };
         // Måndag–Torsdag: 08:00–12:00, 13:00–16:30 (raster 12:00–13:00), Fredag: 08:00–14:00
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday,    new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5)) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday,   new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5)) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5)) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Thursday,  new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5)) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Friday,    new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(14)) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday,    new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday,   new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Thursday,  new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16.5), 1) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Friday,    new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(14), 1) });
         // Lördag och söndag har redan tomma perioder
         return calendar;
     }
@@ -47,10 +47,10 @@ public static class MockedDataStore
             OvertimeHours = new Dictionary<DateTime, double> { { DateTime.Today.AddDays(1), 1.5 } }
         };
         // Måndag–Torsdag: 08:00–12:00, 13:00–15:00 (raster 12:00–13:00)
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday,    new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(15)) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday,   new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(15)) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(15)) });
-        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Thursday,  new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(15)) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday,    new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday,   new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
+        calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Thursday,  new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(15), 1) });
         // Fredag, lördag och söndag har tomma perioder
         return calendar;
     }
@@ -64,7 +64,7 @@ public static class MockedDataStore
             OvertimeHours = new Dictionary<DateTime, double>()
         };
         // Måndag–Fredag: 08:00–12:00, 13:00–16:00 (raster 12:00–13:00)
-        var periods = new List<(TimeSpan, TimeSpan)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12)), (TimeSpan.FromHours(13), TimeSpan.FromHours(16)) };
+        var periods = new List<(TimeSpan, TimeSpan, double)> { (TimeSpan.FromHours(8), TimeSpan.FromHours(12), 1), (TimeSpan.FromHours(13), TimeSpan.FromHours(16), 1) };
         calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Monday, periods);
         calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Tuesday, periods);
         calendar.SetWorkPeriodsByDayOfWeek(DayOfWeek.Wednesday, periods);

@@ -13,6 +13,7 @@ public class EndDateProject
     }
 
     public string Id { get; private set; }
+    public bool IsSelected { get; set; } = false;
     public string Name { get; private set; }
     public string Description { get; private set; }
     public DateTime? Start { get; private set; }
