@@ -17,5 +17,5 @@ public class WorkCalendar
     // Special-helgdagar (t.ex. påsk, midsommar)
     public HashSet<Holyday> Holidays { get; set; } = [];
     // Övertid per dag (datum -> antal extra timmar)
-    public Dictionary<DateOnly, double> OvertimeHours { get; set; } = new();
+    public HashSet<Overtime> Overtime { get; set; } = [];
 }

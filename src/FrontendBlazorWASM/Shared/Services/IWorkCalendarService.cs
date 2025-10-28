@@ -9,6 +9,6 @@ public interface IWorkCalendarService
     Task AddWorkPeriods(string resourceId, IEnumerable<WorkPeriod> periods);
     Task AddHolidayAsync(string resourceId, Holyday holyday);
     Task RemoveHolidayAsync(string resourceId, Holyday holyday);
-    Task SetOvertimeAsync(string resourceId, DateOnly date, double overtimeHours);
-    Task RemoveOvertimeAsync(string resourceId, DateOnly date);
+    Task SetOvertimeAsync(string resourceId, Overtime overtime);
+    Task RemoveOvertimeAsync(string resourceId, Overtime overtime);
 }

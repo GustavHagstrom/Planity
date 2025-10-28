@@ -33,7 +33,7 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
                     .ToList();
 
                 bool isHoliday = workCalendar.Holidays.Any(x => x.Date == DateOnly.FromDateTime(currentDate.Date));
-                bool hasOvertime = workCalendar.OvertimeHours.TryGetValue(DateOnly.FromDateTime(currentDate.Date), out var overtimeHours) && overtimeHours > 0;
+                bool hasOvertime = workCalendar.Overtime.Any(x => x.Date == DateOnly.FromDateTime(currentDate.Date) && x.TotalHours > 0);
 
                 bool hasOrdinaryWork = dayPeriods.Count > 0 && !isHoliday;
                 bool hasAnyWork = hasOrdinaryWork || hasOvertime;
@@ -99,6 +99,10 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
                     {
                         overtimeStart = currentDate.TimeOfDay;
                     }
+
+                    // FIX: Define overtimeHours from the calendar's Overtime entry for the current date
+                    var overtimeEntry = workCalendar.Overtime.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(currentDate.Date));
+                    var overtimeHours = overtimeEntry?.TotalHours ?? 0;
 
                     var availableOvertime = overtimeHours * workerEff; // effekt-justerade timmar
                     if (availableOvertime > 0)

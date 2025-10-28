@@ -44,17 +44,17 @@ public class MockedWorkCalendarService : IWorkCalendarService
         return Task.CompletedTask;
     }
 
-    public Task SetOvertimeAsync(string resourceId, DateOnly date, double overtimeHours)
+    public Task SetOvertimeAsync(string resourceId, Overtime overtime)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
-            calendar.OvertimeHours[date] = overtimeHours;
+            calendar.Overtime.Add(overtime);
         return Task.CompletedTask;
     }
 
-    public Task RemoveOvertimeAsync(string resourceId, DateOnly date)
+    public Task RemoveOvertimeAsync(string resourceId, Overtime overtime)
     {
         if (MockedDataStore.WorkCalendars.TryGetValue(resourceId, out var calendar))
-            calendar.OvertimeHours.Remove(date);
+            calendar.Overtime.Remove(overtime);
         return Task.CompletedTask;
     }
 }

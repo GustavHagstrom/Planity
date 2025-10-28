@@ -27,7 +27,7 @@ public class DateCalculatorTests
     }
 
     private static DateCalculator CreateCalculator(IResourceService? svc = null)
-        => new DateCalculator(resourceService: svc ?? new FakeResourceService(MockData.GetDefaultResources(), MockData.GetDefaultTasks(MockData.GetDefaultResources())));
+        => new(resourceService: svc ?? new FakeResourceService(MockData.GetDefaultResources(), MockData.GetDefaultTasks(MockData.GetDefaultResources())));
 
     [Test]
     public void CalculateEnd_Task8Hours_SpansToTuesdayMorning()
@@ -94,8 +94,8 @@ public class DateCalculatorTests
         // Arrange
         var resource = CreateResource(configure: cal =>
         {
-            // Add3 hours overtime on Saturday
-            cal.OvertimeHours[new DateOnly(2025, 3, 8)] = 3; // Saturday
+            // Add 3 hours overtime on Saturday
+            cal.Overtime.Add(new Overtime { Date = new DateOnly(2025, 3, 8), From = TimeSpan.FromHours(17), To = TimeSpan.FromHours(20) });
         });
         var resources = new List<Resource> { resource };
         var start = new DateTime(2025, 3, 8, 8, 0, 0); // Saturday
@@ -155,8 +155,11 @@ public class DateCalculatorTests
         var monday = new DateTime(2025, 3, 3);
         var sunday = new DateTime(2025, 3, 2);
 
-        // Act + Assert
-        Assert.That(sut.IsWorkDay(calendar, monday), Is.True);
-        Assert.That(sut.IsWorkDay(calendar, sunday), Is.False);
+        Assert.Multiple(() =>
+        {
+            // Act + Assert
+            Assert.That(sut.IsWorkDay(calendar, monday), Is.True);
+            Assert.That(sut.IsWorkDay(calendar, sunday), Is.False);
+        });
     }
 }
