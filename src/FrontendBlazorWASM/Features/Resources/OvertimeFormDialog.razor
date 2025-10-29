@@ -1,0 +1,52 @@
+﻿@inject IStringLocalizer<WorkperiodFormDialog> localizer
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudDatePicker Margin="Margin.Dense" @bind-Date="Date" Required="true" Label="@localizer["Datum"]" />
+            <MudTimePicker Margin="Margin.Dense" @bind-Time="From" Required="true" Label="@localizer["Start"]" />
+            <MudTimePicker Margin="Margin.Dense" @bind-Time="To" Required="true" Label="@localizer["Slut"]" />
+            <PlanityTextField T="double" Label="@localizer["Total timmars övertid"]" Value="@TotalHours" ReadOnly="true" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="MudDialog.Cancel">@localizer["Avbryt"]</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(From == null || To == null)" OnClick="Submit" StartIcon="@Icons.Material.Sharp.Save">@localizer["Spara"]</MudButton>
+    </DialogActions>
+   
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public Overtime? Overtime { get; set; }
+    DateTime? Date = DateTime.Now;
+    TimeSpan? From;
+    TimeSpan? To;
+    double TotalHours => (To - From)?.TotalHours ?? 0;
+
+    protected override void OnInitialized()
+    {
+        if (Overtime is not null)
+        {
+            Date = Overtime.Date.ToDateTime(TimeOnly.MinValue);
+            From = Overtime.From;
+            To = Overtime.To;
+        }
+    }
+
+
+    void Submit()
+    {
+        if (MudDialog is not null && From is not null && To is not null && Date is not null)
+        {
+            MudDialog.Close(DialogResult.Ok(new Overtime
+            {
+                Date = DateOnly.FromDateTime(this.Date.Value),
+                From = From.Value,
+                To = To.Value,
+            }));
+        }
+    }
+
+}

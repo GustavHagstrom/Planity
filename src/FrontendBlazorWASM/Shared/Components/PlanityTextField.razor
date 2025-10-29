@@ -14,7 +14,8 @@
               AdornmentColor="@AdornmentColor" 
               Class="@Class" 
               Style="@Style"
-              Label="@Label"/>
+              Label="@Label"
+              ReadOnly="@ReadOnly"/>
 
 @code {
     [Parameter] public T? Value { get; set; }
@@ -26,5 +27,6 @@
     [Parameter] public string? AdornmentText { get; set; }
     [Parameter] public string? AdornmentIcon { get; set; }
     [Parameter] public Color AdornmentColor { get; set; } = Color.Default;
+    [Parameter] public bool ReadOnly { get; set; } = false;
 }
 

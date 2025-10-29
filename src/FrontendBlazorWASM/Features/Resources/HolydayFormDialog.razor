@@ -1,0 +1,46 @@
+﻿@inject IStringLocalizer<WorkperiodFormDialog> localizer
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <PlanityTextField T="string" @bind-Value="Name" Required="true" Label="@localizer["Namn"]" />
+            <MudDatePicker Margin="Margin.Dense" @bind-Date="Date" Required="true" Label="@localizer["Datum"]" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="MudDialog.Cancel">@localizer["Avbryt"]</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(Date == null || Name == null)" OnClick="Submit" StartIcon="@Icons.Material.Sharp.Save">@localizer["Spara"]</MudButton>
+    </DialogActions>
+   
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public Holyday? Holyday { get; set; }
+    DateTime? Date;
+    string? Name; 
+
+    protected override void OnInitialized()
+    {
+        if (Holyday is not null)
+        {
+            Date = Holyday.Date.ToDateTime(TimeOnly.MinValue);
+            Name = Holyday.Name;
+        }
+    }
+
+
+    void Submit()
+    {
+        if (MudDialog is not null && Date is not null && Name is not null)
+        {
+            MudDialog.Close(DialogResult.Ok(new Holyday
+            {
+                Date = DateOnly.FromDateTime(Date.Value),
+                Name = Name
+            }));
+        }
+    }
+
+}

@@ -33,9 +33,10 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
                     .ToList();
 
                 bool isHoliday = workCalendar.Holidays.Any(x => x.Date == DateOnly.FromDateTime(currentDate.Date));
+                bool isVacation = workCalendar.Vacations.Any(v => DateOnly.FromDateTime(currentDate.Date) >= v.From && DateOnly.FromDateTime(currentDate.Date) <= v.To);
                 bool hasOvertime = workCalendar.Overtime.Any(x => x.Date == DateOnly.FromDateTime(currentDate.Date) && x.TotalHours > 0);
 
-                bool hasOrdinaryWork = dayPeriods.Count > 0 && !isHoliday;
+                bool hasOrdinaryWork = dayPeriods.Count > 0 && !isHoliday && !isVacation;
                 bool hasAnyWork = hasOrdinaryWork || hasOvertime;
                 if (!hasAnyWork)
                 {

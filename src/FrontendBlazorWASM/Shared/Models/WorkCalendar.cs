@@ -18,4 +18,5 @@ public class WorkCalendar
     public HashSet<Holyday> Holidays { get; set; } = [];
     // Övertid per dag (datum -> antal extra timmar)
     public HashSet<Overtime> Overtime { get; set; } = [];
+    public HashSet<Vacation> Vacations { get; set; } = [];
 }

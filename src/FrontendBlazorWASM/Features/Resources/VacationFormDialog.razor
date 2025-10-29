@@ -1,0 +1,46 @@
+﻿@inject IStringLocalizer<WorkperiodFormDialog> localizer
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudDatePicker Margin="Margin.Dense" @bind-Date="From" Required="true" Label="@localizer["Start"]" />
+            <MudDatePicker Margin="Margin.Dense" @bind-Date="To" Required="true" Label="@localizer["Slut"]" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="MudDialog.Cancel">@localizer["Avbryt"]</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Disabled="@(From == null || To == null)" OnClick="Submit" StartIcon="@Icons.Material.Sharp.Save">@localizer["Spara"]</MudButton>
+    </DialogActions>
+   
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public Vacation? Vacation { get; set; }
+    DateTime? From;
+    DateTime? To; 
+
+    protected override void OnInitialized()
+    {
+        if (Vacation is not null)
+        {
+            From = Vacation.From.ToDateTime(TimeOnly.MinValue);
+            To = Vacation.To.ToDateTime(TimeOnly.MinValue);
+        }
+    }
+
+
+    void Submit()
+    {
+        if (MudDialog is not null && From is not null && To is not null)
+        {
+            MudDialog.Close(DialogResult.Ok(new Vacation
+            {
+                From = DateOnly.FromDateTime(From.Value),
+                To = DateOnly.FromDateTime(To.Value)
+            }));
+        }
+    }
+
+}
