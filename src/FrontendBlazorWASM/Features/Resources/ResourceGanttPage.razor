@@ -1,0 +1,25 @@
+﻿@page "/resources/resource-gantt"
+@layout FullHeightLayout
+@inject SelectedResourcesState state
+@inject IResourceService ResourceService
+
+<GanttView  ItemsParam="resources" LinksParam="null" />
+
+
+@code{
+    List<Resource> resources = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        resources = await ResourceService.GetResourcesAsync(state.Ids);
+        if (state.Expanded)
+        {
+            foreach (var resource in resources)
+            {
+                resource.IsExpanded = true;
+            }
+        }
+    }
+
+}

@@ -1,35 +1,114 @@
 @page "/resources"
-@inject NavigationManager NavigationManager
+@inject ResourceNavigator Navigator
 @inject IResourceService ResourceService
 @inject IStringLocalizer<ResourceOverviewPage> localizer
 
-
-
 <OverviewPageLayout Title="@localizer["Resursöversikt"]">
     <LeftActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.ResourceNew))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@Routes.ResourceNew" StartIcon="@Icons.Material.Sharp.Add" Size="Size.Small">
             @localizer["Ny resurs"]
         </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ViewSelectionInGantt" StartIcon="@Icons.Material.Sharp.ViewTimeline" Size="Size.Small">
+            @localizer["Visa urval i Gantt"]
+        </MudButton>
     </LeftActions>
+    <RightActions>
+        <PlanitySearchField @bind-Value="searchString" />
+    </RightActions>
 
     <ChildContent>
-        <EntityTable Items="@resources" EditLinkFunction="x => Routes.ResourceDetails(x.Id)">
+        <EntityTable Items="@resources" Filter="FilterFunction">
             <HeaderContent>
-                <MudTh>@localizer["Namn"]</MudTh>
+                <TableHeaderSelectItems T="Resource" Title="@localizer["Välj"]" Value="@HeaderSelect" ValueChanged="@OnHeaderSelectChanged" />
+                <TableHeaderTextFilter T="Resource" Title="@localizer["Namn"]" SortBy="new Func<Resource, object>(x => x.Name)" @bind-FilterString="NameFilter" />
+                <TableHeaderTextFilter T="Resource" Title="@localizer["Arbetare (st)"]" SortBy="new Func<Resource, object>(x => x.Workers)" @bind-FilterString="WorkersFilter" Style="max-width: 160px;" />
+                <TableHeaderTextFilter T="Resource" Title="@localizer["Effektivitet (%)"]" SortBy="new Func<Resource, object>(x => x.Efficiency)" @bind-FilterString="EfficiencyFilter" Style="max-width: 180px;" />
+                <MudTh Style="width: 60px;">
+                    <MudStack Spacing="0">
+                        <MudText><b>@localizer["Åtgärder"]</b></MudText>
+                        <MudField Variant="Variant.Outlined" Margin="Margin.Dense" Style="visibility: hidden;" />
+                    </MudStack>
+                </MudTh>
             </HeaderContent>
             <RowTemplate>
+                <MudTd>
+                    <MudCheckBox T="bool" @bind-Value="@context.IsSelected" />
+                </MudTd>
                 <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Workers</MudTd>
+                <MudTd>@((context.Efficiency * 100).ToString("N0"))</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" Href="@Routes.ResourceDetails(context.Id)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+                </MudTd>
             </RowTemplate>
         </EntityTable>
+
+
     </ChildContent>
 </OverviewPageLayout>
 
 
 @code {
-    private List<Resource> resources = new();
+    private List<SelectableResource> resources = new();
+
+    bool HeaderSelect = false;
+
+    string NameFilter = string.Empty;
+    string WorkersFilter = string.Empty;
+    string EfficiencyFilter = string.Empty;
+    string searchString = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        resources = await ResourceService.GetResourcesAsync();
+        var result = await ResourceService.GetResourcesAsync();
+        resources = result.Select(r => new SelectableResource(r)).ToList();
+    }
+
+    void OnHeaderSelectChanged(bool value)
+    {
+        HeaderSelect = value;
+        foreach (var resource in resources)
+        {
+            resource.IsSelected = value;
+        }
+    }
+
+    bool FilterFunction(SelectableResource resource)
+    {
+        if (!string.IsNullOrWhiteSpace(NameFilter))
+        {
+            if (resource.Name == null || !resource.Name.Contains(NameFilter, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+        if (!string.IsNullOrWhiteSpace(WorkersFilter))
+        {
+            if (!resource.Workers.ToString().Contains(WorkersFilter, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+        if (!string.IsNullOrWhiteSpace(EfficiencyFilter))
+        {
+            if (!((resource.Efficiency * 100).ToString("N0")).Contains(EfficiencyFilter, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+        if (!string.IsNullOrWhiteSpace(searchString))
+        {
+            if (!resource.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) && !resource.Workers.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase) && !((resource.Efficiency * 100).ToString("N0")).Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    void ViewSelectionInGantt()
+    {
+        var selectedResourceIds = resources.Where(r => r.IsSelected).Select(r => r.Id).ToList();
+        Navigator.ShowInGantt(selectedResourceIds);
     }
 }

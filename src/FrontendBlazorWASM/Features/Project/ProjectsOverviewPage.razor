@@ -29,7 +29,7 @@
                 <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Namn"]" SortBy="new Func<EndDateProject, object>(x => x.Name)" @bind-FilterString="NameFilter"/>
                 <TableHeaderTextFilter T="EndDateProject" Title="@localizer["Beskrivning"]" SortBy="new Func<EndDateProject, object>(x => x.Description)" @bind-FilterString="DescriptionFilter" />
                 <TableHeaderDateTimeFilter T="EndDateProject" Title="@localizer["Start"]" SortBy="new Func<EndDateProject, object?>(x => x.Start)" @bind-FilterDate="@FromDateFilter" DatePlaceHolder="@localizer["Datum"]" TimePlaceHolder="@localizer["Tid"]" />   
-                <TableHeaderDateTimeFilter T="EndDateProject" Title="@localizer["Slut"]" SortBy="new Func<EndDateProject, object?>(x => x.End)" @bind-FilterDate="@FromDateFilter" DatePlaceHolder="@localizer["TDtum"]" TimePlaceHolder="@localizer["Tid"]" />
+                <TableHeaderDateTimeFilter T="EndDateProject" Title="@localizer["Slut"]" SortBy="new Func<EndDateProject, object?>(x => x.End)" @bind-FilterDate="@FromDateFilter" DatePlaceHolder="@localizer["Datum"]" TimePlaceHolder="@localizer["Tid"]" />
                 <MudTh Style="width: 60px;">
                     <MudStack Spacing="0">
                     <MudText><b>@localizer["Åtgärder"]</b></MudText>

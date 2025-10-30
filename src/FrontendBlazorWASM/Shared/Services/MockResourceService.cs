@@ -49,4 +49,12 @@ public class MockResourceService(IAuthService authService) : IResourceService
             .ToList();
         return await Task.FromResult(tasks);
     }
+
+    public Task<List<Resource>> GetResourcesAsync(List<string> ids)
+    {
+        var resources = MockedDataStore.Resources.Values
+            .Where(r => ids.Contains(r.Id))
+            .ToList();
+        return Task.FromResult(resources);
+    }
 }

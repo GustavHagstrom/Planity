@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Localization;
+using Planity.FrontendBlazorWASM.Features.Resources.Services;
 using Planity.FrontendBlazorWASM.Shared.Abstractions;
 
 namespace Planity.FrontendBlazorWASM.Features.Resources;
@@ -13,6 +14,7 @@ public class ResourceFeature(IStringLocalizer<ResourceFeature> Localizer) : IFea
 
     public void RegisterServices(IServiceCollection services)
     {
-
+        services.AddScoped<ResourceNavigator>();
+        services.AddScoped<SelectedResourcesState>();
     }
 }

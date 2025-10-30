@@ -14,8 +14,10 @@ public static class Routes
 
     // Resource routes
     public const string ResourcesOverview = "/resources";
+    public const string ResourceGantt = "/resources/resource-gantt";
     public static string ResourceDetails(string id) => $"/resources/{id}";
     public const string ResourceNew = "/resources/new";
+
 
     // Task routes
     public const string TasksOverview = "/tasks";

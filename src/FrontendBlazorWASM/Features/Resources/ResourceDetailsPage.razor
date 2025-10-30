@@ -1,18 +1,123 @@
 @page "/resources/{ResourceId}"
 @inject IResourceService ResourceService
-@inject NavigationManager NavigationManager
+@inject ResourceNavigator Navigator
 @inject IStringLocalizer<ResourceDetailsPage> localizer
 @inject IJSRuntime JS
+@inject IDialogService DialogService
 
 <EntityFormsPageLayout Title="@localizer["Resursinformation"]" IsLoading="resource is null" OnSave="Save">
+    <Actions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ViewInGantt" StartIcon="@Icons.Material.Sharp.ViewTimeline" Size="Size.Small">
+            @localizer["Visa i Gantt"]
+        </MudButton>
+    </Actions>
+    
     <MainContent>
-        <ResourceForm ResourceModel="resource"/>
+        
+        @if(resource is not null)
+        {
+            
+            <MudStack Spacing="4">
+            
+                <ResourceForm ResourceModel="resource" />
+
+                <EntityTable Items="resource.WorkCalendar.WorkPeriods.OrderBy(x => x.Day)" Title="@localizer["Arbetstider"]">
+                    <RightActions>
+                        <MudIconButton Icon="@Icons.Material.Sharp.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => OpenWorkPeriodForm()" />
+                    </RightActions>
+                    <HeaderContent>
+                        <MudTh>@localizer["Veckodag"]</MudTh>
+                        <MudTh>@localizer["Från"]</MudTh>
+                        <MudTh>@localizer["Till"]</MudTh>
+                        <MudTh>@localizer["Timmars rast"]</MudTh>
+                        <MudTh Style="width: 60px;">@localizer["Åtgärder"]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@WeekDayToString(@context.Day)</MudTd>
+                        <MudTd>@context.Start.ToString(@"hh\:mm")</MudTd>
+                        <MudTd>@context.End.ToString(@"hh\:mm")</MudTd>
+                        <MudTd>@context.BreakDuration</MudTd>
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" OnClick="@(() => OpenWorkPeriodForm(context))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+                        </MudTd>
+                    </RowTemplate>
+                </EntityTable>
+
+
+                <EntityTable Items="resource.WorkCalendar.Overtime.OrderByDescending(x => x.Date)" Title="@localizer["Övertid"]">
+                    <RightActions>
+                        <MudIconButton Icon="@Icons.Material.Sharp.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => OpenOvertimeForm()" />
+                    </RightActions>
+                    <HeaderContent>
+                        <MudTh>@localizer["Datum"]</MudTh>
+                        <MudTh>@localizer["Från"]</MudTh>
+                        <MudTh>@localizer["Till"]</MudTh>
+                        <MudTh>@localizer["Total tid"]</MudTh>
+                        <MudTh Style="width: 60px;">@localizer["Åtgärder"]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.Date.ToString("yyyy-MM-dd")</MudTd>
+                        <MudTd>@context.From.ToString(@"hh\:mm")</MudTd>
+                        <MudTd>@context.To.ToString(@"hh\:mm")</MudTd>
+                        <MudTd>@context.TotalHours</MudTd>
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" OnClick="() => OpenOvertimeForm(context)" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+                        </MudTd>
+                    </RowTemplate>
+                </EntityTable>
+
+
+                <EntityTable Items="resource.WorkCalendar.Vacations.OrderByDescending(x => x.From)" Title="@localizer["Semester"]">
+                    <RightActions>
+                        <MudIconButton Icon="@Icons.Material.Sharp.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => OpenVacationForm()" />
+                    </RightActions>
+                    <HeaderContent>
+                        <MudTh>@localizer["Från"]</MudTh>
+                        <MudTh>@localizer["Till"]</MudTh>
+                        <MudTh Style="width: 60px;">@localizer["Åtgärder"]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.From.ToString("yyyy-MM-dd")</MudTd>
+                        <MudTd>@context.To.ToString(@"hh\:mm")</MudTd>
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" OnClick="() => OpenVacationForm(context)" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+                        </MudTd>
+                    </RowTemplate>
+                </EntityTable>
+
+
+                <EntityTable Items="resource.WorkCalendar.Holidays.OrderByDescending(x => x.Date)" Title="@localizer["Röda dagar"]">
+                    <RightActions>
+                        <MudIconButton Icon="@Icons.Material.Sharp.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => OpenHolydayForm()" />
+                    </RightActions>
+                    <HeaderContent>
+                        <MudTh>@localizer["Namn"]</MudTh>
+                        <MudTh>@localizer["Datum"]</MudTh>
+                        <MudTh Style="width: 60px;">@localizer["Åtgärder"]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.Name</MudTd>
+                        <MudTd>@context.Date.ToString("yyyy-MM-dd")</MudTd>
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" OnClick="() => OpenHolydayForm(context)" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+                        </MudTd>
+                    </RowTemplate>
+                </EntityTable>
+
+            </MudStack>
+
+        }
+
+        
     </MainContent>
 </EntityFormsPageLayout>
 
 @code {
-    [Parameter]
-    public string? ResourceId { get; set; }
+    [Parameter] public string? ResourceId { get; set; }
     private Resource? resource;
 
     protected override async Task OnParametersSetAsync()
@@ -29,6 +134,116 @@
         {
             await ResourceService.UpdateResourceAsync(resource);
             await JS.InvokeVoidAsync("history.back");
+        }
+    }
+
+    string WeekDayToString(DayOfWeek dayOfWeek)
+    {
+        return dayOfWeek switch
+        {
+            DayOfWeek.Monday => localizer["Måndag"],
+            DayOfWeek.Tuesday => localizer["Tisdag"],
+            DayOfWeek.Wednesday => localizer["Onsdag"],
+            DayOfWeek.Thursday => localizer["Torsdag"],
+            DayOfWeek.Friday => localizer["Fredag"],
+            DayOfWeek.Saturday => localizer["Lördag"],
+            DayOfWeek.Sunday => localizer["Söndag"],
+            _ => string.Empty,
+        };
+    }
+    async Task OpenWorkPeriodForm(WorkPeriod? workPeriod = null)
+    {
+        var parameters = new DialogParameters<WorkperiodFormDialog> { { x => x.Period, workPeriod } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<WorkperiodFormDialog>(localizer["Arbetspass"], parameters, options);
+        var result = await dialog.Result;
+        if (result is not null && !result.Canceled && result.Data is WorkPeriod workperiodResult)
+        {
+            if (workPeriod is not null)
+            {
+                // Update existing period
+                workPeriod.Day = workperiodResult.Day;
+                workPeriod.Start = workperiodResult.Start;
+                workPeriod.End = workperiodResult.End;
+                workPeriod.BreakDuration = workperiodResult.BreakDuration;
+            }
+            else
+            {
+                resource?.WorkCalendar.WorkPeriods.Add(workperiodResult);
+            }
+            StateHasChanged();
+        }
+    }
+    async Task OpenOvertimeForm(Overtime? overtime = null)
+    {
+        var parameters = new DialogParameters<OvertimeFormDialog> { { x => x.Overtime, overtime } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<OvertimeFormDialog>(localizer["Övertid"], parameters, options);
+        var result = await dialog.Result;
+        if (result is not null && !result.Canceled && result.Data is Overtime overtimeResult)
+        {
+            if (overtime is not null)
+            {
+                // Update existing period
+                overtime.Date = overtimeResult.Date;
+                overtime.From = overtimeResult.From;
+                overtime.To = overtimeResult.To;
+            }
+            else
+            {
+                resource?.WorkCalendar.Overtime.Add(overtimeResult);
+            }
+            StateHasChanged();
+        }
+    }
+    async Task OpenVacationForm(Vacation? vacation = null)
+    {
+        var parameters = new DialogParameters<VacationFormDialog> { { x => x.Vacation, vacation } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<VacationFormDialog>(localizer["Semester"], parameters, options);
+        var result = await dialog.Result;
+        if (result is not null && !result.Canceled && result.Data is Vacation vacationResult)
+        {
+            if (vacation is not null)
+            {
+                // Update existing period
+                vacation.From = vacationResult.From;
+                vacation.To = vacationResult.To;
+            }
+            else
+            {
+                resource?.WorkCalendar.Vacations.Add(vacationResult);
+            }
+            StateHasChanged();
+        }
+    }
+    async Task OpenHolydayForm(Holyday? holyday = null)
+    {
+        var parameters = new DialogParameters<HolydayFormDialog> { { x => x.Holyday, holyday } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<HolydayFormDialog>(localizer["Röd dag"], parameters, options);
+        var result = await dialog.Result;
+        if (result is not null && !result.Canceled && result.Data is Holyday holydayResult)
+        {
+            if (holyday is not null)
+            {
+                // Update existing period
+                holyday.Date = holydayResult.Date;
+                holyday.Name = holydayResult.Name;
+            }
+            else
+            {
+                resource?.WorkCalendar.Holidays.Add(holydayResult);
+            }
+            StateHasChanged();
+        }
+    }
+
+    void ViewInGantt()
+     {
+        if (resource != null)
+        {
+            Navigator.ShowInGantt([resource.Id], true);
         }
     }
 
