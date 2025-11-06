@@ -2,14 +2,21 @@
 
 <PlanityToolbar Title="@Title">
     <LeftActions>
-        <MudSelect InputClass="denser-input" Value="DragMode" ValueChanged="DragModeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" T="GanttDragMode" MultiSelection="false" Class="denser-input" RelativeWidth="DropdownWidth.Relative" Style="width: 170px;" ToStringFunc="ToStringFunc">
+        <MudSelect T="GanttViewMode" Value="GanttView.Mode" ValueChanged="GanttView.SetViewMode" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" MultiSelection="false" RelativeWidth="DropdownWidth.Relative" Style="width: 150px;">
+            <MudSelectItem Value="GanttViewMode.Year">@Localizer["År"]</MudSelectItem>
+            <MudSelectItem Value="GanttViewMode.Month">@Localizer["Månad"]</MudSelectItem>
+            <MudSelectItem Value="GanttViewMode.Week">@Localizer["Vecka"]</MudSelectItem>
+        </MudSelect>
+            
+
+        <MudSelect Value="DragMode" ValueChanged="DragModeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" T="GanttDragMode" MultiSelection="false" RelativeWidth="DropdownWidth.Relative" Style="width: 170px;" ToStringFunc="ToStringFunc">
             <MudSelectItem Value="GanttDragMode.None" />
             <MudSelectItem Value="GanttDragMode.EditDate" />
             <MudSelectItem Value="GanttDragMode.Link" />
         </MudSelect>
 
         <div class="date-picker">
-            <MudDateRangePicker DateRange="dateRange" DateRangeChanged="DateRangeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" Class="denser-input" RelativeWidth="DropdownWidth.Adaptive" />
+            <MudDateRangePicker DateRange="dateRange" DateRangeChanged="DateRangeChanged" Variant="Variant.Outlined" Margin="Margin.Dense" RelativeWidth="DropdownWidth.Adaptive" />
         </div>
     </LeftActions>
     <RightActions>
@@ -19,6 +26,8 @@
 </PlanityToolbar>
 
 @code {
+
+    [CascadingParameter] GanttView GanttView { get; set; } = null!;
     [Parameter] public GanttDragMode DragMode { get; set; }
     [Parameter] public EventCallback<GanttDragMode> DragModeChanged { get; set; }
     [Parameter] public string? Title { get; set; }

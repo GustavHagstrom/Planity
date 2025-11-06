@@ -1,7 +1,7 @@
 @inject IStringLocalizer<GanttView> Localizer
 @inject IResourceService ResourceService
-@using Planity.FrontendBlazorWASM.Shared.Abstractions
-@using Planity.FrontendBlazorWASM.Shared.Models
+@inject GanttViewState State
+
 
 @if(Items is not null)
 {
@@ -27,7 +27,7 @@
 
 @code {
 
-    [Parameter] public DateTime StartParam { get; set; } = DateTime.Today.AddMonths(-1);
+    [Parameter] public DateTime StartParam { get; set; } = DateTime.Today;
     [Parameter] public DateTime EndParam { get; set; } = DateTime.Today.AddMonths(3);
     [Parameter] public GanttViewMode Mode { get; set; } = GanttViewMode.Month;
     [Parameter] public string Title { get; set; } = "Gantt Chart";
@@ -146,6 +146,14 @@
         {
             _editLinks.Remove(link);
             _LinkKeys.Remove(linkKey);
+            StateHasChanged();
+        }
+    }
+    public void SetViewMode(GanttViewMode mode)
+    {
+        if (Mode != mode)
+        {
+            Mode = mode;
             StateHasChanged();
         }
     }

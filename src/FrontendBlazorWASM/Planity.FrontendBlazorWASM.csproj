@@ -22,7 +22,6 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Shared\Mappers\" />
-    <Folder Include="Shared\State\" />
   </ItemGroup>
 
 </Project>
