@@ -11,7 +11,8 @@ public class ProjectTask : IGanttItem
     public string? Description { get; set; }
     public DateTime? Start { get; set; }
     public double WorkHours { get; set; } = 8; // Exempel: 8 timmar arbete för att slutföra uppgiften
-    public string ResourceId { get; set; } = string.Empty;
+    public string? ResourceId { get; set; } = string.Empty;
+    public string? ProjectId { get; set; } = string.Empty;
     public GanttItemType Type => GanttItemType.Task;
     public IEnumerable<IGanttItem>? Children => [];
     public bool IsExpanded { get; set; } = false;
@@ -26,6 +27,7 @@ public class ProjectTask : IGanttItem
             Description = this.Description,
             Start = this.Start,
             WorkHours = this.WorkHours,
+            ProjectId = this.ProjectId,
             ResourceId = this.ResourceId,
             IsExpanded = this.IsExpanded
         };
@@ -42,6 +44,7 @@ public class ProjectTask : IGanttItem
                Description == t.Description &&
                Start == t.Start &&
                WorkHours == t.WorkHours &&
+               ProjectId == t.ProjectId &&
                ResourceId == t.ResourceId &&
                IsExpanded == t.IsExpanded;
     }

@@ -3,58 +3,70 @@ using Planity.FrontendBlazorWASM.Shared.Mock;
 
 namespace Planity.FrontendBlazorWASM.Shared.Services;
 
-public class MockResourceService(IAuthService authService) : IResourceService
+public class MockResourceService : IResourceService
 {
-    public Task<List<Resource>> GetResourcesAsync() => Task.FromResult(MockedDataStore.Resources.Values.ToList());
-
-    public Task<Resource?> GetResourceByIdAsync(string resourceId) =>
-        Task.FromResult(MockedDataStore.Resources.TryGetValue(resourceId, out var r) ? r : null);
-
-    public Task<Resource> CreateResourceAsync(Resource resource)
+    public Task<Resource?> GetAsync(string resourceId)
     {
-        resource.Id = Guid.NewGuid().ToString();
-        MockedDataStore.Resources[resource.Id] = resource;
-        return Task.FromResult(resource);
-    }
-
-    public Task<Resource> UpdateResourceAsync(Resource resource)
-    {
-        if (MockedDataStore.Resources.TryGetValue(resource.Id, out var existing))
+        var resource = MockedDataStore.Resources.FirstOrDefault(r => r.Id == resourceId);
+        if (resource is not null)
         {
-            existing.Name = resource.Name;
-            existing.OrganizationId = resource.OrganizationId;
+            var tasks = MockedDataStore.Tasks.Where(t => t.ResourceId == resourceId).ToList();
+            resource.Tasks = tasks;
         }
-        return Task.FromResult(resource);
+        return Task.FromResult(MockedDataStore.Resources.FirstOrDefault(r => r.Id == resourceId));
+    }
+        
+    public Task<List<Resource>> GetAllAsync()
+    {
+        var resources = new List<Resource>();
+        foreach (var resource in MockedDataStore.Resources)
+        {
+            var tasks = MockedDataStore.Tasks.Where(t => t.ResourceId == resource.Id).ToList();
+            resource.Tasks = tasks;
+            resources.Add(resource);
+        }
+        return Task.FromResult(resources);
+    }
+    public Task<List<Resource>> GetAllAsync(List<string> ids)
+    {
+        var resources = new List<Resource>();
+        foreach (var resource in MockedDataStore.Resources.Where(r => ids.Contains(r.Id)))
+        {
+            var tasks = MockedDataStore.Tasks.Where(t => t.ResourceId == resource.Id).ToList();
+            resource.Tasks = tasks;
+            resources.Add(resource);
+        }
+        return Task.FromResult(resources);
     }
 
-    public Task DeleteResourceAsync(string resourceId)
+    public Task CreateAsync(Resource resource)
     {
-        MockedDataStore.Resources.Remove(resourceId);
+        MockedDataStore.Resources.Add(resource);
         return Task.CompletedTask;
     }
 
-    public async Task<List<Resource>> GetOrganizationResources()
+    public Task UpdateAsync(Resource resource)
     {
-        var orgId = await authService.GetOrganizationIdAsync();
-        var resources = MockedDataStore.Resources.Values.Where(r => r.OrganizationId == orgId).ToList();
-        return resources;
+        var existing = MockedDataStore.Resources.FirstOrDefault(r => r.Id == resource.Id);
+        if (existing != null)
+        {
+            MockedDataStore.Resources.Remove(existing);
+        }
+        MockedDataStore.Resources.Add(resource);
+        return Task.CompletedTask;
+
     }
 
-    public async Task<List<ProjectTask>> GetTasksForResourceAsync(string resourceId)
+    public Task DeleteAsync(string resourceId)
     {
-        // Samla alla tasks från alla projekt där ResourceId matchar
-        var tasks = MockedDataStore.Projects
-            .SelectMany(p => p.Tasks)
-            .Where(t => t.ResourceId == resourceId)
-            .ToList();
-        return await Task.FromResult(tasks);
+        var existing = MockedDataStore.Resources.FirstOrDefault(r => r.Id == resourceId);
+        if (existing != null)
+        {
+            MockedDataStore.Resources.Remove(existing);
+        }
+        return Task.CompletedTask;
     }
 
-    public Task<List<Resource>> GetResourcesAsync(List<string> ids)
-    {
-        var resources = MockedDataStore.Resources.Values
-            .Where(r => ids.Contains(r.Id))
-            .ToList();
-        return Task.FromResult(resources);
-    }
+    
+
 }

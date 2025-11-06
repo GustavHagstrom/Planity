@@ -1,30 +1,40 @@
 @page "/tasks/new"
-@inject IProjectService ProjectService
+@inject ITaskService TaskService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<TaskNewPage> localizer
 
 <EntityFormsPageLayout Title="@localizer["Ny uppgift"]" IsLoading="newTask is null" OnSave="Save">
     <MainContent>
-        <TaskForm TaskModel="newTask" />
+        <TaskForm @ref="taskForm" Task="newTask" ProjectId="@ProjectId" ResourceId="@ResourceId"/>
     </MainContent>
 </EntityFormsPageLayout>
 
 @code {
-    private List<Project> Projects = new();
-    private string? selectedProjectId;
+    // private List<Project> Projects = new();
+
+    TaskForm? taskForm;
+
     private ProjectTask newTask = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        Projects = await ProjectService.GetProjectsAsync();
-        selectedProjectId = Projects.FirstOrDefault()?.Id;
-    }
+    [SupplyParameterFromQuery] public string? ProjectId { get; set; }
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    [SupplyParameterFromQuery] public string? ResourceId { get; set; }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     Projects = await ProjectService.GetProjectsAsync();
+    // }
 
     private async Task Save()
     {
-        if (!string.IsNullOrEmpty(selectedProjectId))
+        if (taskForm?.IsValid ?? false)
         {
-            await ProjectService.AddTaskToProjectAsync(selectedProjectId, newTask);
+            await TaskService.CreateAsync(newTask);
+            if (!string.IsNullOrEmpty(ReturnUrl))
+            {
+                NavigationManager.NavigateTo(ReturnUrl);
+                return;
+            }
             NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TasksOverview);
         }
         

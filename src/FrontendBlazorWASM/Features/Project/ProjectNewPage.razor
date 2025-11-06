@@ -17,7 +17,7 @@
 
     private async Task Save()
     {
-        await ProjectService.CreateProjectAsync(Project);
-        NavigationManager.NavigateTo("/projects");
+        await ProjectService.CreateAsync(Project);
+        NavigationManager.NavigateTo(Routes.ProjectDetails(Project.Id));
     }
 }

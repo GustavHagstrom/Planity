@@ -5,157 +5,94 @@ namespace Planity.FrontendBlazorWASM.Shared.Services;
 
 public class MockProjectService : IProjectService
 {
-    public Task<List<Project>> GetProjectsAsync() => Task.FromResult(MockedDataStore.Projects.ToList());
-
-    public Task<Project?> GetProjectByIdAsync(string projectId) =>
-        Task.FromResult(MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId));
-
-    public Task<Project> CreateProjectAsync(Project project)
+    public Task<List<Project>> GetAllAsync()
     {
-        project.Id = Guid.NewGuid().ToString();
-        MockedDataStore.Projects.Add(project);
+        foreach (var project in MockedDataStore.Projects)
+        {
+            var tasks = MockedDataStore.Tasks.Where(t => t.ProjectId == project.Id).ToList();
+            var milestones = MockedDataStore.Milestones.Where(m => m.ProjectId == project.Id).ToList();
+            project.Tasks = tasks;
+            project.Milestones = milestones;
+        }
+        return Task.FromResult(MockedDataStore.Projects);
+    }
+
+    public Task<Project?> GetAsync(string projectId)
+    {
+        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
+        var tasks = MockedDataStore.Tasks.Where(t => t.ProjectId == projectId).ToList();
+        var milestones = MockedDataStore.Milestones.Where(m => m.ProjectId == projectId).ToList();
+        if (project != null)
+        {
+            project.Tasks = tasks;
+            project.Milestones = milestones;
+        }
         return Task.FromResult(project);
     }
 
-    public Task<Project> UpdateProjectAsync(Project project)
+    public Task<Project> CreateAsync(Project project)
     {
+        MockedDataStore.Projects.Add(project);
+        RemoveExistingTasks(project);
+        RemoveExistingMilestones(project);
+        MockedDataStore.Tasks.AddRange(project.Tasks);
+        MockedDataStore.Milestones.AddRange(project.Milestones);
+        return Task.FromResult(project);
+    }
+    
+    public Task<Project> UpdateAsync(Project project)
+    {
+
         var existing = MockedDataStore.Projects.FirstOrDefault(p => p.Id == project.Id);
         if (existing != null)
-        {
-            existing.Name = project.Name;
-            existing.Description = project.Description;
-            existing.Tasks = project.Tasks;
-            existing.Milestones = project.Milestones;
-        }
+            MockedDataStore.Projects.Remove(existing!);
+        MockedDataStore.Projects.Add(project);
+        RemoveExistingTasks(project);
+        RemoveExistingMilestones(project);
+        MockedDataStore.Tasks.AddRange(project.Tasks);
+        MockedDataStore.Milestones.AddRange(project.Milestones);
         return Task.FromResult(project);
     }
 
-    public Task DeleteProjectAsync(string projectId)
+    public Task DeleteAsync(string projectId)
     {
         var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
         if (project != null)
+        {
             MockedDataStore.Projects.Remove(project);
+            RemoveExistingTasks(project);
+            RemoveExistingMilestones(project);
+        }
         return Task.CompletedTask;
     }
-
-    public Task<ProjectTask> AddTaskToProjectAsync(string projectId, ProjectTask task)
+    public async Task<List<Project>> GetAllAsync(List<string> projectIds)
     {
-        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
-        if (project != null)
-        {
-            task.Id = Guid.NewGuid().ToString();
-            project.Tasks.Add(task);
-        }
-        return Task.FromResult(task);
-    }
 
-    public Task<ProjectTask> UpdateTaskAsync(string projectId, ProjectTask task)
-    {
-        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
-        if (project != null)
+        var projects = new List<Project>();
+        foreach (var projectId in projectIds)
         {
-            var existing = project.Tasks.FirstOrDefault(t => t.Id == task.Id);
-            if (existing != null)
+            var project = await GetAsync(projectId);
+            if (project != null)
             {
-                existing.Name = task.Name;
-                existing.Description = task.Description;
-                existing.Start = task.Start;
-                existing.ResourceId = task.ResourceId;
+                projects.Add(project);
             }
         }
-        return Task.FromResult(task);
+        return projects;
     }
-
-    public Task DeleteTaskAsync(string projectId, string taskId)
+    private void RemoveExistingTasks(Project project)
     {
-        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
-        if (project != null)
+        var existingTasks = MockedDataStore.Tasks.Where(t => t.ProjectId == project.Id).ToList();
+        foreach (var task in existingTasks)
         {
-            var task = project.Tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null)
-                project.Tasks.Remove(task);
+            MockedDataStore.Tasks.Remove(task);
         }
-        return Task.CompletedTask;
     }
-
-    public Task AssignResourceToTaskAsync(string projectId, string taskId, string resourceId)
+    private void RemoveExistingMilestones(Project project)
     {
-        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
-        if (project != null)
+        var existingMilestones = MockedDataStore.Milestones.Where(m => m.ProjectId == project.Id).ToList();
+        foreach (var milestone in existingMilestones)
         {
-            var task = project.Tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null)
-                task.ResourceId = resourceId;
+            MockedDataStore.Milestones.Remove(milestone);
         }
-        return Task.CompletedTask;
-    }
-
-    public Task<Milestone> AddMilestoneToProjectAsync(string projectId, Milestone milestone)
-    {
-        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
-        if (project != null)
-        {
-            milestone.Id = Guid.NewGuid().ToString();
-            project.Milestones.Add(milestone);
-        }
-        return Task.FromResult(milestone);
-    }
-
-    public Task<Milestone> UpdateMilestoneAsync(string projectId, Milestone milestone)
-    {
-        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
-        if (project != null)
-        {
-            var existing = project.Milestones.FirstOrDefault(m => m.Id == milestone.Id);
-            if (existing != null)
-            {
-                existing.Name = milestone.Name;
-                existing.Description = milestone.Description;
-                existing.Start = milestone.Start;
-            }
-        }
-        return Task.FromResult(milestone);
-    }
-
-    public Task DeleteMilestoneAsync(string projectId, string milestoneId)
-    {
-        var project = MockedDataStore.Projects.FirstOrDefault(p => p.Id == projectId);
-        if (project != null)
-        {
-            var milestone = project.Milestones.FirstOrDefault(m => m.Id == milestoneId);
-            if (milestone != null)
-                project.Milestones.Remove(milestone);
-        }
-        return Task.CompletedTask;
-    }
-
-    public Task<ProjectTask?> GetTaskByIdAsync(string taskId)
-    {
-        var task = MockedDataStore.Projects.SelectMany(p => p.Tasks).FirstOrDefault(t => t.Id == taskId);
-        return Task.FromResult(task);
-    }
-
-    public Task<List<ProjectTask>> GetAllTasksAsync()
-    {
-        var allTasks = MockedDataStore.Projects.SelectMany(p => p.Tasks).ToList();
-        return Task.FromResult(allTasks);
-    }
-
-    public Task<Milestone?> GetMilestoneByIdAsync(string milestoneId)
-    {
-        var milestone = MockedDataStore.Projects.SelectMany(p => p.Milestones).FirstOrDefault(m => m.Id == milestoneId);
-        return Task.FromResult(milestone);
-    }
-
-    public Task<List<Milestone>> GetAllMilestonesAsync()
-    {
-        var allMilestones = MockedDataStore.Projects.SelectMany(p => p.Milestones).ToList();
-        return Task.FromResult(allMilestones);
-    }
-
-    public Task<List<Project>> GetProjectsAsync(List<string> projectIds)
-    {
-        var projects = MockedDataStore.Projects.Where(p => projectIds.Contains(p.Id)).ToList();
-        return Task.FromResult(projects);
     }
 }

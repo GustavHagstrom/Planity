@@ -9,7 +9,7 @@ public class TaskFeature(IStringLocalizer<TaskFeature> Localizer) : IFeature
     public void RegisterRenderObjects(RenderCollection collection)
     {
         collection.AddAppBarNavigationComponent<AppbarNavigation>();
-        collection.AddCreateNewLink(new MenuLink(Localizer["Uppgift"], Routes.TaskNew));
+        collection.AddCreateNewLink(new MenuLink(Localizer["Uppgift"], Routes.TaskNew()));
     }
 
     public void RegisterServices(IServiceCollection services)

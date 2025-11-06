@@ -9,7 +9,7 @@ public class Milestone : IGanttItem
     public string OrganizationId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public Guid ProjectId { get; set; }
+    public string ProjectId { get; set; } = string.Empty;
     public DateTime? Start { get; set; }
     public GanttItemType Type => GanttItemType.Milestone;
     public IEnumerable<IGanttItem>? Children => null;

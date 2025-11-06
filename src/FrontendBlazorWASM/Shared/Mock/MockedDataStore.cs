@@ -6,19 +6,57 @@ namespace Planity.FrontendBlazorWASM.Shared.Mock;
 
 public static class MockedDataStore
 {
-    public static Dictionary<string, Resource> Resources { get; } = new()
-    {
-        ["1"] = new Resource { Id = "1", Name = "Produktionslina 1", OrganizationId = "OrganizationID123", Workers = 5, Efficiency = 1 },
-        ["2"] = new Resource { Id = "2", Name = "Bertil Berg", OrganizationId = "OrganizationID123", Workers = 1, Efficiency = 1 },
-        ["3"] = new Resource { Id = "3", Name = "Cecilia Carlsson", OrganizationId = "OrganizationID123", Workers = 1, Efficiency = 1.1 }
-    };
+    public static List<Project> Projects { get; } =
+    [
+        new Project
+        {
+            Id = "P1",
+            Name = "Bygg nytt garage",
+            Description = "Bygga ett nytt dubbelgarage."
+        },
+        new Project
+        {
+            Id = "P2",
+            Name = "Renovera kök",
+            Description = "Totalrenovering av kök."
+        },
+        new Project
+        {
+            Id = "P3",
+            Name = "Måla om huset",
+            Description = "Fasadmålning och fönsterrenovering."
+        }
+    ];
+    public static List<Resource> Resources { get; } =
+    [
+        new Resource { Id = "1", Name = "Produktionslina 1", OrganizationId = "OrganizationID123", Workers = 5, Efficiency = 1 },
+        new Resource { Id = "2", Name = "Bertil Berg", OrganizationId = "OrganizationID123", Workers = 1, Efficiency = 1 },
+        new Resource { Id = "3", Name = "Cecilia Carlsson", OrganizationId = "OrganizationID123", Workers = 1, Efficiency = 1.1 }
+    ];
+    public static List<ProjectTask> Tasks { get; } =
+    [
+        new() { Id = "T1", ProjectId = "P1", ResourceId = "1", Name = "Grävning", Start = DateTime.Today.AddHours(8), WorkHours = 160 },
+        new() { Id = "T2", ProjectId = "P1", ResourceId = "2", Name = "Gjutning platta", Start = DateTime.Today.AddDays(3).AddHours(9), WorkHours = 12 },
+        new() { Id = "T3", ProjectId = "P2", ResourceId = "2", Name = "Spika", Start = DateTime.Today.AddDays(8.5).AddHours(10), WorkHours = 6 },
+        new() { Id = "T4", ProjectId = "P2", ResourceId = "3", Name = "Gjutning platta", Start = DateTime.Today.AddDays(9).AddHours(8), WorkHours = 20 },
+        new() { Id = "T5", ProjectId = "P3", ResourceId = "3", Name = "Skrapa färg", Start = DateTime.Today.AddDays(1).AddHours(8), WorkHours = 10 },
+        new() { Id = "T6", ProjectId = "P3", ResourceId = "1", Name = "Grundmåla", Start = DateTime.Today.AddDays(2).AddHours(8), WorkHours = 180 },
+        new() { Id = "T7", ProjectId = "P3", ResourceId = "2", Name = "Slutmåla", Start = DateTime.Today.AddDays(3).AddHours(13), WorkHours = 8 }
 
-    public static Dictionary<string, WorkCalendar> WorkCalendars { get; } = new()
-    {
-        ["1"] = CreateWorkCalendar1(),
-        ["2"] = CreateWorkCalendar2(),
-        ["3"] = CreateWorkCalendar3()
-    };
+    ];
+    public static List<Milestone> Milestones { get; } =
+    [
+        new Milestone { Id = "M1", ProjectId = "P1", Name = "Platta klar", Start = DateTime.Today.AddDays(5).AddHours(15) },
+        new Milestone { Id = "M2", ProjectId = "P3", Name = "Halva huset klart", Start = DateTime.Today.AddDays(4).AddHours(12) },
+        new Milestone { Id = "M3", ProjectId = "P3", Name = "Färdigt!", Start = DateTime.Today.AddDays(5).AddHours(16) }
+    ];
+    public static List<WorkCalendar> WorkCalendars { get; } =
+    [
+        CreateWorkCalendar1(),
+        CreateWorkCalendar2(),
+        CreateWorkCalendar3()
+    ];
+
 
     private static WorkCalendar CreateWorkCalendar1()
     {
@@ -80,51 +118,5 @@ public static class MockedDataStore
         return calendar;
     }
 
-    public static List<Project> Projects { get; } =
-    [
-        new Project
-        {
-            Id = "P1",
-            Name = "Bygg nytt garage",
-            Description = "Bygga ett nytt dubbelgarage.",
-            Tasks =
-            [
-                new() { Id = "T1", Name = "Grävning", Start = DateTime.Today.AddHours(8), ResourceId = "1", WorkHours = 160 },
-                new() { Id = "T2", Name = "Gjutning platta", Start = DateTime.Today.AddDays(3).AddHours(9), ResourceId = "2", WorkHours = 12 }
-            ],
-            Milestones =
-            [
-                new Milestone { Id = "M1", Name = "Platta klar", Start = DateTime.Today.AddDays(5).AddHours(15), ProjectId = Guid.Empty }
-            ]
-        },
-        new Project
-        {
-            Id = "P2",
-            Name = "Renovera kök",
-            Description = "Totalrenovering av kök.",
-            Tasks =
-            [
-                new ProjectTask { Id = "T3", Name = "Spika", Start = DateTime.Today.AddDays(8.5).AddHours(10), ResourceId = "2", WorkHours = 6 },
-                new ProjectTask { Id = "T4", Name = "Gjutning platta", Start = DateTime.Today.AddDays(9).AddHours(8), ResourceId = "3", WorkHours = 20 }
-            ],
-            Milestones = []
-        },
-        new Project
-        {
-            Id = "P3",
-            Name = "Måla om huset",
-            Description = "Fasadmålning och fönsterrenovering.",
-            Tasks =
-            [
-                new ProjectTask { Id = "T5", Name = "Skrapa färg", Start = DateTime.Today.AddDays(1).AddHours(8), ResourceId = "3", WorkHours = 10 },
-                new ProjectTask { Id = "T6", Name = "Grundmåla", Start = DateTime.Today.AddDays(2).AddHours(8), ResourceId = "1", WorkHours = 180 },
-                new ProjectTask { Id = "T7", Name = "Slutmåla", Start = DateTime.Today.AddDays(3).AddHours(13), ResourceId = "2", WorkHours = 8 }
-            ],
-            Milestones =
-            [
-                new() { Id = "M2", Name = "Halva huset klart", Start = DateTime.Today.AddDays(4).AddHours(12), ProjectId = Guid.Empty },
-                new() { Id = "M3", Name = "Färdigt!", Start = DateTime.Today.AddDays(5).AddHours(16), ProjectId = Guid.Empty }
-            ]
-        }
-    ];
+    
 }

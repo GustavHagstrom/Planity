@@ -1,5 +1,6 @@
 @page "/tasks"
 @inject NavigationManager NavigationManager
+@inject ITaskService TaskService
 @inject IProjectService ProjectService
 @inject IStringLocalizer<TaskOverviewPage> localizer
 @inject IResourceService ResourceService
@@ -7,7 +8,7 @@
 
 <OverviewPageLayout Title="@localizer["Uppgiftsöversikt"]">
     <LeftActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TaskNew))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.TaskNew()))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
             @localizer["Ny uppgift"]
         </MudButton>
     </LeftActions>
@@ -33,15 +34,20 @@
 
 @code {
     private List<ProjectTask> Tasks = new();
+
+    /// <summary>
+    /// key: taskId, value projectName
+    /// </summary>
     private Dictionary<string, string> TaskProjectMap = new();
     private List<Resource> Resources = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var projects = await ProjectService.GetProjectsAsync();
-        Resources = await ResourceService.GetOrganizationResources();
-        Tasks = await ProjectService.GetAllTasksAsync();
-        TaskProjectMap = Tasks.Select(t => new { t.Id, ProjectName = projects.FirstOrDefault(p => p.Tasks.Any(x => x.Id == t.Id))?.Name ?? "" })
+        var projects = await ProjectService.GetAllAsync();
+        Resources = await ResourceService.GetAllAsync();
+        Tasks = await TaskService.GetAllAsync();
+        TaskProjectMap = Tasks
+            .Select(t => new { t.Id, ProjectName = projects.FirstOrDefault(p => p.Id == t.ProjectId)?.Name ?? "" })
             .ToDictionary(x => x.Id, x => x.ProjectName);
     }
 

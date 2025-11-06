@@ -3,6 +3,7 @@
 @using Planity.FrontendBlazorWASM.Shared.Components.Gantt
 @inject IProjectService ProjectService
 @inject IResourceService ResourceService
+@inject ITaskService TaskService
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -17,16 +18,16 @@
     string testResourceTitle => $"Tasks for resource {testResource.Name}";
     protected override async Task OnInitializedAsync()
     {
-        var projects = await ProjectService.GetProjectsAsync();
+        var projects = await ProjectService.GetAllAsync();
         if (projects is not null)
         {
             this.projects = projects.ToList();
         }
-        var resources = await ResourceService.GetResourcesAsync();
+        var resources = await ResourceService.GetAllAsync();
         if (resources is not null)
         {
             testResource = resources.First();
         }
-        testResourceTasks = await ResourceService.GetTasksForResourceAsync(testResource.Id);
+        testResourceTasks = await TaskService.GetFromResourceIdAsync(testResource.Id);
     }
 }

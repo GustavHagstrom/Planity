@@ -2,7 +2,7 @@
 @inject IResourceService ResourceService
 @inject ResourceNavigator Navigator
 @inject IStringLocalizer<ResourceDetailsPage> localizer
-@inject IJSRuntime JS
+@inject NavigationManager NavigatonManager
 @inject IDialogService DialogService
 
 <EntityFormsPageLayout Title="@localizer["Resursinformation"]" IsLoading="resource is null" OnSave="Save">
@@ -124,7 +124,7 @@
     {
         if (!string.IsNullOrEmpty(ResourceId))
         {
-            resource = await ResourceService.GetResourceByIdAsync(ResourceId);
+            resource = await ResourceService.GetAsync(ResourceId);
         }
     }
 
@@ -132,8 +132,8 @@
     {
         if (resource != null)
         {
-            await ResourceService.UpdateResourceAsync(resource);
-            await JS.InvokeVoidAsync("history.back");
+            await ResourceService.UpdateAsync(resource);
+            NavigatonManager.NavigateTo(Routes.ResourcesOverview);
         }
     }
 

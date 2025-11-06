@@ -1,36 +1,39 @@
 @page "/tasks/{TaskId}"
-@inject IProjectService ProjectService
+@inject ITaskService TaskService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IStringLocalizer<TaskDetailsPage> localizer
 
 <EntityFormsPageLayout Title="@localizer["Uppgiftsinformation"]" IsLoading="task is null" OnSave="Save">
     <MainContent>
-        <TaskForm TaskModel="task"/>
+        <TaskForm Task="task"/>
     </MainContent>
 </EntityFormsPageLayout>
 
 @code {
     [Parameter] public string? TaskId { get; set; }
     private ProjectTask? task;
-    private string? projectId;
+    // private string? projectId;
+
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        // Find the project and task by searching all projects
-        var projects = await ProjectService.GetProjectsAsync();
-        var found = projects.SelectMany(p => p.Tasks.Select(t => (Task: t, ProjectId: p.Id)))
-                            .FirstOrDefault(x => x.Task.Id == TaskId);
-        task = found.Task;
-        projectId = found.ProjectId;
+        if (TaskId != null)
+            task = await TaskService.GetAsync(TaskId);
     }
 
     private async Task Save()
     {
-        if (task != null && projectId != null)
+        if (task != null)
         {
-            await ProjectService.UpdateTaskAsync(projectId, task);
-            await JS.InvokeVoidAsync("history.back");
+            await TaskService.UpdateAsync(task);
+            if (!string.IsNullOrEmpty(ReturnUrl))
+            {
+                NavigationManager.NavigateTo(ReturnUrl);
+                return;
+            }
+            NavigationManager.NavigateTo(Routes.TasksOverview);
         }
     }
 

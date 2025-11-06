@@ -9,57 +9,69 @@
 
 <EntityFormsPageLayout Title="@localizer["Projektinformation"]" IsLoading="Project is null || Resources is null" OnSave="Save" >
     <Actions>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="ShowInGantt" Size="Size.Small" StartIcon="@Icons.Material.Filled.ViewTimeline">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="ShowInGantt" Size="Size.Small" StartIcon="@Icons.Material.Sharp.ViewTimeline">
             <span>@localizer["Visa i Gantt"]</span>
         </MudButton>
     </Actions>
     <MainContent>
         
-            <MudStack Spacing="2">
-                <ProjectForm ProjectModel="Project" />
+        <MudStack Spacing="2">
+            <ProjectForm ProjectModel="Project" />
 
-                <EntityTable Title="@localizer["Uppgifter"]" Items="Project!.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
-                    <HeaderContent>
-                        <MudTh>@localizer["Namn"]</MudTh>
-                        <MudTh>@localizer["Startdatum"]</MudTh>
-                        <MudTh>@localizer["Slutdatum"]</MudTh>
-                        <MudTh>@localizer["Tilldelad resurs"]</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd>
-                            @context.Name
-                        </MudTd>
-                        <MudTd>
-                            @context.Start?.ToString("yyyy-MM-dd")
-                        </MudTd>
-                        <MudTd>
-                            @GanttDateCalculator.CalculateEnd(context, Resources!)
-                        </MudTd>
-                        <MudTd>
-                            @Resources?.FirstOrDefault(r => r.Id == context.ResourceId)?.Name
-                        </MudTd>
-                    </RowTemplate>
-                </EntityTable>
+            <EntityTable Title="@localizer["Uppgifter"]" Items="Project!.Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id, NavigationManager.Uri)">
+                <RightActions>
+                    <MudIconButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@AddTask" Size="Size.Small" Icon="@Icons.Material.Sharp.Add"/>
+                </RightActions>
+                <HeaderContent>
+                    <MudTh>@localizer["Namn"]</MudTh>
+                    
+                    <MudTh>@localizer["Arbetstimmar"]</MudTh>
+                    <MudTh>@localizer["Tilldelad resurs"]</MudTh>
+                    <MudTh>@localizer["Starttid"]</MudTh>
+                    <MudTh>@localizer["Sluttid"]</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        @context.Name
+                    </MudTd>
+                    
+                    <MudTd>
+                        @context.WorkHours.ToString("N0")
+                    </MudTd>
+                    <MudTd>
+                        @Resources?.FirstOrDefault(r => r.Id == context.ResourceId)?.Name
+                    </MudTd>
+                    <MudTd>
+                        @GanttDateCalculator.CalculateStart(context, Resources!)?.ToString("yyyy-MM-dd HH:mm:ss")
+                    </MudTd>
+                    <MudTd>
+                        @GanttDateCalculator.CalculateEnd(context, Resources!)?.ToString("yyyy-MM-dd HH:mm:ss")
+                    </MudTd>
+                </RowTemplate>
+            </EntityTable>
 
-                <EntityTable Title="@localizer["Milstenar"]" Items="Project!.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
-                    <HeaderContent>
-                        <MudTh>@localizer["Namn"]</MudTh>
-                        <MudTh>@localizer["Datum"]</MudTh>
-                        <MudTh>@localizer["Beskrivning"]</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd>
-                            @context.Name
-                        </MudTd>
-                        <MudTd>
-                            @context.Start?.ToString("yyyy-MM-dd")
-                        </MudTd>
-                        <MudTd>
-                            @context.Description
-                        </MudTd>
-                    </RowTemplate>
-                </EntityTable>
-            </MudStack>
+            <EntityTable Title="@localizer["Milstenar"]" Items="Project!.Milestones" EditLinkFunction="x => Routes.MilestoneDetails(x.Id)">
+                <RightActions>
+                    <MudIconButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@AddMilestone" Size="Size.Small" Icon="@Icons.Material.Sharp.Add" />
+                </RightActions>
+                <HeaderContent>
+                    <MudTh>@localizer["Namn"]</MudTh>
+                    <MudTh>@localizer["Datum"]</MudTh>
+                    <MudTh>@localizer["Beskrivning"]</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        @context.Name
+                    </MudTd>
+                    <MudTd>
+                        @context.Start?.ToString("yyyy-MM-dd HH:mm:ss")
+                    </MudTd>
+                    <MudTd>
+                        @context.Description
+                    </MudTd>
+                </RowTemplate>
+            </EntityTable>
+        </MudStack>
         
     </MainContent>
 </EntityFormsPageLayout>
@@ -72,11 +84,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var resources = await ResourceService.GetResourcesAsync();
+        var resources = await ResourceService.GetAllAsync();
         Resources = resources;
         if (!string.IsNullOrEmpty(Id))
         {
-            var project = await ProjectService.GetProjectByIdAsync(Id);
+            var project = await ProjectService.GetAsync(Id);
             if (project != null)
                 Project = project;
         }
@@ -86,7 +98,7 @@
     {
         if (Project == null)
             return;
-        await ProjectService.UpdateProjectAsync(Project);
+        await ProjectService.UpdateAsync(Project);
         await JS.InvokeVoidAsync("history.back");
     }
     void ShowInGantt()
@@ -94,5 +106,16 @@
         if (Project == null)
             return;
         ProjectNavigator.ShowInGantt([Project.Id], true);
+    }
+    void AddTask()
+    {
+        if (Project is null)
+            return;
+        var uri = Routes.TaskNew(Project.Id, null, NavigationManager.Uri);
+        NavigationManager.NavigateTo(uri);
+    }
+    void AddMilestone()
+    {
+        throw new NotImplementedException();
     }
 }

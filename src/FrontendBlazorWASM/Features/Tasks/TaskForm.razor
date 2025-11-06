@@ -1,27 +1,90 @@
-<MudTextField T="string" @bind-Value="task.Name" Label="Namn" For="() => task.Name" Required="true" />
-<MudTextField T="string" @bind-Value="task.Description" Label="Beskrivning" For="() => task.Description" />
-<MudDatePicker @bind-Date="task.Start" Label="Startdatum" />
+<MudTextField T="string" @bind-Value="Task.Name" Label="Namn" For="() => Task.Name" Required="true" />
+<MudTextField T="string" @bind-Value="Task.Description" Label="Beskrivning" For="() => Task.Description" />
+<MudTextField T="double" @bind-Value="Task.WorkHours" Label="Arbetstimmar" For="() => Task.WorkHours" />
+<MudDatePicker @bind-Date="Task.Start" Label="Startdatum" />
+<MudAutocomplete T="Project" Value="project" ValueChanged="SetSelectedProject" Label="@Localizer["Projekt"]" Required="true" Dense="true" Margin="Margin.Dense" SearchFunc="SearchProjects" ToStringFunc="x => x.Name" />
+<MudAutocomplete T="Resource" Value="resource" ValueChanged="SetSelectedResource" Label="@Localizer["Resurs"]" Dense="true" Margin="Margin.Dense" SearchFunc="SearchResources" ToStringFunc="x => x.Name"/>
 
-
+@inject IProjectService ProjectService
+@inject IResourceService ResourceService
+@inject IStringLocalizer<TaskForm> Localizer
 
 @code {
-    [Parameter] public ProjectTask? TaskModel { get; set; }
+    [Parameter] public ProjectTask Task { get; set; } = new();
+    [Parameter] public string? ProjectId { get; set; }
+    [Parameter] public string? ResourceId { get; set; }
 
-    private ProjectTask task = new();
 
-    protected override void OnParametersSet()
+    private Project? project;
+    private Resource? resource;
+
+    private List<Project> Projects = new();
+    private List<Resource> Resources = new();
+
+    public bool IsValid => !string.IsNullOrWhiteSpace(Task.Name) && !string.IsNullOrWhiteSpace(Task.ProjectId);
+
+    protected override async Task OnInitializedAsync()
     {
-        if (TaskModel != null)
+        Projects = await ProjectService.GetAllAsync();
+        Resources = await ResourceService.GetAllAsync();
+
+        if(!string.IsNullOrWhiteSpace(Task.ProjectId))
         {
-            task = new ProjectTask
-            {
-                Id = TaskModel.Id,
-                Name = TaskModel.Name,
-                Description = TaskModel.Description,
-                Start = TaskModel.Start,
-                ResourceId = TaskModel.ResourceId,
-                OrganizationId = TaskModel.OrganizationId
-            };
+            project = Projects.FirstOrDefault(p => p.Id == Task.ProjectId);
+        }
+        else if(ProjectId is not null)
+        {
+            project = Projects.FirstOrDefault(p => p.Id == ProjectId);
+            Task.ProjectId = ProjectId;
+        }
+
+        if (!string.IsNullOrWhiteSpace(Task.ResourceId))
+        {
+            resource = Resources.FirstOrDefault(r => r.Id == Task.ResourceId);
+        }
+        else if(ResourceId is not null)
+        {
+            resource = Resources.FirstOrDefault(r => r.Id == ResourceId);
+            Task.ResourceId = ResourceId;
         }
     }
+
+    void SetSelectedProject(Project? selectedProject)
+    {
+        project = selectedProject;
+        if(project is not null)
+        {
+            Task.ProjectId = project.Id;
+        }
+        else
+        {
+            Task.ProjectId = null;
+        }
+    }
+    void SetSelectedResource(Resource? selectedResource)
+    {
+        resource = selectedResource;
+        if(resource is not null)
+        {
+            Task.ResourceId = resource.Id;
+        }
+        else
+        {
+            Task.ResourceId = null;
+        }
+    }
+
+    Task<IEnumerable<Project>> SearchProjects(string? value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+            return System.Threading.Tasks.Task.FromResult<IEnumerable<Project>>((IEnumerable<Project>)Projects);
+        return System.Threading.Tasks.Task.FromResult(Projects.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+    }
+    Task<IEnumerable<Resource>> SearchResources(string? value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+        return System.Threading.Tasks.Task.FromResult<IEnumerable<Resource>>((IEnumerable<Resource>)Resources);
+        return System.Threading.Tasks.Task.FromResult(Resources.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
 }

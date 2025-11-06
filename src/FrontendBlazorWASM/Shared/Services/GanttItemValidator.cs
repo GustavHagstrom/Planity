@@ -23,14 +23,14 @@ public class GanttItemValidator
     public List<string> ValidateDependencies(IGanttItem item, List<Resource> resources, List<GanttItemLink> links)
     {
         var warnings = new List<string>();
-        var itemResource = item is ProjectTask pt ? _resourceProvider(pt.ResourceId) : null;
+        var itemResource = item is ProjectTask pt && pt.ResourceId is not null ? _resourceProvider(pt.ResourceId) : null;
         var itemEnd = _dateCalculator.CalculateEnd(item, resources);
 
         // Kontrollera Predecessors via länkar
         var predecessors = links.Where(l => l.To == item).Select(l => l.From);
         foreach (var predecessor in predecessors)
         {
-            var predResource = predecessor is ProjectTask ptp ? _resourceProvider(ptp.ResourceId) : null;
+            var predResource = predecessor is ProjectTask ptp && ptp.ResourceId is not null? _resourceProvider(ptp.ResourceId) : null;
             var predEnd = _dateCalculator.CalculateEnd(predecessor, resources);
             if (predEnd.HasValue && item.Start.HasValue && item.Start < predEnd)
             {
@@ -42,7 +42,7 @@ public class GanttItemValidator
         var successors = links.Where(l => l.From == item).Select(l => l.To);
         foreach (var successor in successors)
         {
-            var succResource = successor is ProjectTask pts ? _resourceProvider(pts.ResourceId) : null;
+            var succResource = successor is ProjectTask pts && pts.ResourceId is not null ? _resourceProvider(pts.ResourceId) : null;
             var succStart = successor.Start;
             var itemEndVal = itemEnd;
             if (itemEndVal.HasValue && succStart.HasValue && itemEndVal > succStart)

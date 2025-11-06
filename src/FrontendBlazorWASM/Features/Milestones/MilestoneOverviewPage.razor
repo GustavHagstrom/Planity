@@ -39,7 +39,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var projects = await ProjectService.GetProjectsAsync();
+        var projects = await ProjectService.GetAllAsync();
         Milestones = projects.SelectMany(p => p.Milestones).ToList();
         MilestoneProjectMap = projects
             .SelectMany(p => p.Milestones.Select(m => new { m.Id, ProjectName = p.Name }))

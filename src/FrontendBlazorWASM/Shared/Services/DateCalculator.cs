@@ -8,7 +8,7 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
 {
     public async Task<DateTime?> CalculateEndAsync(IGanttItem item)
     {
-        var resources = await resourceService.GetOrganizationResources();
+        var resources = await resourceService.GetAllAsync();
         return CalculateEnd(item, resources);
     }
     public DateTime? CalculateEnd(IGanttItem item, IReadOnlyList<Resource> resources)
@@ -150,7 +150,7 @@ public class DateCalculator(IResourceService resourceService) : IDateCalculator
     }
     public async Task<DateTime?> CalculateStartAsync(IGanttItem item)
     {
-        var resources = await resourceService.GetOrganizationResources();
+        var resources = await resourceService.GetAllAsync();
         return CalculateStart(item, resources);
     }
     public DateTime? CalculateStart(IGanttItem item, IReadOnlyList<Resource> resources)

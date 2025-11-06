@@ -1,5 +1,6 @@
 @page "/milestones/new"
 @using Planity.FrontendBlazorWASM.Shared.Models
+@inject IMilestoneService MilestoneService
 @inject IProjectService ProjectService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<MilestoneNewPage> localizer
@@ -13,20 +14,19 @@
 
 @code {
     private List<Project> Projects = new();
-    private string? selectedProjectId;
     private Milestone milestone = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Projects = await ProjectService.GetProjectsAsync();
-        selectedProjectId = Projects.FirstOrDefault()?.Id;
+        Projects = await ProjectService.GetAllAsync();
+        milestone.ProjectId = Projects.FirstOrDefault()?.Id ?? string.Empty;
     }
 
     private async Task Save()
     {
-        if (!string.IsNullOrEmpty(selectedProjectId))
+        if (!string.IsNullOrEmpty(milestone.ProjectId))
         {
-            await ProjectService.AddMilestoneToProjectAsync(selectedProjectId, milestone);
+            await MilestoneService.CreateAsync(milestone);
             NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
         }
     }

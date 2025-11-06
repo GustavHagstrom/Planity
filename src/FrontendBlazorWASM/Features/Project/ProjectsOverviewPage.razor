@@ -70,8 +70,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var projects = await ProjectService.GetProjectsAsync();
-        var resources = await ResourceService.GetOrganizationResources();
+        var projects = await ProjectService.GetAllAsync();
+        var resources = await ResourceService.GetAllAsync();
 
         Projects = projects?.Select(p => ProjectFactory.CreateEndDateProject(p, resources)).ToList() ?? new List<EndDateProject>();
     }

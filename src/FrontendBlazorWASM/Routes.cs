@@ -21,8 +21,30 @@ public static class Routes
 
     // Task routes
     public const string TasksOverview = "/tasks";
-    public const string TaskNew = "/tasks/new";
-    public static string TaskDetails(string id) => $"/tasks/{id}";
+    //public const string TaskNew = "/tasks/new";
+    public static string TaskNew(string? projectId = null, string? resourceId = null, string? returnUrl = null)
+    {
+        var url = "/tasks/new";
+        var queryParams = new List<string>();
+        if (!string.IsNullOrWhiteSpace(projectId))
+            queryParams.Add($"projectId={projectId}");
+        if (!string.IsNullOrWhiteSpace(resourceId))
+            queryParams.Add($"resourceId={resourceId}");
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+            queryParams.Add($"returnUrl={Uri.EscapeDataString(returnUrl)}");
+        if (queryParams.Count > 0)
+            url += "?" + string.Join("&", queryParams);
+        return url;
+    }
+    public static string TaskDetails(string id, string? returnUrl = null)
+    {
+        var url = $"/tasks/{id}";
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            url += $"?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        }
+        return url;
+    }
 
     // Milestone routes
     public const string MilestonesOverview = "/milestones";
@@ -41,7 +63,7 @@ public static class Routes
         ResourceDetails("SampleId"),
         ResourceNew,
         TasksOverview,
-        TaskNew,
+        TaskNew(),
         TaskDetails("SampleId"),
         MilestonesOverview,
         MilestoneNew,

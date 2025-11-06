@@ -82,7 +82,7 @@
     {
         Start = StartParam;
         End = EndParam;
-        Resources = await ResourceService.GetResourcesAsync() ?? [];
+        Resources = await ResourceService.GetAllAsync() ?? [];
         CloneItemAndLinkLists();
         BuildItemAndLinkDictionaries();
         SelectedItem = _editItems.FirstOrDefault();

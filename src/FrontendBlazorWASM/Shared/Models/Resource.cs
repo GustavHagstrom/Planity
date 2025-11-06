@@ -10,9 +10,10 @@ public class Resource : IGanttItem
     public string Name { get; set; } = string.Empty;
     public int Workers { get; set; } = 1; // Antal personer i resursen
     public double Efficiency { get; set; } = 1.0; // Effektivitetsfaktor, t.ex. 1.0 = normal, 1.2 = 20% mer effektiv
+    public List<ProjectTask> Tasks { get; set; } = new List<ProjectTask>();
     public DateTime? Start { get => null; set { } } // Kalkylerad, ej setbar
     public GanttItemType Type => GanttItemType.Resource;
-    public IEnumerable<IGanttItem>? Children => null;
+    public IEnumerable<IGanttItem>? Children => Tasks;
     public bool IsExpanded { get; set; } = false;
     // Koppling till WorkCalendar
     public WorkCalendar WorkCalendar { get; set; } = new WorkCalendar();

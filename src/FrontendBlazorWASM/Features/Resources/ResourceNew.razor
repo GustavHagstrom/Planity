@@ -2,7 +2,7 @@
 @inject NavigationManager Navigation
 @inject IResourceService ResourceService
 @inject IStringLocalizer<ResourceNew> localizer
-@inject IJSRuntime JS
+@inject NavigationManager Navigation
 
 <EntityFormsPageLayout Title="@localizer["Ny resurs"]"  OnSave="Save">
     <MainContent>
@@ -15,7 +15,7 @@
     private Resource resource = new();
     private async Task Save()
     {
-        await ResourceService.CreateResourceAsync(resource);
-        await JS.InvokeVoidAsync("history.back");
+        await ResourceService.CreateAsync(resource);
+        Navigation.NavigateTo(Routes.ResourceDetails(resource.Id));
     }
 }

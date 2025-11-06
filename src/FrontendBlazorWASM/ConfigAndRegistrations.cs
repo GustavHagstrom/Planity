@@ -49,6 +49,8 @@ public static class ConfigAndRegistrations
         services.AddScoped<IDateCalculator, DateCalculator>();
         services.AddScoped<IRenderCalculator, RenderCalculator>();
         services.AddScoped<RenderFragmentService>();
+        services.AddScoped<ITaskService, MockedTaskService>();
+        services.AddScoped<IMilestoneService, MockedMilestoneService>();
         return services;
     }
     public static void ConfigureFeatures(this WebAssemblyHostBuilder builder, Action<FeatureBuilder> config)

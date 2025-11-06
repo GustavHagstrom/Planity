@@ -2,7 +2,7 @@
 
 <MudGrid Spacing="2">
     <MudItem xs="12" sm="3" lg="3">
-        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="project.Name" Label="@Localizer["Projektnamn"]" For="() => project.Name" Required="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="project.Name" Label="@Localizer["Namn"]" For="() => project.Name" Required="true" />
     </MudItem>
     <MudItem xs="12" sm="9" lg="9">
         <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="project.Description" Label="@Localizer["Beskrivning"]" For="() => project.Description" />

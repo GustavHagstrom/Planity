@@ -61,7 +61,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await ResourceService.GetResourcesAsync();
+        var result = await ResourceService.GetAllAsync();
         resources = result.Select(r => new SelectableResource(r)).ToList();
     }
 

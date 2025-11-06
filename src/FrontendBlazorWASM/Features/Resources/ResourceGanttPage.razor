@@ -12,7 +12,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        resources = await ResourceService.GetResourcesAsync(state.Ids);
+        resources = await ResourceService.GetAllAsync(state.Ids);
         if (state.Expanded)
         {
             foreach (var resource in resources)
