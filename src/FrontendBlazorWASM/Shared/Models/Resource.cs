@@ -28,7 +28,8 @@ public class Resource : IGanttItem
             Workers = this.Workers,
             Efficiency = this.Efficiency,
             IsExpanded = this.IsExpanded,
-            WorkCalendar = this.WorkCalendar
+            WorkCalendar = this.WorkCalendar,
+            Tasks = this.Tasks
         };
         return clone;
     }
