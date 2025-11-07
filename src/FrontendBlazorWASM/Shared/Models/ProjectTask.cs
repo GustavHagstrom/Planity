@@ -1,5 +1,4 @@
 ﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
-using Planity.FrontendBlazorWASM.Shared.Models;
 
 namespace Planity.FrontendBlazorWASM.Shared.Models;
 
@@ -8,7 +7,7 @@ public class ProjectTask : IGanttItem
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string OrganizationId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public string? Description { get; set; }
+    public string Description { get; set; } = string.Empty;
     public DateTime? Start { get; set; }
     public double WorkHours { get; set; } = 8; // Exempel: 8 timmar arbete för att slutföra uppgiften
     public string? ResourceId { get; set; } = string.Empty;

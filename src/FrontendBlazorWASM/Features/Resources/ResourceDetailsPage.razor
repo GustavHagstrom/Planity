@@ -80,7 +80,7 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@context.From.ToString("yyyy-MM-dd")</MudTd>
-                        <MudTd>@context.To.ToString(@"hh\:mm")</MudTd>
+                        <MudTd>@context.To.ToString("yyyy-MM-dd")</MudTd>
                         <MudTd>
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" OnClick="() => OpenVacationForm(context)" />
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />

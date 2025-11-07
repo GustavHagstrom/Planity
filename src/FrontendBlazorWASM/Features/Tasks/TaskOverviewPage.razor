@@ -12,20 +12,32 @@
             @localizer["Ny uppgift"]
         </MudButton>
     </LeftActions>
+    <RightActions>
+        <PlanitySearchField @bind-Value="searchField"/>
+    </RightActions>
 
     <ChildContent>
-        <EntityTable Items="@Tasks" EditLinkFunction="x => Routes.TaskDetails(x.Id)">
+        <EntityTable Items="@Tasks" Filter="FilterFunction"  >
             <HeaderContent>
-                <MudTh>Namn</MudTh>
-                <MudTh>Start</MudTh>
-                <MudTh>Slut</MudTh>
-                <MudTh>Projekt</MudTh>
+                <TableHeaderTextFilter T="ProjectTask" Title="@localizer["Namn"]" @bind-FilterString="@nameFilter" SortBy="x => x.Name" />
+                    <TableHeaderTextFilter T="ProjectTask" Title="@localizer["Beskrivning"]" @bind-FilterString="@descriptionFilter" SortBy="x => x.Description" />
+                <TableHeaderDateTimeFilter T="ProjectTask" Title="@localizer["Start"]" @bind-FilterDate="@FromDateFilter" DatePlaceHolder="@localizer["Datum"]" TimePlaceHolder="@localizer["Tid"]" SortBy="x => x.Start" />
+                <TableHeaderDateTimeFilter T="ProjectTask" Title="@localizer["Slut"]" @bind-FilterDate="@ToDateFilter" DatePlaceHolder="@localizer["Datum"]" TimePlaceHolder="@localizer["Tid"]" SortBy="x => GetEnd(x)" />
+                <TableHeaderTextFilter T="ProjectTask" Title="@localizer["Projekt"]" @bind-FilterString="@projectNameFilter" SortBy="x => GetProjectName(x)" />
+                <MudTh Style="width: 60px;">
+                    <MudText><b>@localizer["Åtgärder"]</b></MudText>
+                </MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Description</MudTd>
                 <MudTd>@context.Start?.ToString("yyyy-MM-dd HH:mm")</MudTd>
-                <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                <MudTd>@GetEnd(context)?.ToString("yyyy-MM-dd HH:mm")</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
+                <MudTd>
+                    <MudIconButton Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Sharp.Edit" Href="@Planity.FrontendBlazorWASM.Routes.TaskDetails(context.Id)" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Sharp.Delete" Color="Color.Error" />
+                </MudTd>
             </RowTemplate>
         </EntityTable>
     </ChildContent>
@@ -33,13 +45,20 @@
 
 
 @code {
-    private List<ProjectTask> Tasks = new();
+    List<ProjectTask> Tasks = new();
 
     /// <summary>
     /// key: taskId, value projectName
     /// </summary>
-    private Dictionary<string, string> TaskProjectMap = new();
-    private List<Resource> Resources = new();
+    Dictionary<string, string> TaskProjectMap = new();
+    List<Resource> Resources = new();
+
+    string searchField = string.Empty;
+    string nameFilter = string.Empty;
+    string descriptionFilter = string.Empty;
+    string projectNameFilter = string.Empty;
+    DateTime? FromDateFilter;
+    DateTime? ToDateFilter;
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,8 +70,58 @@
             .ToDictionary(x => x.Id, x => x.ProjectName);
     }
 
+    bool FilterFunction(ProjectTask task)
+    {
+        if (!string.IsNullOrWhiteSpace(nameFilter) && !task.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+        if (!string.IsNullOrWhiteSpace(descriptionFilter) && !task.Description.Contains(descriptionFilter, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+        if (FromDateFilter.HasValue && task.Start < FromDateFilter.Value)
+        {
+            return false;
+        }
+        var taskEnd = GetEnd(task);
+        if (ToDateFilter.HasValue && (taskEnd == null || taskEnd > ToDateFilter.Value))
+        {
+            return false;
+        }
+        if (!string.IsNullOrWhiteSpace(projectNameFilter))
+        {
+            var projectName = GetProjectName(task);
+            if (!projectName.Contains(projectNameFilter, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchField))
+        {
+            var projectName = GetProjectName(task);
+            if (!(task.Name.Contains(searchField, StringComparison.OrdinalIgnoreCase) ||
+                  task.Description.Contains(searchField, StringComparison.OrdinalIgnoreCase) ||
+                  projectName.Contains(searchField, StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
+        }
+
+
+
+
+
+        return true;
+    }
+
     private string GetProjectName(ProjectTask task)
     {
         return TaskProjectMap.TryGetValue(task.Id, out var name) ? name : string.Empty;
+    }
+    DateTime? GetEnd(ProjectTask task)
+    {
+        return GanttDateCalculator.CalculateEnd(task, Resources);
     }
 }
