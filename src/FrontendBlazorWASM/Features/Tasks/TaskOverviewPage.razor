@@ -23,8 +23,8 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
-                <MudTd>@context.Start?.ToShortDateString()</MudTd>
-                <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToShortDateString()</MudTd>
+                <MudTd>@context.Start?.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                <MudTd>@GanttDateCalculator.CalculateEnd(context, Resources)?.ToString("yyyy-MM-dd HH:mm")</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
             </RowTemplate>
         </EntityTable>

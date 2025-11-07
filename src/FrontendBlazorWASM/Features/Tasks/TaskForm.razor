@@ -1,9 +1,17 @@
-<MudTextField T="string" @bind-Value="Task.Name" Label="Namn" For="() => Task.Name" Required="true" />
-<MudTextField T="string" @bind-Value="Task.Description" Label="Beskrivning" For="() => Task.Description" />
-<MudTextField T="double" @bind-Value="Task.WorkHours" Label="Arbetstimmar" For="() => Task.WorkHours" />
-<MudDatePicker @bind-Date="Task.Start" Label="Startdatum" />
-<MudAutocomplete T="Project" Value="project" ValueChanged="SetSelectedProject" Label="@Localizer["Projekt"]" Required="true" Dense="true" Margin="Margin.Dense" SearchFunc="SearchProjects" ToStringFunc="x => x.Name" />
-<MudAutocomplete T="Resource" Value="resource" ValueChanged="SetSelectedResource" Label="@Localizer["Resurs"]" Dense="true" Margin="Margin.Dense" SearchFunc="SearchResources" ToStringFunc="x => x.Name"/>
+<MudForm @ref="form" @bind-IsValid="IsValid">
+    <MudStack Spacing="2">
+        <PlanityTextField T="string" @bind-Value="Task.Name" Label="Namn" For="() => Task.Name" Required="true" />
+        <PlanityTextField T="string" @bind-Value="Task.Description" Label="Beskrivning" For="() => Task.Description" />
+        <PlanityTextField T="double" @bind-Value="Task.WorkHours" Label="Arbetstimmar" For="() => Task.WorkHours" />
+        <PlanityTextField T="double?" Value="@resource?.EffektiveWorkHours(Task.WorkHours)" Label="Effektiv arbetstid" Adornment="Adornment.End" AdornmentText="@Localizer["Timmar"]" ReadOnly="true" />
+        <MudDatePicker Date="@Task.Start" DateChanged="OnDayChanged" Label="Startdatum" Margin="Margin.Dense" />
+        <MudTimePicker Time="@Task.Start?.TimeOfDay" TimeChanged="OnTimeChanged" Label="Starttid" Margin="Margin.Dense" />
+        <MudAutocomplete T="Project" Value="project" ValueChanged="SetSelectedProject" Label="@Localizer["Projekt"]" Required="true" Dense="true" Margin="Margin.Dense" SearchFunc="SearchProjects" ToStringFunc="x => x.Name" Clearable="true" />
+        <MudAutocomplete T="Resource" Value="resource" ValueChanged="SetSelectedResource" Label="@Localizer["Resurs"]" Dense="true" Margin="Margin.Dense" SearchFunc="SearchResources" ToStringFunc="x => x.Name" Clearable="true" />
+    </MudStack>
+</MudForm>
+
+
 
 @inject IProjectService ProjectService
 @inject IResourceService ResourceService
@@ -14,6 +22,7 @@
     [Parameter] public string? ProjectId { get; set; }
     [Parameter] public string? ResourceId { get; set; }
 
+    private MudForm? form;
 
     private Project? project;
     private Resource? resource;
@@ -21,7 +30,20 @@
     private List<Project> Projects = new();
     private List<Resource> Resources = new();
 
-    public bool IsValid => !string.IsNullOrWhiteSpace(Task.Name) && !string.IsNullOrWhiteSpace(Task.ProjectId);
+    // public bool IsValid => !string.IsNullOrWhiteSpace(Task.Name) && !string.IsNullOrWhiteSpace(Task.ProjectId);
+    public bool IsValid { get; set; }
+    public void Validate() => form?.Validate();
+
+    void OnDayChanged(DateTime? value)
+    {
+        
+        Task.Start = value?.Date + (Task.Start?.TimeOfDay ?? TimeSpan.Zero);
+    }
+    void OnTimeChanged(TimeSpan? value)
+    {
+        Task.Start = Task.Start?.Date + (value ?? TimeSpan.Zero);
+    }
+
 
     protected override async Task OnInitializedAsync()
     {

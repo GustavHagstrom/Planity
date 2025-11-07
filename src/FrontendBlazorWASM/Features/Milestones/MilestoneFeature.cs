@@ -8,7 +8,7 @@ public class MilestoneFeature(IStringLocalizer<MilestoneFeature> Localizer) : IF
     public void RegisterRenderObjects(RenderCollection collection)
     {
         collection.AddAppBarNavigationComponent<AppbarNavigation>();
-        collection.AddCreateNewLink(new MenuLink(Localizer["Milsten"], Routes.MilestoneNew));
+        collection.AddCreateNewLink(new MenuLink(Localizer["Milsten"], Routes.MilestoneNew()));
     }
     public void RegisterServices(IServiceCollection services)
     {

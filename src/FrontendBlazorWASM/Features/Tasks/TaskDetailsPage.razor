@@ -6,16 +6,16 @@
 
 <EntityFormsPageLayout Title="@localizer["Uppgiftsinformation"]" IsLoading="task is null" OnSave="Save">
     <MainContent>
-        <TaskForm Task="task"/>
+        <TaskForm @ref="taskForm" Task="task"/>
     </MainContent>
 </EntityFormsPageLayout>
 
 @code {
     [Parameter] public string? TaskId { get; set; }
-    private ProjectTask? task;
-    // private string? projectId;
-
     [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    
+    ProjectTask? task;
+    TaskForm? taskForm;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -25,7 +25,8 @@
 
     private async Task Save()
     {
-        if (task != null)
+        taskForm?.Validate();
+        if (task != null && taskForm?.IsValid == true)
         {
             await TaskService.UpdateAsync(task);
             if (!string.IsNullOrEmpty(ReturnUrl))

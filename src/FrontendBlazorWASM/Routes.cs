@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Planity.FrontendBlazorWASM;
+﻿namespace Planity.FrontendBlazorWASM;
 
 public static class Routes
 {
@@ -48,25 +46,25 @@ public static class Routes
 
     // Milestone routes
     public const string MilestonesOverview = "/milestones";
-    public const string MilestoneNew = "/milestones/new";
-    public static string MilestoneDetails(string id) => $"/milestones/{id}";
-
-    public static string[] AllRoutes =>
-    [
-        Dashboard,
-        Settings,
-        ProjectsOverview,
-        ProjectsNew,
-        ProjectDetails("SampleId"),
-        Unauthorized,
-        ResourcesOverview,
-        ResourceDetails("SampleId"),
-        ResourceNew,
-        TasksOverview,
-        TaskNew(),
-        TaskDetails("SampleId"),
-        MilestonesOverview,
-        MilestoneNew,
-        MilestoneDetails("SampleId")
-    ];
+    public static string MilestoneNew(string? projectId = null, string? returnUrl = null)
+    {
+        var url = "/milestones/new";
+        var queryParams = new List<string>();
+        if (!string.IsNullOrWhiteSpace(projectId))
+            queryParams.Add($"projectId={projectId}");
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+            queryParams.Add($"returnUrl={Uri.EscapeDataString(returnUrl)}");
+        if (queryParams.Count > 0)
+            url += "?" + string.Join("&", queryParams);
+        return url;
+    }
+    public static string MilestoneDetails(string id, string? returnUrl = null)
+    {
+        var url = $"/milestones/{id}";
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            url += $"?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        }
+        return url;
+    }
 }

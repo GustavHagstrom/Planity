@@ -1,26 +1,61 @@
-<MudStack Spacing="2">
-    <MudTextField T="string" @bind-Value="milestone.Name" Label="Namn" For="() => milestone.Name" Required="true" />
-    <MudTextField T="string" @bind-Value="milestone.Description" Label="Beskrivning" For="() => milestone.Description" />
-    <MudDatePicker @bind-Date="milestone.Start" Label="Datum" />
-</MudStack>
+<MudForm @ref="form" @bind-IsValid="@IsValid">
+    <MudStack Spacing="2">
+        <PlanityTextField T="string" @bind-Value="Milestone.Name" Label="Namn" For="() => Milestone.Name" Required="true" />
+        <PlanityTextField T="string" @bind-Value="Milestone.Description" Label="Beskrivning" For="() => Milestone.Description" />
+        <MudDatePicker Date="Milestone.Start" DateChanged="OnDateChanged" Label="Datum" Margin="Margin.Dense" Variant="Variant.Outlined" />
+        <MudTimePicker Time="Milestone.Start?.TimeOfDay" TimeChanged="OnTimeChanged" Label="Tid" Margin="Margin.Dense" Variant="Variant.Outlined" />
+
+        <MudAutocomplete T="Project" Value="project" ValueChanged="SetSelectedProject" Label="@Localizer["Projekt"]" Dense="true" Margin="Margin.Dense" SearchFunc="SearchProjects" ToStringFunc="x => x.Name" Clearable="true" Required="true"/>
+    </MudStack>
+</MudForm>
+
+@inject IProjectService ProjectService
+@inject IStringLocalizer<MilestoneForm> Localizer
 
 @code {
-    [Parameter] public Milestone? MilestoneModel { get; set; }
+    [Parameter] public Milestone Milestone { get; set; } = new();
+    [Parameter] public string? ProjectId { get; set; }
 
-    private Milestone milestone = new();
 
-    protected override void OnParametersSet()
+    MudForm? form;
+    Project? project;
+    List<Project> projects = new();
+
+    public bool IsValid { get; set; }
+    public void Validate() => form?.Validate();
+
+    void OnDateChanged(DateTime? value)
     {
-        if (MilestoneModel != null)
+        Milestone.Start = value?.Date + (Milestone.Start?.TimeOfDay ?? TimeSpan.Zero);
+    }
+    void OnTimeChanged(TimeSpan? value)
+    {
+        Milestone.Start = Milestone.Start?.Date + (value ?? TimeSpan.Zero);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        projects = await ProjectService.GetAllAsync();
+        if (!string.IsNullOrWhiteSpace(Milestone.ProjectId))
         {
-            milestone = new Milestone
-            {
-                Id = MilestoneModel.Id,
-                Name = MilestoneModel.Name,
-                Description = MilestoneModel.Description,
-                OrganizationId = MilestoneModel.OrganizationId,
-                ProjectId = MilestoneModel.ProjectId
-            };
+            project = projects.FirstOrDefault(p => p.Id == Milestone.ProjectId);
         }
+        else if (!string.IsNullOrWhiteSpace(ProjectId))
+        {
+            project = projects.FirstOrDefault(p => p.Id == ProjectId);
+            Milestone.ProjectId = ProjectId;
+        }
+    }
+
+    void SetSelectedProject(Project? selectedProject)
+    {
+        project = selectedProject;
+        Milestone.ProjectId = selectedProject?.Id ?? string.Empty;
+    }
+    Task<IEnumerable<Project>> SearchProjects(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Task.FromResult(projects.AsEnumerable());
+        return Task.FromResult(projects.Where(p => p.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase)));
     }
 }

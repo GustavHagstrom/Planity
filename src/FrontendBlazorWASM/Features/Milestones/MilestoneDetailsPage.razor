@@ -1,18 +1,20 @@
 @page "/milestones/{MilestoneId}"
 @inject IMilestoneService MilestoneService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
 @inject IStringLocalizer<MilestoneDetailsPage> localizer
 
 <EntityFormsPageLayout Title="@localizer["Milestoneinformation"]" IsLoading="milestone is null" OnSave="Save">
     <MainContent>
-        <MilestoneForm MilestoneModel="milestone"/>
+        <MilestoneForm @ref="form" Milestone="milestone"/>
     </MainContent>
 </EntityFormsPageLayout>
 
 @code {
     [Parameter] public string? MilestoneId { get; set; }
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
     private Milestone? milestone;
+    MilestoneForm? form;
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,10 +26,18 @@
 
     private async Task Save()
     {
-        if (milestone != null)
+        form?.Validate();
+        if (form?.IsValid == true && milestone != null)
         {
             await MilestoneService.UpdateAsync(milestone);
-            await JS.InvokeVoidAsync("history.back");
+            if (!string.IsNullOrEmpty(ReturnUrl))
+            {
+                NavigationManager.NavigateTo(ReturnUrl);
+            }
+            else
+            {
+                NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
+            }
         }
     }
 }

@@ -7,27 +7,38 @@
 
 <EntityFormsPageLayout Title="@localizer["Ny milestone"]" OnSave="Save">
     <MainContent>
-        <MilestoneForm MilestoneModel="milestone" />
+        <MilestoneForm @ref="form" Milestone="milestone" ProjectId="@ProjectId" />
     </MainContent>
 </EntityFormsPageLayout>
 
 
 @code {
-    private List<Project> Projects = new();
     private Milestone milestone = new();
+    MilestoneForm? form;
 
-    protected override async Task OnInitializedAsync()
+    [SupplyParameterFromQuery] public string? ProjectId { get; set; }
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
+    protected override void OnInitialized()
     {
-        Projects = await ProjectService.GetAllAsync();
-        milestone.ProjectId = Projects.FirstOrDefault()?.Id ?? string.Empty;
+        base.OnInitialized();
     }
 
     private async Task Save()
     {
-        if (!string.IsNullOrEmpty(milestone.ProjectId))
+        form?.Validate();
+        if (form?.IsValid == true)
         {
             await MilestoneService.CreateAsync(milestone);
-            NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
+            if (!string.IsNullOrEmpty(ReturnUrl))
+            {
+                NavigationManager.NavigateTo(ReturnUrl);
+                return;
+            }
+            else
+            {
+                NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestonesOverview);
+            }
         }
     }
 }

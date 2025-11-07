@@ -55,4 +55,6 @@ public class Resource : IGanttItem
     {
         return HashCode.Combine(Id, OrganizationId, Name, Workers, Efficiency, IsExpanded);
     }
+
+    public double EffektiveWorkHours(double availableHours) => availableHours / (Workers * Efficiency);
 }

@@ -24,8 +24,8 @@
                 </RightActions>
                 <HeaderContent>
                     <MudTh>@localizer["Namn"]</MudTh>
-                    
                     <MudTh>@localizer["Arbetstimmar"]</MudTh>
+                    <MudTh>@localizer["Effektiv arbetstid (tim)"]</MudTh>
                     <MudTh>@localizer["Tilldelad resurs"]</MudTh>
                     <MudTh>@localizer["Starttid"]</MudTh>
                     <MudTh>@localizer["Sluttid"]</MudTh>
@@ -34,18 +34,20 @@
                     <MudTd>
                         @context.Name
                     </MudTd>
-                    
                     <MudTd>
                         @context.WorkHours.ToString("N0")
+                    </MudTd>
+                    <MudTd>
+                        @Resources?.FirstOrDefault(r => r.Id == context.ResourceId)?.EffektiveWorkHours(context.WorkHours)
                     </MudTd>
                     <MudTd>
                         @Resources?.FirstOrDefault(r => r.Id == context.ResourceId)?.Name
                     </MudTd>
                     <MudTd>
-                        @GanttDateCalculator.CalculateStart(context, Resources!)?.ToString("yyyy-MM-dd HH:mm:ss")
+                        @GanttDateCalculator.CalculateStart(context, Resources!)?.ToString("yyyy-MM-dd HH:mm")
                     </MudTd>
                     <MudTd>
-                        @GanttDateCalculator.CalculateEnd(context, Resources!)?.ToString("yyyy-MM-dd HH:mm:ss")
+                        @GanttDateCalculator.CalculateEnd(context, Resources!)?.ToString("yyyy-MM-dd HH:mm")
                     </MudTd>
                 </RowTemplate>
             </EntityTable>
@@ -64,7 +66,7 @@
                         @context.Name
                     </MudTd>
                     <MudTd>
-                        @context.Start?.ToString("yyyy-MM-dd HH:mm:ss")
+                        @context.Start?.ToString("yyyy-MM-dd HH:mm")
                     </MudTd>
                     <MudTd>
                         @context.Description
@@ -116,6 +118,9 @@
     }
     void AddMilestone()
     {
-        throw new NotImplementedException();
+        if (Project is null)
+            return;
+        var uri = Routes.MilestoneNew(Project.Id, NavigationManager.Uri);
+        NavigationManager.NavigateTo(uri);        
     }
 }

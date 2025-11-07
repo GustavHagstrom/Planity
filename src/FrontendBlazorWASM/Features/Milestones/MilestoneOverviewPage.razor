@@ -6,7 +6,7 @@
 
 <OverviewPageLayout Title="@localizer["Milstensöversikt"]">
     <LeftActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestoneNew))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo(Planity.FrontendBlazorWASM.Routes.MilestoneNew()))" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
             @localizer["Ny milsten"]
         </MudButton>
     </LeftActions>
@@ -21,7 +21,7 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
-                <MudTd>@context.Start.ToString()</MudTd>
+                <MudTd>@context.Start?.ToString("yyyy-MM-dd HH:mm")</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
                 <MudTd>
                     <MudIconButton Href="@Routes.MilestoneDetails(context.Id)" Size="Size.Small" Icon="@Icons.Material.Sharp.Edit" Color="Color.Primary"/>
