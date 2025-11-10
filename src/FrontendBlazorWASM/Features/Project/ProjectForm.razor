@@ -1,13 +1,9 @@
 @inject IStringLocalizer<ProjectForm> Localizer
 
-<MudGrid Spacing="2">
-    <MudItem xs="12" sm="3" lg="3">
-        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="ProjectModel.Name" Label="@Localizer["Namn"]" For="() => ProjectModel.Name" Required="true" />
-    </MudItem>
-    <MudItem xs="12" sm="9" lg="9">
-        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="ProjectModel.Description" Label="@Localizer["Beskrivning"]" For="() => ProjectModel.Description" />
-    </MudItem>
-</MudGrid>
+<MudStack Spacing="2" Style="max-width: 500px;">
+    <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="ProjectModel.Name" Label="@Localizer["Namn"]" For="() => ProjectModel.Name" Required="true" />
+    <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="ProjectModel.Description" Label="@Localizer["Beskrivning"]" For="() => ProjectModel.Description" />
+</MudStack>
 
 
 @code {

@@ -11,18 +11,26 @@
         </MudButton>
     </LeftActions>
 
+    <RightActions>
+        <PlanitySearchField @bind-Value="searchString"/>
+    </RightActions>
+
     <ChildContent>
-        <EntityTable Items="@Milestones">
+        <EntityTable Items="@Milestones" Filter="@FilterFunction" >
             <HeaderContent>
-                <MudTh>@localizer["Namn"]</MudTh>
-                <MudTh>@localizer["Datum"]</MudTh>
-                <MudTh>@localizer["Projekt"]</MudTh>
-                <MudTh>@localizer["Handlingar"]</MudTh>
+                <TableHeaderTextFilter T="Milestone" @bind-FilterString="nameFilter" SortBy="x => x.Name" Title="@localizer["Namn"]" />
+                <TableHeaderTextFilter T="Milestone" @bind-FilterString="descriptionFilter" SortBy="x => x.Description" Title="@localizer["Beskrivning"]" />
+                <TableHeaderTextFilter T="Milestone" @bind-FilterString="projectFilter" SortBy="x => GetProjectName(x)" Title="@localizer["Projekt"]" />
+                <TableHeaderDateTimeFilter T="Milestone" @bind-FilterDate="dateFilter" SortBy="x => x.Start" Title="@localizer["Datum"]" />
+                <MudTh>
+                    <MudText><b>@localizer["Åtgärder"]</b></MudText>
+                </MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Name</MudTd>
-                <MudTd>@context.Start?.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                <MudTd>@context.Description</MudTd>
                 <MudTd>@GetProjectName(context)</MudTd>
+                <MudTd>@context.Start?.ToString("yyyy-MM-dd HH:mm")</MudTd>
                 <MudTd>
                     <MudIconButton Href="@Routes.MilestoneDetails(context.Id)" Size="Size.Small" Icon="@Icons.Material.Sharp.Edit" Color="Color.Primary"/>
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Sharp.Delete" Color="Color.Error" />
@@ -36,6 +44,14 @@
 @code {
     private List<Milestone> Milestones = new();
     private Dictionary<string, string> MilestoneProjectMap = new();
+    
+    string nameFilter = string.Empty;
+    string descriptionFilter = string.Empty;
+    string projectFilter = string.Empty;
+    DateTime? dateFilter = null;
+
+    string searchString = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,5 +65,15 @@
     private string GetProjectName(Milestone milestone)
     {
         return MilestoneProjectMap.TryGetValue(milestone.Id, out var name) ? name : string.Empty;
+    }
+
+    bool FilterFunction(Milestone milestone)
+    {
+        bool matchesName = string.IsNullOrWhiteSpace(nameFilter) || milestone.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase);
+        bool matchesDescription = string.IsNullOrWhiteSpace(descriptionFilter) || milestone.Description.Contains(descriptionFilter, StringComparison.OrdinalIgnoreCase);
+        bool matchesProject = string.IsNullOrWhiteSpace(projectFilter) || GetProjectName(milestone).Contains(projectFilter, StringComparison.OrdinalIgnoreCase);
+        bool matchesDate = !dateFilter.HasValue || (milestone.Start.HasValue && milestone.Start.Value.Date >= dateFilter.Value.Date);
+        bool matchesSearch = string.IsNullOrWhiteSpace(searchString) || milestone.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) || GetProjectName(milestone).Contains(searchString, StringComparison.OrdinalIgnoreCase) || milestone.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+        return matchesName && matchesDescription && matchesProject && matchesDate && matchesSearch;
     }
 }

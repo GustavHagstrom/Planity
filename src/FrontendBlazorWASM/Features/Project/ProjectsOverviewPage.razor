@@ -93,8 +93,6 @@
         bool toMatches = false;
         bool filterMatches = false;
 
-    
-
         if (string.IsNullOrWhiteSpace(NameFilter) || project.Name.Contains(NameFilter, StringComparison.OrdinalIgnoreCase)) nameMatches = true;
         else return false;
         if (string.IsNullOrWhiteSpace(DescriptionFilter) || project.Description.Contains(DescriptionFilter, StringComparison.OrdinalIgnoreCase)) descriptionMatches = true;
@@ -103,10 +101,7 @@
         else return false;
         if (ToDateFilter is null || project.End <= ToDateFilter?.Date) toMatches = true;
         else return false;
-        // if( FromTimeFilter is null || project.Start is null || project.Start?.TimeOfDay >= FromTimeFilter) fromMatches = true;
-        // else return false;
-        // if( ToTimeFilter is null || project.End is null || project.End?.TimeOfDay <= ToTimeFilter) toMatches = true;
-        // else return false;
+
 
         if (string.IsNullOrWhiteSpace(FilterString)) filterMatches = true;
         if (project.Name.Contains(FilterString, StringComparison.OrdinalIgnoreCase)) filterMatches = true;
@@ -116,7 +111,6 @@
     }
     void ViewSelectionInGantt()
     {
-        // ProjectNavigator.ShowInGantt(Projects.Where(p => FilterFunction(p)).Select(p => p.Id).ToList());
         ProjectNavigator.ShowInGantt(Projects.Where(p => p.IsSelected).Select(p => p.Id).ToList());
     }
 }

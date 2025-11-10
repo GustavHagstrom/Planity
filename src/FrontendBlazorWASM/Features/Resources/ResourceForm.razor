@@ -1,17 +1,10 @@
 @inject IStringLocalizer<ResourceForm> localizer
 
-<MudGrid Spacing="2">
-    <MudItem xs="12" sm="4">
-        <PlanityTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" Style="max-width: 300px;" />
-    </MudItem>
-
-    <MudItem xs="12" sm="4">
-        <PlanityTextField T="int" @bind-Value="@resource.Workers" Label="@localizer["Antal arbetare"]" Required="true" Style="max-width: 300px;" />
-    </MudItem>
-    <MudItem xs="12" sm="4">
-        <PlanityTextField T="int" Value="@Convert.ToInt32(resource.Efficiency * 100)" ValueChanged="SetEfficiency" Label="@localizer["Effektivitet"]" Required="true" Adornment="Adornment.Start" AdornmentText="%" Style="max-width: 300px;" />
-    </MudItem>
-</MudGrid>
+<MudStack Spacing="2" Style="max-width: 500px;">
+    <PlanityTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" Style="max-width: 300px;" />
+    <PlanityTextField T="int" @bind-Value="@resource.Workers" Label="@localizer["Antal arbetare"]" Required="true" Style="max-width: 300px;" />
+    <PlanityTextField T="int" Value="@Convert.ToInt32(resource.Efficiency * 100)" ValueChanged="SetEfficiency" Label="@localizer["Effektivitet"]" Required="true" Adornment="Adornment.Start" AdornmentText="%" Style="max-width: 300px;" />
+</MudStack>
 
 
 @code {
