@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Planity.FrontendBlazorWASM.Shared.Abstractions;
 using Planity.FrontendBlazorWASM.Shared.Services;
-using Planity.FrontendBlazorWASM.Shared.State;
 namespace Planity.FrontendBlazorWASM;
 
 public class FeatureBuilder
@@ -52,7 +51,6 @@ public static class ConfigAndRegistrations
         services.AddScoped<RenderFragmentService>();
         services.AddScoped<ITaskService, MockedTaskService>();
         services.AddScoped<IMilestoneService, MockedMilestoneService>();
-        services.AddScoped<GanttViewState>();
         return services;
     }
     public static void ConfigureFeatures(this WebAssemblyHostBuilder builder, Action<FeatureBuilder> config)

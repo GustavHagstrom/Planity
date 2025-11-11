@@ -1,31 +1,34 @@
 @inject IStringLocalizer<GanttView> Localizer
 @inject IResourceService ResourceService
-@inject GanttViewState State
 
 
 @if(Items is not null)
 {
 
     <CascadingValue Value="this">
-        <div class="d-flex" style="height: 100%; flex-direction: column;">
-            <GanttToolbar Title="@Title" DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" Start="Start" End="End" DateRangeChanged="OnDateRangeChanged" />
-            <MudPaper Class="d-flex ma-4 border" Style="flex-grow: 1;">
-                <GanttItemEditForm Item="SelectedItem" />
-                <GanttLeftPanel />
-                <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
-                    <GanttHeader />
-                    <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
-                        <GanttGrid />
-                        <GanttChart DragMode="@_dragMode" />
+        <CascadingValue Value="State">
+            <div class="d-flex" style="height: 100%; flex-direction: column;">
+                <GanttToolbar Title="@Title" DragMode="@_dragMode" DragModeChanged="OnDragModeChanged" Start="Start" End="End" DateRangeChanged="OnDateRangeChanged" />
+                <MudPaper Class="d-flex ma-4 border" Style="flex-grow: 1;">
+                    <GanttItemEditForm Item="SelectedItem" />
+                    <GanttLeftPanel />
+                    <div class="flex-grow-1 d-flex" style="width: calc(100% - @LeftWidthPx); overflow-y: hidden; flex-direction: column;">
+                        <GanttHeader />
+                        <div style="position: relative; width: @SvgWidthPx; height: calc(100% - @HeaderHeightPx);">
+                            <GanttGrid />
+                            <GanttChart DragMode="@_dragMode" />
+                        </div>
                     </div>
-                </div>
-            </MudPaper>
-        </div>
+                </MudPaper>
+            </div>
+        </CascadingValue>
     </CascadingValue>
 
 }
 
 @code {
+    GanttState State = new();
+
 
     [Parameter] public DateTime StartParam { get; set; } = DateTime.Today;
     [Parameter] public DateTime EndParam { get; set; } = DateTime.Today.AddMonths(3);

@@ -1,34 +1,17 @@
 @inject IStringLocalizer<ResourceForm> localizer
 
 <MudStack Spacing="2" Style="max-width: 500px;">
-    <PlanityTextField T="string" @bind-Value="resource.Name" Label="@localizer["Namn"]" For="() => resource.Name" Required="true" Style="max-width: 300px;" />
-    <PlanityTextField T="int" @bind-Value="@resource.Workers" Label="@localizer["Antal arbetare"]" Required="true" Style="max-width: 300px;" />
-    <PlanityTextField T="int" Value="@Convert.ToInt32(resource.Efficiency * 100)" ValueChanged="SetEfficiency" Label="@localizer["Effektivitet"]" Required="true" Adornment="Adornment.Start" AdornmentText="%" Style="max-width: 300px;" />
+    <PlanityTextField T="string" @bind-Value="Resource.Name" Label="@localizer["Namn"]" For="() => Resource.Name" Required="true" Style="max-width: 300px;" />
+    <PlanityTextField T="int" @bind-Value="@Resource.Workers" Label="@localizer["Antal arbetare"]" Required="true" Style="max-width: 300px;" />
+    <PlanityTextField T="int" Value="@Convert.ToInt32(Resource.Efficiency * 100)" ValueChanged="SetEfficiency" Label="@localizer["Effektivitet"]" Required="true" Adornment="Adornment.Start" AdornmentText="%" Style="max-width: 300px;" />
 </MudStack>
 
 
 @code {
-    [Parameter] public Resource? ResourceModel { get; set; }
-
-    private Resource resource = new();
-
-    protected override void OnParametersSet()
-    {
-        if (ResourceModel != null)
-        {
-            resource = new Resource
-            {
-                Id = ResourceModel.Id,
-                Name = ResourceModel.Name,
-                OrganizationId = ResourceModel.OrganizationId,
-            };
-        }
-    }
+    [Parameter] public Resource Resource { get; set; } = new();
 
     void SetEfficiency(int value)
     {
-        resource.Efficiency = value / 100.0;
-    }
-
-    
+        Resource.Efficiency = value / 100.0;
+    }    
 }

@@ -1,19 +1,20 @@
-﻿using Planity.FrontendBlazorWASM.Shared.Abstractions;
-using Planity.FrontendBlazorWASM.Shared.Components.Gantt;
+﻿using Microsoft.AspNetCore.Components;
+using Planity.FrontendBlazorWASM.Shared.Abstractions;
 using Planity.FrontendBlazorWASM.Shared.Models;
 using Planity.FrontendBlazorWASM.Shared.Services;
 
-namespace Planity.FrontendBlazorWASM.Shared.State;
+namespace Planity.FrontendBlazorWASM.Shared.Components.Gantt;
 
-public class GanttViewState
+public class GanttState : ComponentBase
 {
+
     public DateTime Start { get; private set; } = DateTime.Today.AddMonths(-1);
     public DateTime End { get; private set; } = DateTime.Today.AddMonths(3);
     public GanttViewMode Mode { get; private set; } = GanttViewMode.Month;
     public IEnumerable<IGanttItem> Items { get; private set; } = [];
     public IGanttItem? SelectedItem { get; private set; }
     public List<Resource> Resources { get; private set; } = [];
-    public IEnumerable<GanttItemLink> Links { get;  private set; } = [];
+    public IEnumerable<GanttItemLink> Links { get; private set; } = [];
     public Dictionary<string, IGanttItem> ItemIdMap { get; private set; } = [];
     public HashSet<LinkKey> LinkKeys { get; private set; } = new();
     public GanttDragMode DragMode { get; private set; } = GanttDragMode.None;
@@ -23,7 +24,7 @@ public class GanttViewState
 
     public double Zoom { get; private set; } = 1.0;
     public string SvgWidthPx => $"{SvgWidth}px";
-    
+
     public record struct LinkKey(string FromId, string ToId);
     public string LeftWidthPx => $"220px";
     public double RowHeight => 30;
@@ -44,8 +45,4 @@ public class GanttViewState
         GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
         _ => throw new ArgumentOutOfRangeException()
     };
-   
-
-    
-
 }

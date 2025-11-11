@@ -18,8 +18,8 @@
         {
             
             <MudStack Spacing="4">
-            
-                <ResourceForm ResourceModel="resource" />
+
+                <ResourceForm Resource="resource" />
 
                 <EntityTable Items="resource.WorkCalendar.WorkPeriods.OrderBy(x => x.Day)" Title="@localizer["Arbetstider"]">
                     <RightActions>
