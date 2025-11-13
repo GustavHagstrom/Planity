@@ -2,11 +2,17 @@
 using Planity.FrontendBlazorWASM.Shared.Abstractions;
 using Planity.FrontendBlazorWASM.Shared.Models;
 using Planity.FrontendBlazorWASM.Shared.Services;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Planity.FrontendBlazorWASM.Shared.Components.Gantt;
 
 public class GanttState : ComponentBase
 {
+    public GanttState()
+    {
+        
+    }
 
     public DateTime Start { get; private set; } = DateTime.Today.AddMonths(-1);
     public DateTime End { get; private set; } = DateTime.Today.AddMonths(3);
@@ -45,4 +51,18 @@ public class GanttState : ComponentBase
         GanttViewMode.Week => PixelsPerDay * (End - Start).Days,
         _ => throw new ArgumentOutOfRangeException()
     };
+    public void SetProperty<T>(Expression<Func<GanttState, T>> propertyLambda, T value)
+    {
+        if (propertyLambda.Body is not MemberExpression member)
+        {
+            throw new ArgumentException("Expression must be a member expression");
+        }
+
+        if (member.Member is not PropertyInfo property)
+        {
+            throw new ArgumentException("Member is not a property");
+        }
+        property.SetValue(this, value);
+        StateHasChanged();
+    }
 }

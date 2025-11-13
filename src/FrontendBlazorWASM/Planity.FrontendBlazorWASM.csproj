@@ -8,6 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Shared\Mappers\**" />
+    <Compile Remove="Shared\State\**" />
+    <Content Remove="Shared\Mappers\**" />
+    <Content Remove="Shared\State\**" />
+    <EmbeddedResource Remove="Shared\Mappers\**" />
+    <EmbeddedResource Remove="Shared\State\**" />
+    <None Remove="Shared\Mappers\**" />
+    <None Remove="Shared\State\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.5" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="9.0.5" />
@@ -21,8 +32,6 @@
 
   <ItemGroup>
     <Folder Include="Extensions\" />
-    <Folder Include="Shared\Mappers\" />
-    <Folder Include="Shared\State\" />
   </ItemGroup>
 
 </Project>
